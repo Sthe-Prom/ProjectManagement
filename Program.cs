@@ -27,14 +27,14 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 
-//iFrame Fix
-// app.UseCors("AllowSpecificOrigin");
+// iFrame Fix
+app.UseCors("AllowSpecificOrigin");
 
-// app.Use(async (context, next) =>
-// {
-//     context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors 'self' https://digitalisation-funding.powerappsportals.com/");
-//     await next();
-// });
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors 'self' https://mir-projects.powerappsportals.com/");
+    await next();
+});
 
 app.UseRouting();
 
@@ -57,7 +57,7 @@ try
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
     //Will runs only once - To create Initial user on an empty UserDB, after that username will already exists.   
-    //await AppIdentityDbContext.CreateAdminAccount(userManager, roleManager, builder.Configuration);
+    await AppIdentityDbContext.CreateAdminAccount(userManager, roleManager, builder.Configuration);
 }
 catch (Exception ex)
 {

@@ -16,6 +16,26 @@ function ProjectAdd(tit,msg) {
     });   
 }
 
+
+//Success Edit
+function ProjectEdit(tit,msg) {
+
+    swal({
+        title: tit ,
+        text: "<h5>Updating Project... </h5><br />" + msg,
+        type: "success",
+        confirmButtonColor: "#0F204B",
+        confirmButtonText: "Okay",
+        closeOnConfirm: false,
+        html: true
+           
+    },
+      function(){ 
+            location.reload();
+        }); 
+     
+}
+
 function ActivityAdd(tit,msg) {
 
     swal({

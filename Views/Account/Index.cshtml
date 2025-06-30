@@ -21,8 +21,8 @@
                     var AccountProfile = from account in Model.Accounts
                                         join dept in Model.SubdeptsList
                                         on account.UnitId equals dept.UnitId
-                                        /*join des in Model.Designation
-                                        on account.DesignationId equals des.Id*/
+                                        join des in Model.DesignationList
+                                        on account.DesignationId equals des.Id
                                     select new 
                                     {
                                         account.AccountID,
@@ -31,10 +31,9 @@
                                         account.LastName, 
                                         account.Phone,
                                         account.Email,
-                                        //account.DesignationId,
                                         account.UnitId,
                                         dept.SubdeptName,
-                                        //des.Name                                                           
+                                        des.Name                                                           
                                     };
                 }
 
@@ -76,6 +75,11 @@
                                         <div class="row mb-3">
                                             <div class="col-lg-4 col-md-4 label fw-bold">Sub Department</div>
                                             <div class="col-lg-8 col-md-8">@item.SubdeptName</div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-lg-4 col-md-4 label fw-bold">Designation</div>
+                                            <div class="col-lg-8 col-md-8">@item.Name</div>
                                         </div>
                                         
                                     </div>

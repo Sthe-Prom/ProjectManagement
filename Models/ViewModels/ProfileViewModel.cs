@@ -19,6 +19,6 @@ namespace ProjectManagement.Models
         public Microsoft.AspNetCore.Mvc.Rendering.SelectList Designation { get; set; }
 
         public IEnumerable<Subdept> SubdeptsList { get; set; }
-        public IEnumerable<Subdept> DesignationList { get; set; }
+        public IEnumerable<Designation> DesignationList { get; set; }
     }
 }

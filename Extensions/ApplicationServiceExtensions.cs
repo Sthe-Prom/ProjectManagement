@@ -19,7 +19,7 @@ namespace ProjectManagement.Extensions
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("https://digitalisation-funding.powerappsportals.com/")
+                    builder => builder.WithOrigins("https://mir-projects.powerappsportals.com/")
                                     .AllowAnyHeader()
                                     .AllowAnyMethod()
                                     .AllowCredentials());

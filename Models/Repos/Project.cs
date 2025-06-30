@@ -16,7 +16,7 @@ namespace ProjectManagement.Models
         public DateTime ProjectStartDate { get; set; } = DateTime.UtcNow;
         public DateTime ProjectEndDate { get; set; } = DateTime.UtcNow;
         public DateTime ProjectUpdateTime { get; set; } = DateTime.UtcNow;
-        public string ProjectWorkInConj { get; set; }
+        public string? ProjectWorkInConj { get; set; }
         public string ProjectAreaOfWork { get; set; }       
         public string ProjectFiles { get; set; }
         //public List<Account> AssignedUsers { get; set; }

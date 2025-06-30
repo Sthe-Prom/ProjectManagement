@@ -37,6 +37,7 @@ public class AccountController : Controller
         new Designation(4, "Digitalisation")
     };
 
+    
     // Public property to hold the SelectList
     public SelectList DesignationSelectList { get; set; }
 
@@ -68,6 +69,8 @@ public class AccountController : Controller
         vm.Accounts = context.Accounts;
         vm.SubdeptsList = subdept_context.Subdepts;
         vm.Account = new Account();
+               
+        vm.DesignationList = DesignationList;
 
         return View(vm);
     }
@@ -139,7 +142,7 @@ public class AccountController : Controller
         vm.ProfileModel.Email = Account.Email;
         vm.ProfileModel.UnitId = Account.UnitId;
         vm.ProfileModel.AccountID = Account.AccountID;
-        // vm.Account.DesignationId = Account.DesignationId;
+        vm.ProfileModel.DesignationId = Account.DesignationId;
         vm.ProfileModel.Id =  Account.Id;
 
         return View(vm);
@@ -168,7 +171,7 @@ public class AccountController : Controller
         //     if (ModelState.IsValid)
         //     {
                 await context.SaveAccount(Account);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Account");
             // }
             // else
             // {
@@ -236,6 +239,11 @@ public class AccountController : Controller
     {       
         return DesignationSelectList = new SelectList(DesignationList, "Id", "Name");
     }
+
+    // public IEnumerable<Designation> getDesignations()
+    // {       
+    //     return await Designation.ToList();
+    // }
   
 }
 

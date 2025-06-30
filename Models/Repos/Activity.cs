@@ -12,13 +12,13 @@ namespace ProjectManagement.Models
         [Key]
         public int Id {get;set;}
         public string ActivityName {get; set; }
-        public string ActivityComments {get; set; }
-        public string ActivityChallenges {get; set; }
-        public string ActivityHighlights {get; set; }
+        public string? ActivityComments {get; set; }
+        public string? ActivityChallenges {get; set; }
+        public string? ActivityHighlights {get; set; }
         public DateTime ActivityStartDate {get; set; } = DateTime.UtcNow;
         public DateTime ActivityEndDate {get; set; } = DateTime.UtcNow;
         public DateTime ActivityUpdateTime {get; set; } = DateTime.UtcNow;
-        public string ProjectFiles {get; set; }
+        public string? ProjectFiles {get; set; }
         public int ActivityProgress {get; set; }
  
         /* Relationship

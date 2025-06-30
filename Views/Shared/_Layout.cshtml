@@ -126,10 +126,10 @@
                                 <ul class="nav">
                                     
                                         <span class="nav-item">
-                                            <a asp-action="Manage" asp-controller="Account" class="nav-link text-dark" asp-route-AccountID="@acc.AccountID">My Account</a>
+                                            <a asp-action="Index" asp-controller="Account" class="nav-link text-dark" asp-route-AccountID="@acc.AccountID">My Account</a>
                                         </span>                                       
                                     
-                                        <span class="nav-link" style="padding-left:0;padding-right:0;">  &vert; </span>
+                                        <span class="nav-link" style="padding-left:0;padding-right:0;color:#A71930;">  &vert; </span>
                                                                       
                                         <span class="nav-link text-dark">
                                             @* <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#A71930" class="bi bi-person" viewBox="0 0 16 16">
@@ -138,10 +138,10 @@
                                             @acc.FirstName @acc.LastName 
                                         </span>                                        
                                    
-                                        <span class="nav-link" style="padding-left:0;padding-right:0;">  &vert; </span>
+                                        <span class="nav-link" style="padding-left:0;padding-right:0;color:#A71930;">  &vert; </span>
                                                                     
                                         <a class="nav-link text-dark" asp-action="Logout" asp-controller="UserAccount">                                                
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px" fill="currentColor"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"></path></svg> 
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20px" height="20px" fill="#A71930"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"></path></svg> 
                                         </a>
                                  
                                 </ul>
@@ -158,14 +158,14 @@
                                         <a class="nav-link text-dark" href="~/Account/Profile">Manage Account</a>
                                     </span>
                                    
-                                    <span class="nav-link text-dark" style="padding-left:0;padding-right:0;">  &vert; </span>
+                                    <span class="nav-link text-dark" style="padding-left:0;padding-right:0;color:#A71930;">  &vert; </span>
 
                                     <span  class="nav-link text-dark" style="color:#A71930;">@user_id.UserName</span>     
 
-                                    <span class="nav-link text-dark" style="padding-left:0;padding-right:0;">  &vert; </span>
+                                    <span class="nav-link text-dark" style="padding-left:0;padding-right:0;color:#A71930;">  &vert; </span>
 
                                     <a class="nav-link text-dark" asp-action="Logout" asp-controller="UserAccount">                                                
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px" fill="#A71930"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"></path></svg> 
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20px" height="20px" fill="#A71930"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"></path></svg> 
                                     </a>
                                     
                                 </ul>

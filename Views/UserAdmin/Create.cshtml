@@ -50,7 +50,7 @@
                                         <div class="mb-3">
 
                                             <label class="form-label">Your Username</label>
-                                            <input asp-for="@Model.CreateModel.Name" type="text" class="form-control form-control-md" required>
+                                            <input asp-for="@Model.CreateModel.Name" type="text" pattern="^\S+$" title="Please enter a single word (no spaces)." class="form-control form-control-md" required>
                                             <div class="invalid-feedback">Please, enter your name!</div>
                                               
 										</div>

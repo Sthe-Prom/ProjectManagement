@@ -101,7 +101,8 @@ public class HomeController : Controller
 
         if (vm.ProjectFiles == null || vm.ProjectFiles.Length == 0)
         {
-            model.ResponseMessage = "No file uploded.";
+            //model.ResponseMessage = "No file uploded.";
+            uniqueFileName = "na";
         }
         else
         {
@@ -113,20 +114,21 @@ public class HomeController : Controller
             //var fileSize = file.Length;
             //var contentType = file.ContentType;
             uniqueFileName = Guid.NewGuid().ToString().Substring(0, 3) + "_" + vm.ProjectFiles.FileName;
+        
+
+            string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Projects");
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                vm.ProjectFiles.CopyTo(fileStream);
+            } 
         }
-
-        string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Projects");
-        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        if (!Directory.Exists(uploadsFolder))
-        {
-            Directory.CreateDirectory(uploadsFolder);
-        }
-
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            vm.ProjectFiles.CopyTo(fileStream);
-        } 
        
         List<int> selectedUserIds = new List<int>();
         string selectedIdsString = formCollection["ProjectModel_SelectedAssignedUserIds"].ToString();
@@ -223,7 +225,8 @@ public class HomeController : Controller
 
         if (vm.ProjectFiles == null || vm.ProjectFiles.Length == 0)
         {
-            model.ResponseMessage = "No file uploded.";
+            //model.ResponseMessage = "No file uploded.";
+            uniqueFileName = "na";
         }
         else
         {
@@ -235,20 +238,21 @@ public class HomeController : Controller
             //var fileSize = file.Length;
             //var contentType = file.ContentType;
             uniqueFileName = Guid.NewGuid().ToString().Substring(0, 3) + "_" + vm.ProjectFiles.FileName;
+       
+
+            string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Activity");
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                vm.ProjectFiles.CopyTo(fileStream);
+            }        
         }
-
-        string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Activity");
-        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        if (!Directory.Exists(uploadsFolder))
-        {
-            Directory.CreateDirectory(uploadsFolder);
-        }
-
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            vm.ProjectFiles.CopyTo(fileStream);
-        }        
         
         var Activity = new ProjectManagement.Models.Activity()
         {            
@@ -296,11 +300,11 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> UpdateProject(IFormCollection formCollection, ProjectViewModel vm)
+    public async Task<JsonResult> UpdateProject(IFormCollection formCollection, ProjectViewModel vm, int Id)
     {
-        var proj_Id = Convert.ToInt32(formCollection["ProjectModel_Id"]);
-        var Project = project_context.Projects.FirstOrDefault(c => c.Id == proj_Id);
-        //var Project = project_context.Projects.Where(c => c.Id == Id).FirstOrDefault();  
+        //var proj_Id = Convert.ToInt32(formCollection["projectID"]);
+        //var Project = project_context.Projects.FirstOrDefault(c => c.Id == 26);
+        var Project = project_context.Projects.Where(c => c.Id == Id).FirstOrDefault();  
 
         //Prepare Json Response
         JsonViewModel model = new JsonViewModel();
@@ -309,7 +313,8 @@ public class HomeController : Controller
 
         if (vm.ProjectFiles == null || vm.ProjectFiles.Length == 0)
         {
-            model.ResponseMessage = "No file uploded.";
+            //model.ResponseMessage = "No file uploded.";
+            uniqueFileName = "na";
         }
         else
         {
@@ -321,20 +326,20 @@ public class HomeController : Controller
             //var fileSize = file.Length;
             //var contentType = file.ContentType;
             uniqueFileName = Guid.NewGuid().ToString().Substring(0, 3) + "_" + vm.ProjectFiles.FileName;
+            
+            string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Projects");
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                vm.ProjectFiles.CopyTo(fileStream);
+            } 
         }
-
-        string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Projects");
-        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        if (!Directory.Exists(uploadsFolder))
-        {
-            Directory.CreateDirectory(uploadsFolder);
-        }
-
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            vm.ProjectFiles.CopyTo(fileStream);
-        } 
        
         List<int> selectedUserIds = new List<int>();
         string selectedIdsString = formCollection["proj_SelectedAssignedUserIds"].ToString();
@@ -378,11 +383,21 @@ public class HomeController : Controller
             Project.ProjectName = formCollection["proj_ProjectName"].ToString();
             Project.ProjectDetails = formCollection["proj_ProjectDetails"].ToString();
             Project.ProjectAreaOfWork = formCollection["proj_ProjectAreaOfWork"].ToString();
-            Project.ProjectWorkInConj = formCollection["proj_ProjectWorkInConj"].ToString();          
-            Project.ProjectFiles = uniqueFileName;
+            Project.ProjectWorkInConj = formCollection["proj_ProjectWorkInConj"].ToString(); 
+
+            
+            if (vm.ProjectFiles == null || vm.ProjectFiles.Length == 0)
+            {
+                Project.ProjectFiles =  Project.ProjectFiles;    
+            }
+            else
+            {
+                Project.ProjectFiles = uniqueFileName;
+            }   
+
             Project.ProjectUpdateTime = DateTime.UtcNow;
             Project.ProjectStartDate = Convert.ToDateTime(formCollection["proj_ProjectStartDate"]);
-            Project.ProjectEndDate =  DateTime.UtcNow;//Convert.ToDateTime(formCollection["proj_ProjectEndDate"]);
+            Project.ProjectEndDate =  Convert.ToDateTime(formCollection["proj_ProjectEndDate"]);
             Project.ProjectStatusID = Convert.ToInt32(formCollection["proj_ProjectStatusID"]);
             Project.AccountID = Convert.ToInt32(formCollection["proj_AccountID"]);
             Project.SelectedAssignedUserIds = selectedUserIds;
@@ -421,7 +436,7 @@ public class HomeController : Controller
         return Json(model);
     }
 
-     [HttpPost]
+    [HttpPost]
     public async Task<JsonResult> UpdateActivity(IFormCollection formCollection, ProjectViewModel vm)
     {
         var act_Id = Convert.ToInt32(formCollection["ActivityModel_Id"]);
@@ -434,32 +449,42 @@ public class HomeController : Controller
         if (vm.ProjectFiles == null || vm.ProjectFiles.Length == 0)
         {
             model.ResponseMessage = "No file uploded.";
+            uniqueFileName = "na";
         }
         else
         {          
-            uniqueFileName = Guid.NewGuid().ToString().Substring(0, 3) + "_" + vm.ProjectFiles.FileName;
+            uniqueFileName = Guid.NewGuid().ToString().Substring(0, 3) + "_" + vm.ProjectFiles.FileName;        
+
+            string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Projects");
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                vm.ProjectFiles.CopyTo(fileStream);
+            } 
         }
 
-        string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Projects");
-        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        if (!Directory.Exists(uploadsFolder))
-        {
-            Directory.CreateDirectory(uploadsFolder);
-        }
-
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            vm.ProjectFiles.CopyTo(fileStream);
-        } 
-       
         if (Activity != default(ProjectManagement.Models.Activity))
         {                         
             Activity.ActivityName = formCollection["act_ActivityName"].ToString();
             Activity.ActivityComments = formCollection["act_ActivityComments"].ToString();
             Activity.ActivityChallenges = formCollection["act_ActivityChallenges"].ToString();
-            Activity.ActivityHighlights = formCollection["act_ActivityHighlights"].ToString();          
-            Activity.ProjectFiles = uniqueFileName;
+            Activity.ActivityHighlights = formCollection["act_ActivityHighlights"].ToString();  
+
+            if (vm.ProjectFiles == null || vm.ProjectFiles.Length == 0)
+            {
+                Activity.ProjectFiles =  Activity.ProjectFiles;    
+            }
+            else
+            {
+                Activity.ProjectFiles = uniqueFileName;
+            }   
+
             Activity.ActivityUpdateTime = DateTime.UtcNow;
             Activity.ActivityStartDate =  Convert.ToDateTime(formCollection["act_ActivityStartDate"]);
             Activity.ActivityEndDate =  Convert.ToDateTime(formCollection["act_ActivityEndDate"]);
@@ -515,23 +540,26 @@ public class HomeController : Controller
     public SelectList getAccounts()
     {
         List<Account> models = new List<Account>();
-
+       
         var AllUsers = from acc in account_context.Accounts
                     select new
                     {
                         AccountID = acc.AccountID,
-                        FullName = acc.FirstName + " " + acc.LastName
+                        FullName = acc.FirstName + " " + acc.LastName,
+                        Id = acc.Id
                     };
 
-        foreach (var item in AllUsers)
-        {
-            var m = new Account();
-            
-            m.AccountID = item.AccountID;
-            m.FirstName = item.FullName;
-            models.Add(m);
-        }        
-        
+            foreach (var item in AllUsers)
+            {
+                var m = new Account();
+                
+                m.AccountID = item.AccountID;
+                m.FirstName = item.FullName;
+
+                models.Add(m);
+                
+            }        
+               
         SelectList userSelect = new SelectList(models, "AccountID", "FirstName");
         return userSelect;
 
@@ -639,7 +667,6 @@ public class HomeController : Controller
     {       
         return ActivityStatusSelectList = new SelectList(ActivityStatusList, "Id", "Name");
     }
-
 
 
 }
