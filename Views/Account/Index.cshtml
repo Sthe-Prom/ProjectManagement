@@ -1,0 +1,94 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Index";
+
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<div class="container ">
+    <div class="row">
+        <div class="col-sm-12">
+           
+            <div class="col-lg-8" style="margin:0 auto;float:none;">                    
+                <h4 class="text-center p-3" style="color: #A71930; font-weight: 400;">My Profile Details</h4>
+                        
+                @{                    
+                    var AccountProfile = from account in Model.Accounts
+                                        join dept in Model.SubdeptsList
+                                        on account.UnitId equals dept.UnitId
+                                        /*join des in Model.Designation
+                                        on account.DesignationId equals des.Id*/
+                                    select new 
+                                    {
+                                        account.AccountID,
+                                        account.Id,
+                                        account.FirstName, 
+                                        account.LastName, 
+                                        account.Phone,
+                                        account.Email,
+                                        //account.DesignationId,
+                                        account.UnitId,
+                                        dept.SubdeptName,
+                                        //des.Name                                                           
+                                    };
+                }
+
+                @if((signInManager.IsSignedIn(User)))                                                
+                    { 
+                    if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                    {
+                        foreach (var item in AccountProfile.Where(c => c.Id == userId))
+                        {      
+                            <div class="card">
+                                <div class="card-body">
+                                    
+                                    <div class="row">
+                                    
+                                        <div class="col-lg-12 col-md-12 text-center">
+                                            <a asp-action="Manage" asp-route-AccountID="@item.AccountID" class="text-center btn btn-sm btn-info">Manage Profile</a>    
+                                            <hr />                                
+                                            
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-8 col-md-8" style="margin: 0 auto; float:none;">           
+                                
+                                        <div class="row mb-3">
+                                            <div class="col-lg-4 col-md-4 label fw-bold">Full Name</div>
+                                            <div class="col-lg-8 col-md-8">@item.FirstName</div>
+                                        </div>                    
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-lg-4 col-md-4 label fw-bold">Phone</div>
+                                            <div class="col-lg-8 col-md-8">@item.Phone</div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-lg-4 col-md-4 label fw-bold">Email</div>
+                                            <div class="col-lg-8 col-md-8">@item.Email</div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-lg-4 col-md-4 label fw-bold">Sub Department</div>
+                                            <div class="col-lg-8 col-md-8">@item.SubdeptName</div>
+                                        </div>
+                                        
+                                    </div>
+                                                                            
+                                </div>
+                            </div>
+                            
+                        }
+                    }
+                }                 
+
+            </div>
+        </div>
+    </div> 
+                           
+</div>  

@@ -1,0 +1,74 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProfileViewModel;
+
+@{
+     ViewData["Title"] = "Account";
+}
+
+
+<div class="midde_cont">
+    <div class="container-fluid">
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Profile</h2>
+                </div>
+            </div>
+        </div>
+        <!-- row -->
+        <div class="card column1">
+            <div class="col-md-6" style="margin: 0 auto;float:none;">
+                <div class="white_shd full margin_bottom_30">
+                    <div class="full graph_head">
+                        <div class="card-header">
+                            <h2 class="card-title mb-0">My profile</h2>
+                        </div>
+                       
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- user profile section -->
+                            <!-- profile image -->
+                            <div class="col-lg-12">
+                                <div class="full dis_flex center_text">
+
+                                    @if(signInManager.IsSignedIn(User))                                                 
+                                    { 
+                                        var userId = userManager.GetUserId(User);
+
+                                        @foreach (var item in Model.Accounts.Where(c => c.Id == userId))
+                                        {                            
+                                           
+                                            <div class="profile_contant">
+                                                <div class="contact_inner">
+                                                
+                                                        <h3>@User.Identity.Name</h3>
+                                                        <p><strong>About: </strong></p>
+                                                        <ul class="list-unstyled">
+                                                            <li><i class="fa fa-envelope-o"></i>@item.FirstName</li>
+                                                            <li><i class="fa fa-phone"></i>@item.Phone</li>
+                                                        </ul>
+                                                    
+                                                </div>                                        
+                                            </div>
+                                        }
+                                    }
+                                </div>
+
+                                
+                               
+                                <!-- end user profile section -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+            <!-- end row -->
+        </div>
+        
+    </div>
+    <!-- end dashboard inner -->
+</div>

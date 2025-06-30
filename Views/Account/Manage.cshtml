@@ -1,0 +1,116 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Manage Your Profile";
+    Layout = "_Layout";
+    
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<div class="container ">
+    <div class="row">
+        <div class="col-sm-12 mt-5">
+            <form asp-action="Manage" method="post">
+                <div class="col-lg-8" style="margin:0 auto;float:none;border:1px lightgrey solid;border-radius:8px;padding:50px">
+                    
+                            <h4 class="text-center p-3" style="color: #A71930; font-weight: 400;">My Profile Details</h4>
+                               
+                            <div class="row mb-3">  
+                                <label asp-for="@Model.ProfileModel.Id" class="col-md-4 col-lg-3 col-form-label fw-bold">Username</label>
+                                <div class="col-md-8 col-lg-9"> 
+                                    <div>
+                                       <span asp-validation-for="@Model.ProfileModel.Id" class="text-danger"></span>
+                                    </div>    
+                                
+                                    @if((signInManager.IsSignedIn(User)))     
+                                    {        
+                                       // @if(await userManager.IsInRoleAsync(user,"Guest"))
+                                        //{
+                                            <input class="form-control" asp-for="@Model.ProfileModel.Id" type="hidden" value="@userId" >
+                                            <input class="form-control" type="text" value="@user.UserName"  >
+                                        //}
+                                    }
+
+                                </div>
+                            </div> 
+
+                            @*-- <div class="card-body">                              
+                                <input asp-for="@Model.ProfileModel.Id" value="@userId" type="text" class="form-control" >
+                            </div>*@
+
+                            <input asp-for="@Model.ProfileModel.AccountID" type="hidden" class="form-control"  >
+                            
+                            <div class="row mb-3">
+                                <label asp-for="@Model.ProfileModel.FirstName" class="col-md-4 col-lg-3 col-form-label fw-bold">First Name</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input asp-for="@Model.ProfileModel.FirstName" type="text" class="form-control"  >
+                                </div>
+                            </div>  
+
+                            <div class="row mb-3">
+                                <label asp-for="@Model.ProfileModel.LastName" class="col-md-4 col-lg-3 col-form-label fw-bold">Last Name</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input asp-for="@Model.ProfileModel.LastName" type="text" class="form-control" >
+                                </div>
+                            </div>                      
+
+                            <div class="row mb-3">
+                                <label asp-for="@Model.ProfileModel.UnitId" class="col-md-4 col-lg-3 col-form-label fw-bold">Sub-directorate</label>
+                                <div class="col-md-8 col-lg-9"> 
+                                    
+                                    <select class="form-select mb-3" asp-for="@Model.ProfileModel.UnitId" asp-items="Model.Subdepts" required>
+                                        <option value="" selected>Select Your Sub-directorate</option>                                    
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="@Model.ProfileModel.DesignationId" class="col-md-4 col-lg-3 col-form-label fw-bold">Designation</label>
+                                <div class="col-md-8 col-lg-9"> 
+                                    
+                                    <select class="form-select mb-3" asp-for="@Model.ProfileModel.DesignationId" asp-items="Model.Designation" required>
+                                        <option value="" selected>Select Your Designation</option>                                    
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="@Model.ProfileModel.Phone" class="col-md-4 col-lg-3 col-form-label fw-bold">Work Phone</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input asp-for="@Model.ProfileModel.Phone" type="text" class="form-control" >
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="@Model.ProfileModel.Email" class="col-md-4 col-lg-3 col-form-label fw-bold">Email</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input asp-for="@Model.ProfileModel.Email" type="email" class="form-control" >
+                                </div>
+                            </div>    
+
+                            <div class="row mb-5">
+                                <div class="col-sm-8" style="margin:0 auto;float:none;">
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary" style="background-color:#A71930;color:white;">Update Profile</button>
+                                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                                    </div>
+                                </div>                                 
+                            </div>                    
+                        
+                                    
+                        
+                </div>
+            
+
+               
+                
+            </form>
+        </div>
+    </div>
+</div>

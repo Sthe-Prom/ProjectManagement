@@ -1,0 +1,100 @@
+@model UserAdminViewModel
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "_Layout";
+}
+
+
+<div class="container-fluid p-0">
+
+    <h1 class="h3 mb-3">User Management</h1>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex flex-row justify-content-between">  
+                        
+                            <div class="col-auto">
+                                <h5 class="card-title mb-0">Managing Users</h5>
+                            </div>
+                            <div class="col-auto">
+                                <a href="~/RoleAdmin/Index" class="text-right btn btn-outline-info">Manage Roles</a>                         
+                                <a class="btn btn-outline-info" asp-action="CreateAdminUser">Add New User</a>                                                            
+                            </div>
+                            
+                    </div>
+                    <hr />
+                </div>
+                <div class="card-body">
+            
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="container-fluid">
+                        <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                        
+                        <div class="row">
+                            <div class="col-sm">
+                                <table class="table table-sm table-bordered" >
+                                    <tr>
+                                        @*<th>ID</th>*@
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        @*<th>Logged in</th>*@
+                                        <th class="text-info">Action</th>
+                                    </tr>
+
+                                    @foreach (User user in Model.Users)
+                                    {
+                                        if((Model.Users.Count() == 0) && (signInManager.IsSignedIn(User)))
+                                        {
+                                            <tr><td colspan="3" class="text-center">No User Accounts</td></tr>
+                                        }
+                                        else
+                                        {
+                                            @if(await userManager.IsInRoleAsync(user,"Officer") || await userManager.IsInRoleAsync(user,"Admins") || await userManager.IsInRoleAsync(user,"Data Manager"))
+                                            {
+                                                <tr>
+                                                @* <td>@user.Id</td> *@
+                                                <td>@user.UserName</td>
+                                                <td>@user.Email</td>
+                                                @*<td>@User.Identity.Name</td>*@
+                                                <td>
+                                                    <form asp-action="Delete" asp-route-id="@user.Id" method="post">
+                                                        <a asp-action="Edit" asp-route-Id="@user.Id">
+                                                            <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                        </a>
+                                                        <a type="submit"
+                                                                class="">
+                                                            <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                        </a>
+                                                    </form>
+
+                                                    
+                                                </td>
+                                                
+                                                </tr>
+                                            }
+                                        }
+                                    }
+
+                                    
+                                </table>
+                            </div>
+                        </div>
+
+                    
+                    </div>
+                               
+                
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+                    
