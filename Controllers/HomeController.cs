@@ -88,6 +88,80 @@ public class HomeController : Controller
         vm.StatusList = getStatuses();
         vm.ActivityStatuses = getActivityStatus();
 
+        List<DataPoint> dataPoints = new List<DataPoint>();
+        List<DataPoint> dataPointsActivity = new List<DataPoint>();
+
+        var projects_data = from acc in account_context.Accounts
+                    join proj in project_context.Projects
+                    on acc.AccountID equals proj.AccountID
+                    join stat in status_context.Statuses
+                    on proj.ProjectStatusID equals stat.Id
+                    group new {proj, stat}     
+                        by new {proj.ProjectStatusID, stat.StatusName} 
+                    into g     
+                  select new {
+                    Status = g.Key.StatusName,
+                    ProjectCount = g.Count()              
+
+                  };
+
+        var activities_data = from acc in account_context.Accounts
+                    join proj in project_context.Projects
+                    on acc.AccountID equals proj.AccountID
+                    join stat in status_context.Statuses
+                    on proj.ProjectStatusID equals stat.Id
+                    join act in activity_context.Activities
+                    on proj.Id equals act.ProjectID
+                    group new {proj, stat, act}     
+                        by new {proj.ProjectStatusID, stat.StatusName, act.ActivityProgress} 
+                    into g     
+                  select new {
+                    Status = g.Key.StatusName,
+                    ActivityProgress = g.Key.ActivityProgress,
+                    ActivityCount = g.Count()              
+
+                  };
+
+        foreach(var item in projects_data)
+        {
+            dataPoints.Add(new DataPoint(item.Status, item.ProjectCount) );
+        }
+
+        foreach(var item in activities_data)
+        {
+            if(item.ActivityProgress == 1)
+            {
+                dataPointsActivity.Add(new DataPoint("Upcoming", item.ActivityCount) );
+            }
+             if(item.ActivityProgress == 2)
+            {
+                dataPointsActivity.Add(new DataPoint("Started", item.ActivityCount) );
+            }
+             if(item.ActivityProgress == 3)
+            {
+                dataPointsActivity.Add(new DataPoint("Ongoing", item.ActivityCount) );
+            }
+             if(item.ActivityProgress == 4)
+            {
+                dataPointsActivity.Add(new DataPoint("Completed", item.ActivityCount) );
+            }
+             if(item.ActivityProgress == 5)
+            {
+                dataPointsActivity.Add(new DataPoint("Incomplete", item.ActivityCount) );
+            }
+            if(item.ActivityProgress == 6)
+            {
+                dataPointsActivity.Add(new DataPoint("On-Hold", item.ActivityCount) );
+            }
+             if(item.ActivityProgress == 7)
+            {
+                dataPointsActivity.Add(new DataPoint("Sent for Review", item.ActivityCount) );
+            }
+        }
+
+        ViewBag.DataPoints = JsonConvert.SerializeObject(dataPoints);    
+        ViewBag.DataPointsActivity = JsonConvert.SerializeObject(dataPointsActivity);          
+
         return View(vm);
     }
 
@@ -132,6 +206,11 @@ public class HomeController : Controller
        
         List<int> selectedUserIds = new List<int>();
         string selectedIdsString = formCollection["ProjectModel_SelectedAssignedUserIds"].ToString();
+        
+        //Add Current User
+        var currentUser = await UserManager.GetUserAsync(User);
+        var project_owner = account_context.Accounts.Where(c => c.Id == currentUser.Id).FirstOrDefault();
+        selectedUserIds.Add(project_owner.AccountID);
 
         if (!string.IsNullOrEmpty(selectedIdsString))
         {
@@ -265,7 +344,8 @@ public class HomeController : Controller
             ActivityStartDate =  Convert.ToDateTime(formCollection["ActivityModel_ActivityStartDate"]),
             ActivityEndDate =  Convert.ToDateTime(formCollection["ActivityModel_ActivityEndDate"]),
             ActivityProgress = Convert.ToInt32(formCollection["ActivityModel_ActivityProgress"]),
-            ProjectID = Convert.ToInt32(formCollection["ActivityModel_ProjectID"])
+            ProjectID = Convert.ToInt32(formCollection["ActivityModel_ProjectID"]),
+            MemberProject = Convert.ToInt32(formCollection["ActivityModel_MemberProject"])
             
         };
        
@@ -341,7 +421,7 @@ public class HomeController : Controller
             } 
         }
        
-        List<int> selectedUserIds = new List<int>();
+        List<int> selectedUserIds = Project.SelectedAssignedUserIds;//new List<int>();
         string selectedIdsString = formCollection["proj_SelectedAssignedUserIds"].ToString();
 
         if (!string.IsNullOrEmpty(selectedIdsString))
@@ -540,6 +620,8 @@ public class HomeController : Controller
     public SelectList getAccounts()
     {
         List<Account> models = new List<Account>();
+        var currentUser = UserManager.GetUserId(User);
+        //var project_owner = account_context.Where(c => c.Id = currentUser.Id);
        
         var AllUsers = from acc in account_context.Accounts
                     select new
@@ -549,7 +631,7 @@ public class HomeController : Controller
                         Id = acc.Id
                     };
 
-            foreach (var item in AllUsers)
+            foreach (var item in AllUsers.Where(c => c.Id != currentUser))
             {
                 var m = new Account();
                 

@@ -1,0 +1,1703 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProjectViewModel
+
+@{
+    ViewData["Title"] = "Manage Projects";
+    
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId); 
+}
+
+<style>
+
+     table ul li {
+        list-style: none;
+        text-align: center;
+        vertical-align: middle;
+        transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+        margin: 0 auto;    
+        color: #0F204B;
+        opacity: 0.6;               
+    }
+
+    table ul li:hover{        
+        transform: scale(1.5); 
+    }
+
+    table ul li .bi{       
+        color: #0F204B;
+        opacity: 0.6;               
+    }
+   
+    table ul li .bi:hover{       
+        color: #0F204B;
+        opacity: 1;
+    }
+
+    /*Delete*/
+    table ul li .danger .bi{
+        color: #A71930;
+        opacity: 0.6;
+    }
+
+      table ul li .danger .bi:hover{
+        color: #A71930;
+        opacity: 1;
+    }
+    
+    /*Edit*/
+    table ul li .safe .bi{
+        color: #00675A;
+        opacity: 0.6;
+    }
+
+      table ul li .safe .bi:hover{
+        color: #00675A;
+        opacity: 1;
+    }
+
+    /*View*/
+    table ul li .clip .bi{
+        color: #0039A6;
+        opacity: 0.6;
+    }
+
+      table ul li .clip .bi:hover{
+        color: #0039A6;
+        opacity: 1;
+    }
+
+    
+     /*Card Footer*/
+
+    .card-footer ul li {
+        list-style: none;
+        text-align: center;
+        vertical-align: middle;
+        transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+        margin: 0 auto;    
+        color: #00675A;
+        opacity: 0.6;               
+    }
+
+    .card-footer ul li:hover{        
+        transform: scale(1.5); 
+    }
+
+    ul li .card_footer_edit .bi{
+        color: #00675A;
+        opacity: 0.6;
+    }
+
+    ul li .card_footer_edit .bi:hover{
+        color: #00675A;
+        opacity: 1;
+    }
+
+    ul li .card_footer_delete .bi{
+        color: #A71930;
+        opacity: 0.6;
+    }
+
+    ul li .card_footer_delete .bi:hover{
+        color: #A71930;
+        opacity: 1;
+    }
+   
+   
+    
+    /* In your custom.css file or within a <style> tag */
+    .fs-7 {
+      font-size: 0.75rem; /* Adjust this value as needed, 0.75rem is usually smaller than default paragraph */
+      line-height: 1.2; /* Adjust line-height if needed for readability */
+    }
+
+    /* You could also make it a tiny bit smaller than fs-6 (which is typically 1rem) */
+    .fs-7 {
+      font-size: 0.875rem; /* This is 14px assuming 16px base, if fs-6 is 1rem (16px) this is slightly smaller */
+      line-height: 1.3;
+    }
+
+    .card_flow {
+      height: 200px;
+      overflow: auto;
+    }
+
+    /* Extra Small Devices (e.g., Small Phones, portrait mode) */
+    /* Less than or equal to 480px wide */
+    @@media only screen and (max-width: 480px) {
+
+       table tr th {
+        font-size: 10px;
+      }
+      
+      table tr td {
+        font-size: 9px;
+      }
+
+      table {
+         font-size: 10px;
+      }
+
+      .modal {
+         font-size: 10px;
+      }
+
+      select option, textarea::placeholder, input::placeholder {
+         font-size: 10px;
+      }
+
+    }
+    
+    /* Small Devices (e.g., Phones, Small Tablets) */
+    /* From 481px to 768px wide */
+    @@media only screen and (min-width: 481px) and (max-width: 768px) {
+      
+      table tr th {
+        font-size: 12px;
+      }
+      
+      table tr td {
+        font-size: 11px;
+      }
+
+       table {
+         font-size: 11px;
+      }
+
+      .modal {
+         font-size: 11px;
+      }
+
+      select option, textarea::placeholder, input::placeholder {
+         font-size: 11px;
+      }
+ 
+    }
+
+    /* Medium Devices (e.g., Tablets, Small Laptops) */
+    /* From 769px to 960px wide */
+    @@media only screen and (min-width: 769px) and (max-width:960px) {
+        
+        table tr th {
+        font-size: 13px;
+      }
+      
+      table tr td {
+        font-size: 12px;
+      }
+
+       table {
+         font-size: 12px;
+      }
+
+      .modal {
+         font-size: 12px;
+      }
+
+      select option, textarea::placeholder, input::placeholder {
+         font-size: 12px;
+      }
+
+    }
+
+
+    /* Large Devices (e.g., Laptops, Desktops) - User's example range */
+    /* From 961px to 1200px wide */
+    @@media  only screen and (min-width: 961px) and (max-width:1200px){
+      
+      table tr th {
+        font-size: 14px;
+      }
+      
+      table tr td {
+        font-size: 16px;
+      }
+
+       table {
+         font-size: 14px;
+      }
+
+      .modal {
+         font-size: 14px;
+      } 
+
+      select option, textarea::placeholder, input::placeholder {
+         font-size: 14px;
+      }      
+     
+    }
+
+    /* Extra Large Devices (e.g., Large Desktops, TVs) */
+    /* From 1201px and wider */
+    @@media only screen and (min-width: 1201px) {
+      
+      table tr th {
+        font-size: 14px;
+      }
+      
+      table tr td {
+        font-size: 12px;
+      }
+
+       table {
+         font-size: 13px;
+      }
+
+      .modal {
+         font-size: 13px;
+      }
+
+      select option , textarea::placeholder, input::placeholder {
+         font-size: 13px;
+      }
+      
+    }
+
+   
+</style>
+
+ @section Scripts{
+    <script>
+        
+        $(document).ready(function() {
+
+                //Save Project
+                $("#btnSaveProject").on("click", function() {
+                              
+                    var formData = new FormData(frmAddProject);
+                    const values = [...formData.entries()];
+                    const user_ids = formData.getAll('ProjectModel.SelectedAssignedUserIds');
+
+                    var s_user_ids = '';
+                    for (const id of user_ids) {
+                      s_user_ids += ',' + id;
+                    }
+
+                    formData.append("ProjectModel_ProjectName", $("#ProjectModel_ProjectName").val() );
+                    formData.append("ProjectModel_ProjectDetails",  $("#ProjectModel_ProjectDetails").val() );
+                    formData.append("ProjectModel_ProjectAreaOfWork",  $("#ProjectModel_ProjectAreaOfWork").val() );
+                    formData.append("ProjectModel_ProjectWorkInConj",  $("#ProjectModel_ProjectWorkInConj").val() );
+                    formData.append("ProjectModel_SelectedAssignedUserIds", user_ids);
+                    formData.append("ProjectModel_ProjectStartDate",  $("#ProjectModel_ProjectStartDate").val() ) ;
+                    formData.append("ProjectModel_ProjectEndDate",  $("#ProjectModel_ProjectEndDate").val() ) ;
+                    formData.append("ProjectModel_ProjectStatusID", $("#ProjectModel_ProjectStatusID").val() );
+                    formData.append("ProjectModel_AccountID",  $("#ProjectModel_AccountID").val() );
+                    formData.append("ProjectFiles",  $("#ProjectFiles").val() );
+
+                    var f = [];
+                    var s = 'The following fields are required: \n------------------------------\n';
+                 
+                    for(i = 0; i < values.length;i++){
+                      if(values[i][1] === "" || values[i][1] === 0)// || values[i][1].name == "")
+                      {
+                        if(values[i][0].includes('.')){
+                            s += values[i][0].split('.')[1] + '\n';
+                            f.push(values[i][1]);
+                          }else{
+                            s += values[i][0] + '\n';
+                            f.push(values[i][1]);
+                          }
+                        
+                      }
+                    }
+
+                    if(f.length > 0){
+                        //validateAddRoadFactorsForm();
+                        alert(s);
+                        //validatedNew();
+                    }
+                    else{
+                                                                             
+                      $.ajax({
+                          type: 'POST',
+                          url: '@Url.Action("AddProjectAjax", "Home")',
+                          contentType: false,
+                          processData: false,
+                          cache: false,
+                          data: formData,
+                          success: projectAddSuccess,
+                          error: projectAddError
+                      });
+
+                    }
+                
+
+                });
+
+                function projectAddError(response) {
+                    alert(response.ResponseMessage);
+                }
+
+                function projectAddSuccess(response) {
+                    if (response.responseCode == 0) {
+                        
+                        ProjectAdd("Add Project", "Project Name: " + response.responseMessage 
+                          + " was added successfully."); 
+                        //alert("Project Added Successfully");                       
+                    }
+                    else {
+                        alert(response.ResponseMessage);
+                    }
+                }  
+
+                //Edit Project Forms
+                const editProjectForms = document.getElementsByClassName("frmEditProject");
+
+                for (const form of editProjectForms) {
+
+                    const id = form.getAttribute("id");   
+                
+                    // Using match with regEx
+                    let num_extr = id.match(/(\d+)/);
+                    
+                    // Display output if number extracted
+                    if (num_extr) {
+                        console.log('number found:' + num_extr[0]);
+                    }                                
+
+                    //UPDATE Project
+                    $("#btnUpdateProject_"+num_extr[0]).on("click", function() {
+                       
+                        //var act_id = document.getElementById('projectId_1');
+                        //console.log('delete key is:' + num_extr[0]);
+                        
+                        var formData = new FormData(form);
+                        const values = [...formData.entries()];
+
+                        const user_ids = formData.getAll('proj.SelectedAssignedUserIds');
+
+                        var s_user_ids = '';
+                        for (const id of user_ids) {
+                          s_user_ids += ',' + id;
+                        }
+
+                       
+                       // formData.append("ProjectModel_Id", $("#projectID").val() );
+                        formData.append("proj_AccountID",  values[1][1] );
+                        formData.append("proj_ProjectName", values[2][1] );
+                        formData.append("proj_ProjectDetails",  values[3][1] );
+                        formData.append("proj_ProjectAreaOfWork",  values[4][1] );
+                        formData.append("proj_ProjectWorkInConj",  values[5][1] );
+                        formData.append("proj_SelectedAssignedUserIds", s_user_ids );
+                        formData.append("proj_ProjectStartDate",  formData.get('proj.ProjectStartDate') ) ;
+                        formData.append("proj_ProjectEndDate",  formData.get('proj.ProjectEndDate') ) ;
+                        formData.append("proj_ProjectStatusID", formData.get('proj.ProjectStatusID') );
+                        formData.append("ProjectFiles",  formData.get('ProjectFiles') );
+                       
+                        var f = [];
+                        var s = 'Please correct the following: \n---------------------------------\n';
+                    
+                        for(i = 0; i < values.length;i++){
+                          if(values[i][1] === "" || values[i][1] === 0)// || values[i][1].name == "")
+                          {
+                            if(values[i][0].includes('.')){
+                                s += values[i][0].split('.')[1] + '\n';
+                                f.push(values[i][1]);
+                              }else{
+                                s += values[i][0] + '\n';
+                                f.push(values[i][1]);
+                              }
+                            
+                          }
+                        }
+
+                        if(f.length > 0){
+                            //validateAddRoadFactorsForm();
+                            alert(s);
+                            //validatedNew();
+                        }else{
+
+                          $.ajax({
+                              type: 'POST',
+                              url: '@Url.Action("UpdateProject", "Home")' +'/' + num_extr[0],                       
+                              contentType: false,
+                              processData: false,
+                              cache: false,
+                              data: formData,
+                              success: projectUpdateSuccess,
+                              error: projectUpdateError
+                          });       
+
+                        }
+
+                    });
+
+                    function projectUpdateError(response) {
+                        alert("error");
+                    }
+
+                    function projectUpdateSuccess(response) {
+                        if (response.responseCode == 0) {
+                            
+                            ProjectEdit("Update Project", "Project Name: " + response.responseMessage 
+                                + " was added successfully."); 
+                            //alert("success");                
+                        }
+                        else {
+                            alert('Error..');
+                        }
+                    }  
+
+                };  
+
+                //----------------- Activity --------------------
+
+                //Activity Forms
+                const addActivityForms = document.getElementsByClassName("frm_Activity");
+
+                for (const form of addActivityForms) {
+
+                    const id = form.getAttribute("id");   
+                
+                    // Using match with regEx
+                    let num_extr = id.match(/(\d+)/);
+                    
+                    // Display output if number extracted
+                    if (num_extr) {
+                        console.log('number found:' + num_extr[0]);
+                    }                                      
+                                    
+                    //SAVE Activity
+                    $("#btnSaveActivity_"+num_extr[0]).on("click", function() {
+                    
+                        console.log("btnSaveActivity_"+num_extr[0] +" was clicked, but didn;t respond!");
+                        
+                        var formData_act = new FormData(form);
+                        const values = [...formData_act.entries()];
+
+                        formData_act.append("ActivityModel_ActivityName",  values[1][1] );
+                        formData_act.append("ActivityModel_ActivityComments", values[2][1] );
+                        formData_act.append("ActivityModel_ActivityChallenges", values[3][1] );
+                        formData_act.append("ActivityModel_ActivityHighlights", values[4][1] );
+                        formData_act.append("ActivityModel_ActivityStartDate", values[5][1] );
+                        formData_act.append("ActivityModel_ActivityEndDate", values[7][1] );
+                        formData_act.append("ActivityModel_ActivityProgress", values[9][1] );
+                        formData_act.append("ActivityModel_ProjectID", values[0][1] );
+                        formData_act.append("ProjectFiles",  values[10][1] );
+
+                        var f = [];
+                        var s = 'The following fields are required: \n------------------------------\n';
+                    
+                        for(i = 0; i < values.length;i++){
+                                                    
+                            if(values[i][1] === "" || values[i][1] === 0 ) //|| values[i][1].name == "")
+                            {
+                              if(values[i][0].includes('.')){
+                                  if(values[i][0] !== "ActivityModel.ActivityComments" && values[i][0] !== "ActivityModel.ActivityChallenges" && values[i][0] !== "ActivityModel.ActivityHighlights"){
+                                    s += values[i][0].split('.')[1] + '\n';
+                                    f.push(values[i][1]);
+                                  }
+                                }else{
+                                  s += values[i][0] + '\n';
+                                  f.push(values[i][1]);
+                                }                            
+                            }
+
+                          //}
+                        }
+
+                        if(f.length > 0){
+                            //validateAddRoadFactorsForm();
+                            alert(s);
+                            //validatedNew();
+                        }
+                        else{
+                           
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("AddActivityAjax", "Home")',
+                                contentType: false,
+                                processData: false,
+                                cache: false,
+                                data: formData_act,
+                                success: activitySuccess,
+                                error: activityError
+                            });    
+                        }
+
+                                
+                    });               
+                                
+                    function activityError() {
+                        alert("An error while adding your Action. please try again.");
+                    }
+
+                    function activitySuccess(response) {
+                        if (response.responseCode == 0) {
+                            
+                            ActivityAdd("Add Activity", "Activity Name: " + response.responseMessage 
+                                + " was added successfully.");   
+                            //alert("Activity Added Successfully.");                     
+                        }
+                        else {
+                            alert(response.ResponseMessage);
+                        }
+                    }
+
+                    //DELETE Project
+                    $("#btnDeleteProject_"+num_extr[0]).on("click", function() {
+                      
+                            swal({
+                                title: "Are you sure?",
+                                text: "Projects deleted cannot be recovered",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "Yes, delete Project!",
+                                cancelButtonText: "No, cancel!",
+                                closeOnConfirm: false,
+                                closeOnCancel: false
+                                },
+                                function (isConfirm) {
+                                    if (isConfirm) {
+                                           $.ajax({
+                                                type: 'DELETE',
+                                                url: '@Url.Action("DeleteProject", "Home")' +'/' + num_extr[0],                       
+                                                cache: false
+                                                
+                                            });                                              
+                              
+                                            swal({
+                                                title: "Deleted",
+                                                text: "Selected Project has been deleted.",
+                                                type: "success",
+                                                confirmButtonColor: "#0F204B",
+                                                confirmButtonText: "Okay",
+                                                closeOnConfirm: false,
+                                                html: true                                                  
+                                            },
+                                              function(){ 
+                                                    location.reload();
+                                                }); 
+                                            
+
+                                    } else {
+                                        swal("Cancelled", "No Projects Deleted:)", "error");
+                                    }
+                                });  
+                            
+                    });
+                   
+                };
+
+                //Activity (All) (Edit + Delete) Forms
+                const allActivityForms = document.getElementsByClassName("act_form");
+
+                for (const form of allActivityForms) {
+
+                    const id = form.getAttribute("id");   
+                
+                    // Using match with regEx
+                    let num_extr = id.match(/(\d+)/);
+                                                            
+                   /* $("#btnEditActivity_"+num_extr[0]).click(function() {                                     
+                        $('#card_edit_'+num_extr[0]).toggle(); 
+                        //$('#card_view_'+num_extr[0]).toggle();                                           
+                    });  
+
+                    $("#cancelUpdateActivity_"+num_extr[0]).click(function() {                                     
+                        $('#card_edit_'+num_extr[0]).toggle(); 
+                        //$('#card_view_'+num_extr[0]).toggle();                                           
+                    });  */
+
+                     //UPDATE Activity
+                    $("#btnUpdateActivity_"+num_extr[0]).on("click", function() {
+                    
+                        var formData_act = new FormData(form);
+                        const values = [...formData_act.entries()];
+
+                        formData_act.append("act_ActivityName",  values[1][1] );
+                        formData_act.append("act_ActivityComments", values[2][1] );
+                        formData_act.append("act_ActivityChallenges", values[3][1] );
+                        formData_act.append("act_ActivityHighlights", values[4][1] );
+                        formData_act.append("act_ActivityStartDate", values[5][1] );
+                        formData_act.append("act_ActivityEndDate", values[7][1] );
+                        formData_act.append("act_ActivityProgress", values[9][1] );
+                        formData_act.append("ActivityModel_Id", values[0][1] );
+                        formData_act.append("ProjectFiles",  values[10][1] );
+
+                        var f = [];
+                        var s = 'Please correct the following: \n---------------------------------\n';
+                    
+                        for(i = 0; i < values.length;i++){
+                          if(values[i][1] === 0)// || values[i][1].name == "")
+                          {
+                            if(values[i][0].includes('.')){
+                                if(values[i][0] !== "ActivityModel.ActivityComments" && values[i][0] !== "ActivityModel.ActivityChallenges" && values[i][0] !== "ActivityModel.ActivityHighlights"){
+                                  s += values[i][0].split('.')[1] + '\n';
+                                  f.push(values[i][1]);
+                                }
+                              }else{
+                                s += values[i][0] + '\n';
+                                f.push(values[i][1]);
+                              }
+                            
+                          }
+                        }
+
+                        if(f.length > 0){
+                            //validateAddRoadFactorsForm();
+                            alert(s);
+                            //validatedNew();
+                        }
+                        else{
+                           
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("UpdateActivity", "Home")',
+                                contentType: false,
+                                processData: false,
+                                cache: false,
+                                data: formData_act,
+                                success: activityUpdateSuccess,
+                                error: activityUpdateError
+                            });    
+                        }
+
+                                
+                    });               
+                                
+                    function activityUpdateError() {
+                        alert("An error while updating your Activity. please try again.");
+                    }
+
+                    function activityUpdateSuccess(response) {
+                        if (response.responseCode == 0) {
+                            
+                            ActivityUpdate("Update Activity", "Activity Name: " + response.responseMessage 
+                                + " was updated successfully.");   
+                            //alert("Activity Added Successfully.");                     
+                        }
+                        else {
+                            alert(response.ResponseMessage);
+                        }
+                    }       
+                    
+                    //DELETE Activity
+                    $("#btnDeleteActivity_"+num_extr[0]).on("click", function() {
+                      
+                            swal({
+                                title: "Are you sure?",
+                                text: "Activities deleted cannot be recovered",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "Yes, delete Activity!",
+                                cancelButtonText: "No, cancel!",
+                                closeOnConfirm: false,
+                                closeOnCancel: false
+                                },
+                                function (isConfirm) {
+                                    if (isConfirm) {
+                                           $.ajax({
+                                                type: 'DELETE',
+                                                url: '@Url.Action("DeleteActivity", "Home")' +'/' + num_extr[0],                       
+                                                cache: false
+                                                
+                                            });                                              
+                              
+                                            swal({
+                                                title: "Deleted",
+                                                text: "Selected Activity has been deleted.",
+                                                type: "success",
+                                                confirmButtonColor: "#0F204B",
+                                                confirmButtonText: "Okay",
+                                                closeOnConfirm: false,
+                                                html: true                                                  
+                                            },
+                                              function(){ 
+                                                    location.reload();
+                                                }); 
+                                            
+
+                                    } else {
+                                        swal("Cancelled", "No Activities Deleted:)", "error");
+                                    }
+                                });  
+                            
+                    });                          
+
+                   
+                };
+              
+
+        });         
+
+    </script>
+}
+
+<div class="container-fluid min-height">
+  <div class="container p-1">
+    @* <h3 class="text-center" style="color: #0F204B; margin: 10px;font-weight: 400;">MIR Projects</h3> *@
+  <h4 class="text-center pb-1" style="color: #A71930; font-weight: 400;">Manage Projects and Activities</h4>
+
+    <div class="row d-flex flex-row justify-content-center align-content-center p-3" style="background-color: #fafafa; border: 1px lightgray solid; border-radius: 8px;">
+      @* <h5 class="text-center" style="color: #0F204B;">​<strong style="position: relative;">Process workflow</strong></h5> *@
+      <!-- <ul id="itgyf" class="list list-unstyled list-inline-item align-items-center text-center" style="align-content: center;"> -->
+      <div class="col-auto">
+        <span >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+          </svg> Add a project&nbsp; 
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+          </svg>
+        </span>
+      </div>
+      <div class="col-auto">
+        <span >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-diagram-3" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
+          </svg>&nbsp; 
+            Log a project activity &nbsp; 
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+          </svg>
+        </span>
+      </div>
+      <div class="col-auto">
+        <span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+          </svg>&nbsp; Update project status &nbsp; 
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+          </svg>
+        </span>
+      </div>
+      <div class="col-auto">
+        <span >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bar-chart-fill" viewBox="0 0 16 16">
+            <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
+          </svg>
+          &nbsp;Complete a project 
+        </span>
+      </div>
+      <!-- </ul> -->
+    </div>
+  </div>
+  
+</div>
+
+@* Table *@
+@{
+      var projects_data = from acc in Model.Accounts
+                    join proj in Model.Projects
+                    on acc.AccountID equals proj.AccountID
+                    join stat in Model.Statuses
+                    on proj.ProjectStatusID equals stat.Id
+                    where acc.Id == userId
+                  select new {
+                    proj.AccountID,
+                    proj.Id,
+                    proj.ProjectName,
+                    proj.ProjectDetails,
+                    proj.ProjectAreaOfWork,
+                    proj.ProjectStartDate,
+                    proj.ProjectEndDate,
+                    proj.ProjectWorkInConj,
+                    proj.ProjectStatusID,
+                    proj.ProjectFiles,
+                    stat.StatusName,
+                    proj.SelectedAssignedUserIds
+                  };
+
+      var activities_data = from proj in Model.Projects 
+                        join act in Model.Activities
+                        on proj.Id equals act.ProjectID
+                        group new { proj, act }
+                          by new { act.Id, act.ProjectID, act.ActivityName, act.ActivityComments,
+                                act.ActivityChallenges, act.ActivityHighlights, act.ProjectFiles, 
+                                act.ActivityProgress, act.ActivityUpdateTime, act.ActivityStartDate, act.ActivityEndDate }
+                        into g
+                        select new {
+                            Id = g.Key.Id,
+                            ProjectID = g.Key.ProjectID,
+                            ActivityName = g.Key.ActivityName,
+                            ActivityComments = g.Key.ActivityComments,
+                            ActivityChallenges = g.Key.ActivityChallenges,
+                            ActivityHighlights = g.Key.ActivityHighlights,
+                            ActivityStartDate = g.Key.ActivityStartDate,
+                            ActivityEndDate = g.Key.ActivityEndDate,
+                            ActivityProgress = g.Key.ActivityProgress,
+                            ActivityUpdateTime = g.Key.ActivityUpdateTime,      
+                            ProjectFiles = g.Key.ProjectFiles,                            
+                            totalActivities = g.Count()
+                        };
+}
+
+@* <h4 class="text-center p-3" style="color: #A71930; font-weight: 300;">Manage Projects and Activities</h4> *@
+
+@if(signInManager.IsSignedIn(User))                                               
+{
+   @if(await userManager.IsInRoleAsync(user,"Admin"))
+    {
+        <p>Admin is logged in</p>
+    }
+    else
+    {
+        <div class="container-fluid" style="margin-top: 20px;background-color: #fafafa; border: 1px lightgray solid; border-radius: 4px;">
+          <div class="row" style="margin:0;padding:0;">
+              <div class="col-sm table-responsive" style="margin:0;padding:0;">
+              
+                <table id="" class="table table-striped table-bordered align-middle" style="margin:0;padding:0;">
+            
+                    <thead>
+                        <tr>                                               
+                            <th rowspan="1" class="text-center align-middle text-align:center">Activity Name</th>
+                            <th rowspan="1" class="text-center align-middle text-align:center">Comments</th>
+                            <th rowspan="1" class="text-center align-middle text-align:center">Challenges</th>
+                            <th rowspan="1" class="text-center align-middle text-align:center">Start Date</th>
+                            <th rowspan="1" class="text-center align-middle text-align:center">Activity Duration</th>
+                            <th colspan="1" class="text-center align-middle text-align:center">Progress Details</th>                
+                            <th rowspan="1" class="text-center align-middle text-align:center">Files</th>
+                            <th rowspan="1" class="text-danger text-center align-middle">Action</th>
+                        </tr>
+                       
+                        
+                    </thead>
+                    <tbody>           
+                        @{
+                          
+                            foreach(var proj in projects_data)
+                            {
+                              
+                            
+                              var tot_act = activities_data.Where(c => c.ProjectID == proj.Id).Count();
+
+                              var getTTCompletion = @proj.ProjectEndDate - @proj.ProjectStartDate;
+
+                              // Option A: Using TimeSpan properties (most common and readable)
+                              int totalDays = getTTCompletion.Days;
+                              int totalWeeks = totalDays / 7;
+                              int remainingDays = totalDays % 7;
+
+                              int hours = getTTCompletion.Hours;
+                              int minutes = getTTCompletion.Minutes;
+                              int seconds = getTTCompletion.Seconds;
+
+                              var getProjectMembers = "";
+
+                              if (proj.SelectedAssignedUserIds.Count() > 0)
+                              {
+                                  // 2. Split the string by comma
+                                                        
+                                  // 3. Parse each string part into an integer and add to the list
+                                  foreach (var member in proj.SelectedAssignedUserIds)
+                                  {                           
+                                      var name = Model.Accounts.FirstOrDefault(c => c.AccountID == member);
+                                      getProjectMembers += ", " + name.FirstName ;                       
+                                      
+                                  }               
+                              }
+                              else
+                              {
+                                  // No users were selected or the input was empty
+                                  var project_owner = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
+                                  getProjectMembers = project_owner.FirstName;
+                              }
+                            
+                              @* HEADER - PROJECT *@
+                              <tr class="">
+                                  <th colspan="100%" class="align-middle" style="background-color:#0F204B;opacity:0.8;color:#fff;" >
+                                    
+                                      <div class="d-flex flex-row justify-content-between">
+                                        
+                                        <div class="col-auto"><span>@proj.ProjectName</span></div>
+                                        <div class="col-auto">@proj.ProjectDetails.Substring(15)</div> 
+                                        <div class="col-auto">@proj.ProjectAreaOfWork</div> 
+                                        <div class="col-auto">@getProjectMembers.Substring(1)</div> 
+                                        <div class="col-auto">
+                                            <small>
+                                              <span style="font-size:11px;"> Days </span>
+                                            </small>
+                                              <span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> 
+                                              <span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span>
+                                            <small>
+                                              <span style="font-size:11px;"> Weeks </span>
+                                            </small>
+                                        </div> 
+
+                                        @* Project Status *@
+                                        <div class="col-auto " >
+                                           
+                                            @if(proj.StatusName == "Started")
+                                            {
+                                                <span class="align-middle badge rounded-pill bg-primary"> @proj.StatusName</span>
+                                            }
+                                            else
+                                            @if(proj.StatusName == "Upcoming")
+                                            {
+                                                <span class="align-middle badge rounded-pill bg-light text-muted"> @proj.StatusName</span>
+                                            }
+                                            else
+                                            @if(proj.StatusName == "Ongoing")
+                                            {
+                                                <span class="align-middle badge rounded-pill bg-info"> @proj.StatusName</span>
+                                            }
+                                            else
+                                            @if(proj.StatusName == "Completed")
+                                            {
+                                                <span class="align-middle badge rounded-pill bg-success"> @proj.StatusName</span>
+                                            }
+                                            else
+                                            @if(proj.StatusName == "Incomplete")
+                                            {
+                                                <span class="align-middle badge rounded-pill bg-danger"> @proj.StatusName</span>
+                                            }
+                                            else
+                                            @if(proj.StatusName == "On-Hold")
+                                            {
+                                                <span class="align-middlebadge rounded-pill bg-secondary text-muted"> @proj.StatusName</span>
+                                            }
+                                            else
+                                            @if(proj.StatusName == "Sent for Review")
+                                            {
+                                                <span class="align-middle badge rounded-pill bg-warning"> @proj.StatusName</span>
+                                            }
+                                        </div>
+                                        
+                                        @* Project Actions *@
+                                          <ul class="list-unstyled d-flex align-middle justify-content-between" style="padding: 2px 50px !important;border:1px solid grey;border-radius:4px;">
+                                      
+                                            <li class="col-auto" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">  
+                                                <span class="safe">  
+                                                  <i class="bi bi-plus-circle fs-5"></i>
+                                                </span>
+                                            </li>  
+
+                                            <li class="col-auto" data-bs-toggle="modal" data-bs-target="#modalProjectEdit_@proj.Id">
+                                              <span class="safe">                               
+                                                  <i class="bi bi-pencil-square" ></i>
+                                              </span>
+                                            </li>
+
+                                            @* DELETE *@
+                                            @* @if(tot_act <= 0)
+                                            { *@
+                                              <li class="col-auto" id="btnDeleteProject_@proj.Id">
+                                                <span class="danger">
+                                                    <i class="bi bi-trash3"></i>
+                                                </span>
+                                              </li>
+                                            @* } *@
+                                            @* else
+                                            {
+                                              <li class="align-middle" data-bs-toggle="tooltip" data-bs-placement="top" title="Cannot delete. This project has activities.">
+                                                <span class="">
+                                                    <i class="bi bi-trash3"></i>
+                                                </span>
+                                              </li>
+                                            }
+                                          *@
+                                          </ul>
+                                      
+                                          <hr />
+                                        
+                                      </div> 
+                                                 
+                                  </th>                                        
+                              </tr>   
+
+
+                              foreach(var act in activities_data
+                                      .Where(a => a.ProjectID == proj.Id))
+                              {
+
+                                
+                                  @* ACTIVITIES *@                                
+                                  <tr>              
+                                    
+                                    @* ActivityName *@                      
+                                    <td class="align-middle">
+                                        <span>
+                                          @act.ActivityName
+                                        </span>
+                                    </td>
+
+                                    @* ActivityComments *@
+                                    <td class="align-middle">
+                                        @act.ActivityComments
+                                    </td>
+
+                                    @* Challenges *@
+                                    <td class="align-middle">
+                                        @act.ActivityChallenges
+                                    </td>
+
+                                    @* Activity Start Date *@
+                                    <td class="align-middle">@act.ActivityStartDate.ToString("MMMM dd, yyyy")</td>
+
+                                    @* Activity Durarion *@
+                                    <td class="align-middle text-center">
+                                      <small class="text-muted" > 
+                                        <span style="font-size:11px;"> Days </span></small><span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> | <small class="text-muted"><span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span><span style="font-size:11px;"> Weeks </span></small> 
+                                    </td>
+                                   
+
+                                    @* Activity Status *@
+                                    <td class="align-middle text-center">
+                                      @if(act.ActivityProgress == 2)
+                                      {
+                                          <span class="badge rounded-pill bg-primary">Started</span>
+                                      }
+                                      else
+                                      @if(act.ActivityProgress == 1)
+                                      {
+                                          <span class="badge rounded-pill bg-light text-muted">Upcoming</span>
+                                      }
+                                      else
+                                      @if(act.ActivityProgress == 3)
+                                      {
+                                          <span class="badge rounded-pill bg-info">Ongoing</span>
+                                      }
+                                      else
+                                      @if(act.ActivityProgress == 4)
+                                      {
+                                          <span class="badge rounded-pill bg-success">Completed</span>
+                                      }
+                                      else
+                                      @if(act.ActivityProgress == 5)
+                                      {
+                                          <span class="badge rounded-pill bg-danger">Incomplete</span>
+                                      }
+                                      else
+                                      @if(act.ActivityProgress == 6)
+                                      {
+                                          <span class="badge rounded-pill bg-secondary text-muted">On-Hold</span>
+                                      }
+                                      else
+                                      @if(act.ActivityProgress == 7)
+                                      {
+                                          <span class="badge rounded-pill bg-warning">Sent for Review</span>
+                                      }
+                                    
+                                    </td>
+
+                                    @* Activity Count *@
+                                    @*<td class="text-center align-middle">
+                                      <ul class="list-unstyled d-flex" style="margin: 0 !important; padding: 0 !important;">
+                                        <li class="align-middle" >                                         
+                                          <span class="badge bg-light text-danger fs-6">@tot_act.ToString()</span>  
+                                        </li>               
+                                        <li class="align-middle" data-bs-toggle="modal" data-bs-target="#activityDetails_@proj.Id">
+                                          <i class="bi bi-view-list fs-5"></i>
+                                        </li>
+                                        <li class="align-middle" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">  
+                                            <i class="bi bi-plus-circle fs-5"></i>
+                                        </li>  
+                                      </ul>                   
+                                    </td>*@
+
+                                    @* Attachments *@
+                                    <td class="text-center align-middle">
+                                      <ul class="list-unstyled d-flex mb-4" style="margin: 0 !important; padding: 0 !important;">
+
+                                        @* Attachments *@
+                                        @if(!String.IsNullOrEmpty(act.ProjectFiles) && act.ProjectFiles.Contains('.'))
+                                        {
+                                          <li class="">
+                                            <a href="~/Attachments/Activity/@act.ProjectFiles" class="clip" download>
+                                                <i class="bi bi-paperclip fs-5"></i>
+                                            </a>
+                                          </li>
+                                        }
+                                        else
+                                        {
+                                          <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project."> 
+                                            <a class="" aria-disabled="true" disabled>
+                                                <i class="bi bi-paperclip fs-5"></i>
+                                            </a>
+                                          </li>
+                                        }
+                                      </ul>
+                                    </td>
+
+                                    @* Actions *@
+                                    <td class="text-center align-middle">
+                                      <ul class="list-unstyled d-flex" style="margin: 0 !important; padding: 0 !important;">
+                                        
+                                        <li class="align-middle" data-bs-toggle="modal" data-bs-target="#btnEditActivity_@act.Id" >
+                                          <span class="safe">                               
+                                              <i class="bi bi-pencil-square"></i>
+                                          </span>
+                                        </li>
+
+                                        @* DELETE *@
+                                    
+                                        <li id="btnDeleteActivity_@proj.Id">
+                                          <span class="danger">
+                                              <i class="bi bi-trash3"></i>
+                                          </span>
+                                        </li>
+                                       
+                                      
+                                      </ul>
+                                    </td>
+
+                                  </tr>
+
+                                  @* Update Activity *@
+                                   
+                                    <div class="modal modal-md fade" id="btnEditActivity_@act.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel1" aria-hidden="true">
+                                        
+                                        <div class="modal-dialog">
+                                          <form class="act_form" enctype="multipart/form-data" id="act_form_@act.Id" >
+                                              <input type="hidden" value="@act.Id" asp-for="@Model.ActivityModel.Id" class="form-control" />
+
+                                              <div class="mb-3 form-group">
+                                                  <label class="col-form-label fw-bold">Activity Name:</label>
+                                                  <input class="form-control" placeholder="Project Name" asp-for="@act.ActivityName" />
+                                              </div>
+
+                                              <div class="mb-3 form-group">
+                                                  <label class="col-form-label fw-bold">Activity Comments:</label>
+                                                  <textarea class="form-control" placeholder="Comments" style="margin-top:0 !important;" asp-for="@act.ActivityComments">@act.ActivityComments</textarea>
+                                              </div>
+
+                                              <div class="mb-3 form-group">
+                                                  <label class="col-form-label fw-bold">Activity Challenges:</label>
+                                                  <input type="text" placeholder="Challenges" asp-for="@act.ActivityChallenges" class="form-control"  />
+                                              </div>
+
+                                              <div class="mb-3 form-group">
+                                                  <label class="col-form-label fw-bold">Activity Highlights</label>
+                                                  <input type="text" placeholder="Highlights" asp-for="@act.ActivityHighlights" class="form-control"  />
+                                              </div>
+                                            
+                                              <div class="row mb-3">
+                                                  <div class="col-sm-6">
+                                                      <label class="col-form-label fw-bold">Start Date</label>
+                                                      <input type="date" asp-for="@act.ActivityStartDate" class="form-control"  />
+                                                  </div>
+
+                                                  <div class="col-sm-6">
+                                                      <label class="col-form-label fw-bold align-right">End Date</label>
+                                                      <input type="date" asp-for="@act.ActivityEndDate" class="form-control"  />
+                                                  </div>
+                                              </div>
+
+                                              <div class="form-group mb-3">
+                                                  <label asp-for="@act.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>                                    
+                                                  <select class="form-select mb-3" asp-for="@act.ActivityProgress" asp-items="Model.ActivityStatuses" required>
+                                                      <option value="" selected>@act.ActivityProgress</option>                                    
+                                                  </select>                                         
+
+                                              </div>
+
+                                              <div class="form-group mb-1">
+
+                                                <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Activity Attachments:</label>
+                                                <div class="custom-file">
+                                                    <input type="file" class="form-control" asp-for="@Model.ProjectFiles" />
+
+                                                    @if(act.ProjectFiles.Count() > 5)
+                                                    {
+                                                      <div class="ps-1">                                                                
+                                                            Current document: <a href="~/Attachments/Projects/@act.ProjectFiles" target="_blank">@act.ProjectFiles.Substring(4)</a>
+                                                            <br />
+                                                            <span style="vertical-align:center;color:#A71930;">
+                                                              <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
+                                                            </span>
+                                                      </div>
+                                                    }    
+                                                  
+                                                </div>
+
+                                              </div>
+
+                                              <div class="card-footer">
+                                                    <a href="javascript:void(0)" id="btnUpdateActivity_@act.Id" class="btn btn-sm btn-primary" style="background-color:#A71930;color:white;">Update Activity</a>
+                                                    <a href="javascript:void(0)" id="cancelUpdateActivity_@act.Id" class="btn btn-sm btn-secondary">Cancel</a>                                                
+                                              </div>
+                                          </form>
+                                        </div>     
+
+                                    </div>
+
+
+                              }
+
+                              // Modal Activity
+                              <div class="modal modal-md fade" id="modalActivity_@proj.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                      <form enctype="multipart/form-data" class="frm_Activity" id="frm_Activity_@proj.Id" >
+                                    
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Activity</h1>
+                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                <input type="hidden" asp-for="@Model.ActivityModel.ProjectID" value="@proj.Id" class="form-control" />
+
+                                                <div class="mb-3 form-group">
+                                                    <label class="col-form-label fw-bold">Activity Name:</label>
+                                                    <input class="form-control" placeholder="Enter Name"  asp-for="@Model.ActivityModel.ActivityName" />
+                                                </div>
+
+                                                <div class="mb-3 form-group">
+                                                    <label class="col-form-label fw-bold">Activity Comments:</label>
+                                                    <textarea class="form-control"placeholder="Enter Comments" style="margin-top:0 !important;" asp-for="@Model.ActivityModel.ActivityComments"></textarea>
+                                                </div>
+
+                                                <div class="mb-3 form-group">
+                                                    <label class="col-form-label fw-bold">Activity Challenges:</label>
+                                                    <input type="text" placeholder="Challenges..." asp-for="@Model.ActivityModel.ActivityChallenges" class="form-control"  />
+                                                </div>
+
+                                                <div class="mb-3 form-group">
+                                                    <label class="col-form-label fw-bold">Activity Highlights</label>
+                                                    <input type="text" placeholder="Highlights..." asp-for="@Model.ActivityModel.ActivityHighlights" class="form-control"  />
+                                                </div>
+                                              
+                                                <div class="row mb-3">
+                                                    <div class="col-sm-6">
+                                                        <label class="col-form-label fw-bold">Start Date</label>
+                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityStartDate" class="form-control"  />
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+                                                        <label class="col-form-label fw-bold align-right">End Date</label>
+                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityEndDate" class="form-control"  />
+                                                    </div>
+                                                </div>
+
+                                                @* <div class="mb-3 form-group">
+                                                    <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress (%)</label>
+                                                    <input type="range" min="0" max="100" asp-for="@Model.ActivityModel.ActivityProgress" class="form-range"  />
+                                                </div> *@
+
+                                                <div class="form-group mb-3">
+                                                    <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>                                    
+                                                    <select class="form-select mb-3" asp-for="@Model.ActivityModel.ActivityProgress" asp-items="Model.ActivityStatuses" required>
+                                                        <option value="" selected>Select Activity Status</option>                                    
+                                                    </select>                                         
+
+                                                </div>
+
+                                                <div class="form-group mb-3">
+
+                                                    <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Activity Attachments:</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="form-control" asp-for="@Model.ProjectFiles" />
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+
+                                              <div class="mt-2 col-sm-12">
+                                                  <a href="javascript:void(0)" id="btnSaveActivity_@proj.Id" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Save Activity</a>
+                                                  <a href="javascript:void(0)" id="cancelButActivity_@proj.Id" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
+                                              </div>    
+
+                                            </div>
+                                          </div>
+
+                                      </form>
+                                </div>
+                              </div> 
+
+                              //Activity Details - Modal
+                              <div class="modal modal-lg fade modal-dialog-scrollable" id="activityDetails_@proj.Id" tabindex="-1" aria-labelledby="activityDetailsLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                    <div class="modal-header d-flex justify-content-center">
+                                      <h6 class="modal-title fw-bold text-center" style="color: #A71930; font-weight: 400;text-align:center !important;">Project: @proj.ProjectName</h6>                            
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body row d-flex flex-row justify-content-left p-3">
+                                          
+                                          @* //Activity Details - Table  *@
+
+                                          @*
+                                          @if(activities_data.Where(c => c.ProjectID == proj.Id).Count() > 0) 
+                                          {
+                                                                      
+                                            @foreach(var act in activities_data.Where(c => c.ProjectID == proj.Id))
+                                            {    
+
+                                                <div class="card" style="width: 18rem;margin:5px 5px; padding:0 !important" id="card_view_@act.Id">
+                                                  
+                                                    <div class="card-header">
+                                                        <h6 class="fw-bold text-left" style="color: #0F204B;font-weight:400;margin:0;">@act.ActivityName</h6>
+                                                    </div>
+                                                                                
+                                                    <ul class="list-group list-group-flush card_flow" >
+                                                      <li class="list-group-item">
+                                                          <span class="fw-bold">Progress:</span>
+                                                        
+
+                                                          @if(act.ActivityProgress == 2)
+                                                            {
+                                                                <span class="badge rounded-pill bg-primary">Started</span>
+                                                            }
+                                                            else
+                                                            @if(act.ActivityProgress == 1)
+                                                            {
+                                                                <span class="badge rounded-pill bg-light text-muted">Upcoming</span>
+                                                            }
+                                                            else
+                                                            @if(act.ActivityProgress == 3)
+                                                            {
+                                                                <span class="badge rounded-pill bg-info">Ongoing</span>
+                                                            }
+                                                            else
+                                                            @if(act.ActivityProgress == 4)
+                                                            {
+                                                                <span class="badge rounded-pill bg-success">Completed</span>
+                                                            }
+                                                            else
+                                                            @if(act.ActivityProgress == 5)
+                                                            {
+                                                                <span class="badge rounded-pill bg-danger">Incomplete</span>
+                                                            }
+                                                            else
+                                                            @if(act.ActivityProgress == 6)
+                                                            {
+                                                                <span class="badge rounded-pill bg-secondary text-muted">On-Hold</span>
+                                                            }
+                                                            else
+                                                            @if(act.ActivityProgress == 7)
+                                                            {
+                                                                <span class="badge rounded-pill bg-warning">Sent for Review</span>
+                                                            }
+                                                      </li>
+                                                      <li class="list-group-item">
+                                                          <span class="fw-bold">Comments: </span>
+                                                          @act.ActivityComments 
+                                                      </li>
+                                                      <li class="list-group-item">
+                                                          <span class="fw-bold">Challenges: </span>
+                                                          @act.ActivityChallenges 
+                                                      </li>
+                                                      <li class="list-group-item">
+                                                          <span class="fw-bold">Highlights: </span>
+                                                          @act.ActivityHighlights 
+                                                      </li>
+                                                    </ul>
+                                                    
+                                                    <div class="card-footer">
+
+                                                        <div class="">
+                                                                                                                                                                                  
+                                                            <ul class="list-unstyled d-flex" style="margin:0 5px;">
+
+                                                                  @* Activity Attachment 
+                                                                  <li class="align-middle">
+                                                                      @if(act.ProjectFiles.Count() > 5)
+                                                                      {    
+                                                                        <span class="card_footer">                                                                                                            
+                                                                          <a href="~/Attachments/Activity/@act.ProjectFiles" download>
+                                                                              <i class="bi bi-paperclip fs-6"></i>
+                                                                          </a>
+                                                                        </span>
+                                                                      }
+                                                                      else
+                                                                      {
+                                                                        <span class="card_footer">                                                                                                            
+                                                                          <a class="text-muted">
+                                                                              <i class="bi bi-paperclip fs-6"></i>
+                                                                          </a>
+                                                                        </span>
+                                                                      }
+                                                                  </li>
+                                                          
+                                                                  @* Activity Update 
+                                                                  <li class="align-middle ">
+                                                                      <span class="card_footer_edit" id="btnEditActivity__@act.Id">                               
+                                                                          <i class="bi bi-pencil-square"></i>
+                                                                      </span>
+                                                                  </li>
+
+                                                                  @* Activity Delete 
+                                                                  <li class="align-middle" id="btnDeleteActivity_@act.Id">
+                                                                      <span class="card_footer_delete">
+                                                                          <i class="bi bi-trash3"></i>
+                                                                      </span>
+                                                                  </li>
+                                                              
+                                                            </ul>
+                                                        </div>  
+                                                      
+                                                    </div>
+
+                                                </div>
+
+                                                
+                                                  
+                                            }
+
+                                          }
+                                          else
+                                          {
+                                            <p class="text-muted fw-bold text-center">No Activities for this project.</p>
+                                          }
+                                          *@
+                                      
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>                           
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              //<!-- Update Modal Project-->
+                              <div class="modal modal-md fade" id="modalProjectEdit_@proj.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                      <form enctype="multipart/form-data" class="frmEditProject" id="frmEditProject_@proj.Id">
+                                    
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <h1 class="modal-title fs-5" id="staticBackdropLabel">Update Project</h1>
+                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                <input type="hidden" id="projectID" value="@proj.Id" asp-for="@Model.ProjectModel.Id" class="form-control" />
+                                                
+                                                <input type="hidden" asp-for="@proj.AccountID" class="form-control" />
+
+                                                <div class="mb-3 form-group">
+                                                    <label class="col-form-label fw-bold">Project Name:</label>
+                                                    <input class="form-control" placeholder="Project Name" asp-for="@proj.ProjectName" />
+                                                </div>
+
+                                                <div class="mb-3 form-group">
+                                                    <label class="col-form-label fw-bold">Project Details:</label>
+                                                    <textarea class="form-control" placeholder="Project Details" style="margin-top:0 !important;" asp-for="@proj.ProjectDetails">
+                                                        @proj.ProjectDetails
+                                                    </textarea>
+                                                </div>
+
+                                                <div class="mb-3 form-group">
+                                                    <label class="col-form-label fw-bold">Area of Work:</label>
+                                                    <input type="text" placeholder="SAS, DHET, HR, Faculties, Snr Director, Rector, ect." asp-for="@proj.ProjectAreaOfWork" class="form-control"  />
+                                                </div>
+
+                                                <input type="hidden" asp-for="@proj.ProjectWorkInConj" value="null" class="form-control"  />
+                                                
+                                                <div class="mb-3 form-group">
+                                                    <label asp-for="@proj.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>                                        
+                                                    <select class="form-select mb-3" size="3" asp-for="@proj.SelectedAssignedUserIds" asp-items="Model.UserAccounts" multiple required>
+                                                        <option selected>Select Project Members</option>                                            
+                                                    </select> 
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-sm-6">
+                                                        <label class="col-form-label fw-bold">Start Date</label>
+                                                        <input type="date" asp-for="@proj.ProjectStartDate" class="form-control"  />
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+                                                        <label class="col-form-label fw-bold">End Date</label>
+                                                        <input type="date" asp-for="@proj.ProjectEndDate" class="form-control"  />
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress</label>
+                                              
+                                                    <select class="form-select mb-3" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
+                                                        <option value="" selected> @proj.StatusName</option>                                    
+                                                    </select>
+
+                                                </div>
+                                            
+                                                <div class="form-group mb-3">
+
+                                                    <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Project Attachments:</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="form-control" asp-for="@Model.ProjectFiles"/>
+                                                        @if(proj.ProjectFiles.Count() > 5)
+                                                        {
+                                                          <div class="ps-1">
+                                                            <p>
+                                                              Current document: <a href="~/Attachments/Projects/@proj.ProjectFiles" target="_blank">@proj.ProjectFiles.Substring(4)</a>
+                                                              <br />
+                                                              <span style="vertical-align:center;color:#A71930;">
+                                                                <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
+                                                              </span>                                                           
+                                                            </p>
+                                                          </div>
+                                                        }                                                                                                        
+                                                        
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+
+                                              <div class="mt-2 col-sm-12">
+                                                  <a href="javascript:void(0)" id="btnUpdateProject_@proj.Id" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Update Project</a>
+                                                  <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
+                                              </div>    
+
+                                            </div>
+                                          </div>
+
+                                      </form>
+                                </div>
+                              </div>
+
+                            }
+
+                        }
+
+                    </tbody>
+                    @* <tfoot>
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Area of Work</th>
+                            <th>Work in Conjunction</th>
+                            <th>Days since started</th>
+                            <th>Progress</th>
+                            <th>Files attached</th>
+                        </tr>
+                    </tfoot> *@
+
+                </table>
+
+              </div>     
+          </div>
+        </div>        
+    }
+
+
+  //<!-- Modal Project-->
+  @if(Model.Accounts.Where(c => c.Id == userId).FirstOrDefault() != null) 
+  { 
+    var cc = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
+
+    <div class="modal modal-md fade" id="modalProject" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+            <form enctype="multipart/form-data" id="frmAddProject">
+          
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Project</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+
+                      <input type="hidden" asp-for="@Model.ProjectModel.AccountID" value="@cc.AccountID" class="form-control" />
+
+                      <div class="mb-3 form-group">
+                          <label class="col-form-label fw-bold">Project Name:</label>
+                          <input class="form-control" placeholder="Project Name" asp-for="@Model.ProjectModel.ProjectName" required />
+                          @* <div><span asp-validation-for="@Model.ProjectModel.AccountID" class="text-danger"></span></div> *@
+                      </div>
+
+                      <div class="mb-3 form-group">
+                          <label class="col-form-label fw-bold">Project Details:</label>
+                          <textarea class="form-control"placeholder="Project Details" style="margin-top:0 !important;" asp-for="@Model.ProjectModel.ProjectDetails" required></textarea>
+                          @* <div><span asp-validation-for="@Model.ProjectModel.ProjectDetails" class="text-danger"></span></div> *@
+                      </div>
+
+                      <div class="mb-3 form-group">
+                          <label class="col-form-label fw-bold">Area of Work:</label>
+                          <input type="text" placeholder="SAS, DHET, HR, Faculties, Snr Director, Rector, ect." asp-for="@Model.ProjectModel.ProjectAreaOfWork" class="form-control"  required/>
+                          @* <div><span asp-validation-for="@Model.ProjectModel.ProjectAreaOfWork" class="text-danger"></span></div> *@
+                      </div>
+                      
+                      <div class="mb-3 form-group">
+                          <label asp-for="@Model.ProjectModel.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>                                        
+                          <select class="form-select mb-3" size="3" asp-for="@Model.ProjectModel.SelectedAssignedUserIds" asp-items="Model.UserAccounts" multiple required>
+                              <option value="" selected>Select Project Members</option>                                            
+                          </select> 
+                          @* <div><span asp-validation-for="@Model.ProjectModel.SelectedAssignedUserIds" class="text-danger"></span></div> *@
+                      </div>
+
+                      <div class="row mb-3">
+                          <div class="col-sm-6">
+                              <label class="col-form-label fw-bold">Start Date</label>
+                              <input type="date" asp-for="@Model.ProjectModel.ProjectStartDate" class="form-control"  required/>
+                              @* <div><span asp-validation-for="@Model.ProjectModel.ProjectStartDate" class="text-danger"></span></div> *@
+                          </div>
+
+                          <div class="col-sm-6">
+                              <label class="col-form-label fw-bold">End Date</label>
+                              <input type="date" asp-for="@Model.ProjectModel.ProjectEndDate" class="form-control"  required/>
+                              @* <div><span asp-validation-for="@Model.ProjectModel.ProjectEndDate" class="text-danger"></span></div> *@
+                          </div>
+                      </div>
+
+                      <div class="form-group mb-3">
+                          <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress</label>
+                    
+                          <select class="form-select mb-3" asp-for="@Model.ProjectModel.ProjectStatusID" asp-items="Model.StatusList" required>
+                              <option value="" selected>Select Project Status</option>                                    
+                          </select>
+                          @* <div><span asp-validation-for="@Model.ProjectModel.ProjectStatusID" class="text-danger"></span></div> *@
+
+                      </div>
+                  
+                      <div class="form-group mb-3">
+
+                          <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Project Attachments:</label>
+                          <div class="custom-file">
+                              <input type="file" class="form-control" asp-for="@Model.ProjectFiles" required/>
+                          </div>
+                          @* <div><span asp-validation-for="@Model.ProjectFiles" class="text-danger"></span></div> *@
+
+                      </div>
+                      <input type="hidden" asp-for="@Model.ProjectModel.ProjectWorkInConj" class="form-control" value="null" />
+
+                  </div>
+                  <div class="modal-footer">
+
+                    <div class="mt-2 col-sm-12">
+                        <a href="javascript:void(0)" id="btnSaveProject" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Save Project</a>
+                        <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
+                    </div>    
+
+                  </div>
+                </div>
+
+            </form>
+      </div>
+    </div>
+  }
+  else
+  {
+    <div class="modal modal-md fade" id="modalProject" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+
+              <div class="modal-header">
+                <h1 class="modal-title fs-5 text-danger" id="staticBackdropLabel">Error...</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <p class="text-center">Please complete your profile before creating projects.</p>
+              </div>
+              <div class="modal-footer">
+                <div class="mt-2 col-sm-12">
+                    <a href="javascript:void(0)" id="btnSaveProject" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;" disabled>Save Project</a>
+                    <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
+                </div>    
+
+              </div>
+          </div>
+      </div>  
+    </div>
+  }
+
+}      
+
+
+
+  
+
+
+
+

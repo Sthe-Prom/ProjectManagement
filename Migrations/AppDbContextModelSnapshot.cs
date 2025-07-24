@@ -89,6 +89,9 @@ namespace ProjectManagement.Migrations
                     b.Property<DateTime>("ActivityUpdateTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("MemberProject")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ProjectFiles")
                         .HasColumnType("TEXT");
 

@@ -20,6 +20,7 @@ namespace ProjectManagement.Models
         public DateTime ActivityUpdateTime {get; set; } = DateTime.UtcNow;
         public string? ProjectFiles {get; set; }
         public int ActivityProgress {get; set; }
+        public int? MemberProject {get; set; }
  
         /* Relationship
          FKs         
