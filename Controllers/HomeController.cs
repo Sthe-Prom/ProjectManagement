@@ -16,6 +16,7 @@ using QuestPDF.Drawing;
 using System;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace ProjectManagement.Controllers;
 
@@ -75,7 +76,7 @@ public class HomeController : Controller
         this.ViewData["BaseViewModel"] = this.BaseViewModel;
     }
 
-    public IActionResult Index(ProjectViewModel vm)
+    public IActionResult Index(ProjectViewModel vm, int Staff )
     {
         vm.ProjectModel = new Project();
         vm.fileModel = new FileViewModel();
@@ -90,30 +91,72 @@ public class HomeController : Controller
 
         List<DataPoint> dataPoints = new List<DataPoint>();
         List<DataPoint> dataPointsActivity = new List<DataPoint>();
+        List<DataPoint> dataPointsCompleted = new List<DataPoint>();
+        List<DataPoint> dataPointsIncomplete = new List<DataPoint>();
+        List<DataPoint> dataPointsStarted = new List<DataPoint>();
+        List<DataPoint> dataPointsOther = new List<DataPoint>();
+
+        var Project_ = project_context.Projects;
+
+        //Filter By User 
+        if (!string.IsNullOrEmpty(Request.Query["Staff"]))
+        {            
+            vm.Projects = project_context.Projects
+                    .Where(a => a.AccountID == Staff);   
+            
+            var p = project_context.Projects
+                    .Where(a => a.AccountID == Staff)
+                    .Select(a => a.Id);
+
+            vm.Activities = activity_context.Activities
+                    .Where(a => p.Contains(a.ProjectID));
+
+            Project_ = project_context.Projects
+                    .Where(a => a.AccountID == Staff) ;       
+            
+        }
+        else
+            if(Staff == 1)
+            { 
+                vm.Projects = project_context.Projects;     
+                Project_ = project_context.Projects;  
+                vm.Activities = activity_context.Activities;                  
+            }   
+            else
+                {
+                    vm.Projects = project_context.Projects;     
+                    Project_ = project_context.Projects;  
+                    vm.Activities = activity_context.Activities;    
+                }     
 
         var projects_data = from acc in account_context.Accounts
-                    join proj in project_context.Projects
+                    join proj in Project_
                     on acc.AccountID equals proj.AccountID
                     join stat in status_context.Statuses
                     on proj.ProjectStatusID equals stat.Id
                     group new {proj, stat}     
-                        by new {proj.ProjectStatusID, stat.StatusName} 
+                        by new {Year = proj.ProjectStartDate.Year, Month = proj.ProjectStartDate.Month, stat.StatusName} 
                     into g     
                   select new {
                     Status = g.Key.StatusName,
-                    ProjectCount = g.Count()              
+                    ProjectDate = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.Key.Month), 
+                    SortDate = new DateTime(g.Key.Year, g.Key.Month, 1),  
+                    ProjectCount = g.Count()                             
 
                   };
 
+        var projects_sortedMonthly = projects_data.OrderBy(m => m.SortDate).ToList();
+                  
+
         var activities_data = from acc in account_context.Accounts
-                    join proj in project_context.Projects
-                    on acc.AccountID equals proj.AccountID
-                    join stat in status_context.Statuses
-                    on proj.ProjectStatusID equals stat.Id
+                    join proj in Project_
+                    on acc.AccountID equals proj.AccountID             
                     join act in activity_context.Activities
                     on proj.Id equals act.ProjectID
-                    group new {proj, stat, act}     
-                        by new {proj.ProjectStatusID, stat.StatusName, act.ActivityProgress} 
+                    join stat in status_context.Statuses
+                    on act.ActivityProgress equals stat.Id
+                    group new {stat, act}     
+                        by new {stat.StatusName, act.ActivityProgress} 
                     into g     
                   select new {
                     Status = g.Key.StatusName,
@@ -122,45 +165,43 @@ public class HomeController : Controller
 
                   };
 
-        foreach(var item in projects_data)
+        foreach(var item in projects_sortedMonthly)
         {
-            dataPoints.Add(new DataPoint(item.Status, item.ProjectCount) );
+            //Main Projects
+            dataPoints.Add(new DataPoint(item.Status, item.ProjectCount) );  
+            //DayOfWeek day_ = item.ProjectDate.DayOfWeek;
+
+            //Line Charts
+            switch (item.Status)
+            {
+                case "Completed":
+                    dataPointsCompleted.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
+                    break;
+                case "Incomplete":
+                    dataPointsIncomplete.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
+                    break;
+                case "Started":
+                    dataPointsStarted.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
+                    break;
+                default:
+                    dataPointsOther.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
+                    break;
+            }          
         }
 
+       
         foreach(var item in activities_data)
         {
-            if(item.ActivityProgress == 1)
-            {
-                dataPointsActivity.Add(new DataPoint("Upcoming", item.ActivityCount) );
-            }
-             if(item.ActivityProgress == 2)
-            {
-                dataPointsActivity.Add(new DataPoint("Started", item.ActivityCount) );
-            }
-             if(item.ActivityProgress == 3)
-            {
-                dataPointsActivity.Add(new DataPoint("Ongoing", item.ActivityCount) );
-            }
-             if(item.ActivityProgress == 4)
-            {
-                dataPointsActivity.Add(new DataPoint("Completed", item.ActivityCount) );
-            }
-             if(item.ActivityProgress == 5)
-            {
-                dataPointsActivity.Add(new DataPoint("Incomplete", item.ActivityCount) );
-            }
-            if(item.ActivityProgress == 6)
-            {
-                dataPointsActivity.Add(new DataPoint("On-Hold", item.ActivityCount) );
-            }
-             if(item.ActivityProgress == 7)
-            {
-                dataPointsActivity.Add(new DataPoint("Sent for Review", item.ActivityCount) );
-            }
+            dataPointsActivity.Add(new DataPoint(item.Status, item.ActivityCount) );
         }
 
+        //Prepare Json Output
         ViewBag.DataPoints = JsonConvert.SerializeObject(dataPoints);    
-        ViewBag.DataPointsActivity = JsonConvert.SerializeObject(dataPointsActivity);          
+        ViewBag.DataPointsActivity = JsonConvert.SerializeObject(dataPointsActivity);    
+        ViewBag.DataPointsComplete = JsonConvert.SerializeObject(dataPointsCompleted); 
+        ViewBag.DataPointsIncomplete = JsonConvert.SerializeObject(dataPointsIncomplete); 
+        ViewBag.DataPointsStarted = JsonConvert.SerializeObject(dataPointsStarted); 
+        ViewBag.DataPointsOther = JsonConvert.SerializeObject(dataPointsOther);         
 
         return View(vm);
     }
@@ -602,7 +643,6 @@ public class HomeController : Controller
 
         return Json(model);
     }
-
 
     private string UploadedFile(ProjectViewModel model)
     {

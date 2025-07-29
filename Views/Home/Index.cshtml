@@ -911,10 +911,10 @@
        
 
 
-        //Charts
-      
+        //Charts      
         window.onload = function () {
  
+          //Projects
           var chart = new CanvasJS.Chart("projectsContainer", {
             animationEnabled: true,
             theme: "light2", // "light1", "light2", "dark1", "dark2"
@@ -926,22 +926,54 @@
             }]
           });
           chart.render();  
+          //--------------------------------------------------------
 
            //Activity Chart
            var chartAct = new CanvasJS.Chart("activityChart", {
             animationEnabled: true,
             theme: "light2", // "light1", "light2", "dark1", "dark2"
-                     
+                               
             data: [{
-              type: "doughnut",
+              type: "doughnut",    
 		          startAngle: 60,
-              indexLabelFontSize: 17,
+              indexLabelFontSize: 11,
               indexLabel: "{label} - #percent%",
               toolTipContent: "<b>{label}:</b> {y} (#percent%)",
               dataPoints: @Html.Raw(ViewBag.DataPointsActivity)
             }]
           });
           chartAct.render();  
+          
+          //------------------------------------------------------
+
+          //projectOverTime
+          var chartLine = new CanvasJS.Chart("projectOverTime", {
+            animationEnabled: true,
+            theme: "light2",
+            title: {
+              text: "Project Trends Over Time"
+            },
+            toolTip: {
+              shared: true
+            },
+            data: [{
+              type: "line",
+              name: "Completed",
+              showInLegend: true,
+              dataPoints: @Html.Raw(ViewBag.DataPointsComplete)
+            }, {
+              type: "line",
+              name: "Incomplete",
+              showInLegend: true,
+              dataPoints: @Html.Raw(ViewBag.DataPointsIncomplete)
+            }, {
+              type: "line",
+              name: "Started",
+              showInLegend: true,
+              dataPoints: @Html.Raw(ViewBag.DataPointsStarted)
+            }]
+          });
+          chartLine.render(); 
 
            
         }
@@ -951,7 +983,7 @@
 
 
 
-<div class="container-fluid min-height">
+<div class="container-fluid min-height" style="margin-bottom:0 !important;">
   <div class="container p-1">
     @* <h3 class="text-center" style="color: #0F204B; margin: 10px;font-weight: 400;">MIR Projects</h3> *@
   <h4 class="text-center pb-1" style="color: #A71930; font-weight: 400;">Manage Projects and Activities</h4>
@@ -1133,56 +1165,51 @@
     {
 
       @* Admin Main *@
-      <div id="main" class="main">
+      <div id="main" class="main" style="margin-top:0 !important;">
         
-        <div class="pagetitle">         
+        <div class="pagetitle" >         
 
-          <div class="row d-flex flex-row justify-content-center">
-
-              <div class="col-auto">
+            <div class="row d-flex flex-row justify-content-center">      
+              <div class="col-sm-2">
                   <h1>Dashboard</h1>
                   <nav>
                     <ol class="breadcrumb">
-                      <li class="breadcrumb-item"><a >Sort</a></li>
-                      <li class="breadcrumb-item active">Filter</li>
+                      <li class="breadcrumb-item active">Projects/Activities Summaries </li>
                     </ol>
                   </nav>
-              </div>             
-            
-              <div class="col-auto" >
-                  <select class="form-select mb-3" id="sortOrder">                                                         
-                      <option selected>Sort By Date</option> 
-                      <option value="Newest">@Html.ActionLink("Newest", "LatestAccidents", new { sortOrder = "Newest" })</option>
-                      <option value="Oldest">@Html.ActionLink("Oldest", "LatestAccidents", new { sortOrder = "Oldest" })</option>                                    
-                  </select>                           
-              </div>
-              
-              <div class="col-auto" >                                                                                                            
-                  <select class="form-select mb-3" id="sortConfirmed">                                                         
-                      <option selected>Filter By Status</option> 
-                      <option value="Confirmed">@Html.ActionLink("Confirmed", "LatestAccidents", new { filterConfirmed = "Confirmed" })</option>
-                      <option value="Unconfirmed">@Html.ActionLink("Unconfirmed", "LatestAccidents", new { filterConfirmed = "Unconfirmed" })</option>                                            
-                  </select>                                            
-              </div>                                                                                                  
-              
-              <div class="col-auto" >                                                                   
-                  <select class="form-select mb-3" id="sortUser">                                                         
-                      <option selected>Filter By User</option> 
-                      <option value="LoggedIn">@Html.ActionLink("Logged In", "LatestAccidents", new { sortUser = "LoggedIn" })</option>
-                      <option value="AllUsers">@Html.ActionLink("All Users", "LatestAccidents", new { sortUser = "AllUsers" })</option>                                            
-                  </select>
-              </div>
-                  
-              <div class="col-auto" >
-                  @* @await Component.InvokeAsync("AccidentType")                                       *@
-              </div>
+              </div>  
 
-          </div>
+              @if((signInManager.IsSignedIn(User)) )                                                
+                {   
+                  <div class="col-sm-10">
+                  
+                    <ul class="list-unstyled list-item text-center" style="margin-right:20%;">
+
+                        <li class="breadcrumb-item active fw-bold pb-2" style="color:#0f204b"><span class="fs-6 pb-2">Filter by User:</span></li>
+                      
+                        @foreach(var i in Model.Accounts)
+                        {                        
+                          <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #a71930;color:white;padding:4px 20px;border-radius:6px;">
+                            <span style="vertical-align:middle;" class="pe-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                            </span>
+                              @Html.ActionLink(i.FirstName, "Index", new { Staff = i.AccountID }, new {@class="users"})
+                            
+                          </li>       
+                        }     
+
+                    </ul>
+
+                  </div>
+                                              
+                }  
+
+            </div>             
 
         </div>
         @* @*End Page Title *@ 
 
-        <section class="section dashboard">
+        <section class="section dashboard" style="margin-top:0;">
           <div class="row">
             @*Left side columns *@
             <div class="col-lg-8">
@@ -1328,8 +1355,8 @@
                             }
                             @acc.Count()
                           </h6>
-                          <span class="text-danger small pt-1 fw-bold">12%</span>
-                          <span class="text-muted small pt-2 ps-1">decrease</span>
+                          <span class="text-danger small pt-1 fw-bold">80%</span>
+                          <span class="text-muted small pt-2 ps-1">Active</span>
                         </div>
                       </div>
                     </div>
@@ -1440,7 +1467,7 @@
 
                  
                 @*Project Over time *@
-                <div class="col-12" style="display:none;">
+                <div class="col-12" style="display:block;">
                   <div class="card">
                     <div class="filter">
                       <a class="icon" href="#" data-bs-toggle="dropdown"
@@ -1459,75 +1486,8 @@
                     </div>
 
                       @*Line Chart *@
-                      <div id="reportsChart"></div>              
-                      <script>
-                        document.addEventListener("DOMContentLoaded", () => {
-                          new ApexCharts(
-                            document.querySelector("#reportsChart"),
-                            {
-                              series: [
-                                {
-                                  name: "Sales",
-                                  data: [31, 40, 28, 51, 42, 82, 56],
-                                },
-                                {
-                                  name: "Revenue",
-                                  data: [11, 32, 45, 32, 34, 52, 41],
-                                },
-                                {
-                                  name: "Customers",
-                                  data: [15, 11, 32, 18, 9, 24, 11],
-                                },
-                              ],
-                              chart: {
-                                height: 350,
-                                type: "area",
-                                toolbar: {
-                                  show: false,
-                                },
-                              },
-                              markers: {
-                                size: 4,
-                              },
-                              colors: ["#4154f1", "#2eca6a", "#ff771d"],
-                              fill: {
-                                type: "gradient",
-                                gradient: {
-                                  shadeIntensity: 1,
-                                  opacityFrom: 0.3,
-                                  opacityTo: 0.4,
-                                  stops: [0, 90, 100],
-                                },
-                              },
-                              dataLabels: {
-                                enabled: false,
-                              },
-                              stroke: {
-                                curve: "smooth",
-                                width: 2,
-                              },
-                              xaxis: {
-                                type: "datetime",
-                                categories: [
-                                  "2018-09-19T00:00:00.000Z",
-                                  "2018-09-19T01:30:00.000Z",
-                                  "2018-09-19T02:30:00.000Z",
-                                  "2018-09-19T03:30:00.000Z",
-                                  "2018-09-19T04:30:00.000Z",
-                                  "2018-09-19T05:30:00.000Z",
-                                  "2018-09-19T06:30:00.000Z",
-                                ],
-                              },
-                              tooltip: {
-                                x: {
-                                  format: "dd/MM/yy",
-                                },
-                              },
-                            }
-                          ).render();
-                        });
-                      </script> 
-
+                      <div id="projectOverTime" class="echarts" style="min-height: 300px;max-width:100%;"  ></div>              
+                     
                   </div>
                 </div>
                 @*End Project *@
@@ -1577,7 +1537,7 @@
 
                     @foreach(var rec_p in recent_projects.Take(5).OrderByDescending(p => p.ProjectUpdateTime))
                     {
-                        DateTime now = DateTime.Now;
+                        DateTime now = DateTime.UtcNow;
                         DateTime prevDate = rec_p.ProjectUpdateTime;
                         TimeSpan durationFixed = now.Subtract(prevDate);
 
@@ -1598,7 +1558,7 @@
                               }else
                                 if(totalMinutes > 60 && (totalMinutes <= 1440) )
                                 {                                   
-                                  timeDis = Convert.ToInt32(totalMinutes/24);      
+                                  timeDis = Convert.ToInt32(totalMinutes/60);      
                                   <span class="" style="display: inline-flex; align-items: center;">  
                                       <span style="font-weight:100">@timeDis hrs</span>
                                   </span> 
@@ -1670,13 +1630,12 @@
                                       rec_act.ActivityUpdateTime,
                                       rec_act.ActivityHighlights
                                     };
-
                          
                     }
 
-                    @foreach(var a in recent_activities.Take(10).OrderByDescending(a => a.ActivityUpdateTime))
+                    @foreach(var a in recent_activities.OrderByDescending(a => a.Id).Take(10))
                     {
-                        DateTime now = DateTime.Now;
+                        DateTime now = DateTime.UtcNow;
                         DateTime prevDate = a.ActivityUpdateTime;
                         TimeSpan durationFixed = now.Subtract(prevDate);
 
@@ -1691,13 +1650,13 @@
                             @if(totalMinutes <= 60)
                               {                                         
                                 <span class="" style="display: inline-flex; align-items: center;">  
-                                    <span style="font-weight:100">@totalMinutes min</span>
+                                    <span style="font-weight:100">@Convert.ToInt32(totalMinutes) min</span>
                                 </span> 
                                 col = "text-success";
                               }else
                                 if(totalMinutes > 60 && (totalMinutes <= 1440) )
                                 {                                   
-                                  timeDis = Convert.ToInt32(totalMinutes/24);      
+                                  timeDis = Convert.ToInt32(totalMinutes/60);      
                                   <span class="" style="display: inline-flex; align-items: center;">  
                                       <span style="font-weight:100">@timeDis hrs</span>
                                   </span> 
@@ -1732,7 +1691,6 @@
                         </div>
                         @*End activity item*@
                     }
-
                     
                   </div>
                 </div>
@@ -1743,7 +1701,7 @@
             @*End Right side columns *@
 
             @* Full Project Table *@
-            @*Recent Sales *@
+            @*Projects & Activities *@
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
                 <div class="filter">
@@ -1939,7 +1897,6 @@
                                                         </div>
                                                     }
                                                 </div>
-                                                                                        
                                                                                 
                                                 
                                               </div> 
@@ -1957,14 +1914,22 @@
                                                         <p class="fw-light">@proj.ProjectAreaOfWork</p>
                                                       </div> 
                                                       <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;">
-                                                        <span class="fw-semibold mb-1" style="color:#a71930;">Project Members</span>
+                                                        <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
                                                         <p class="fw-light">@getProjectMembers.Substring(1)</p>
                                                       </div> 
                                                       <div class="col-sm-3 ps-3 pe-3">
-                                                        <span class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</span>
+                                                        <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</h6>
                                                         @if(proj.ProjectFiles.Length > 2)
-                                                        {
-                                                          <p class="fw-light">@proj.ProjectFiles.Substring(4)</p>
+                                                        {                                                          
+                                                          <p class="fw-light">
+                                                            <a href="~/Attachments/Projects/@proj.ProjectFiles" class="clip" download>
+                                                              <span>
+                                                                <i class="bi bi-paperclip fs-5"></i>
+                                                              </span>
+                                                              @proj.ProjectFiles.Substring(4)
+                                                            </a>
+                                                          </p>
+
                                                         }
                                                         else
                                                         {
@@ -2387,18 +2352,26 @@
                                                     <p class="fw-light">@proj.ProjectAreaOfWork</p>
                                                   </div> 
                                                   <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;">
-                                                    <span class="fw-semibold mb-1" style="color:#a71930;">Project Members</span>
+                                                    <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
                                                     <p class="fw-light">@getProjectMembers.Substring(1)</p>
                                                   </div> 
                                                   <div class="col-sm-3 ps-3 pe-3">
-                                                    <span class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</span>
+                                                    <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</h6>
                                                     @if(proj.ProjectFiles.Length > 2)
-                                                    {
-                                                      <p class="fw-light">@proj.ProjectFiles.Substring(4)</p>
+                                                    {                                                 
+                                                      <p class="fw-light">
+                                                        <a href="~/Attachments/Projects/@proj.ProjectFiles" class="clip" download>
+                                                          <span>
+                                                            <i class="bi bi-paperclip fs-5"></i>
+                                                          </span>
+                                                          @proj.ProjectFiles.Substring(4)
+                                                        </a>
+                                                      </p>
+
                                                     }
                                                     else
                                                     {
-                                                      <p class="fw-light">No files</p>
+                                                      <p class="fw-light">No project files</p>
                                                     }
                                                     
                                                   </div> 
@@ -2867,16 +2840,7 @@
                         }
 
                     </tbody>
-                    @* <tfoot>
-                        <tr>
-                            <th>Project Name</th>
-                            <th>Area of Work</th>
-                            <th>Work in Conjunction</th>
-                            <th>Days since started</th>
-                            <th>Progress</th>
-                            <th>Files attached</th>
-                        </tr>
-                    </tfoot> *@
+                   
 
                 </table>
 
@@ -3006,4 +2970,63 @@
   }
 
 }      
+
+<script>
+
+       document.addEventListener('DOMContentLoaded', function() {
+          const filterLinks = Array.from(document.getElementsByClassName('users')); // Convert HTMLCollection to Array
+
+          // Define initial styles and event listeners for each link
+          filterLinks.forEach(linkElement => {
+              // Set initial styles (better to do this in CSS, but keeping it for consistency with your original intent)
+              linkElement.style.fontSize = "16px";
+              linkElement.style.color = "white";      
+             
+              // Add hover effect using classes
+              linkElement.addEventListener('mouseover', function() {
+                  linkElement.classList.add('link-hover');
+              });
+
+              linkElement.addEventListener('mouseout', function() {
+                  linkElement.classList.remove('link-hover');
+              });
+
+              // Add click behavior for active state
+              linkElement.addEventListener('click', function(event) {
+                 // event.preventDefault(); // Prevent default link behavior (e.g., navigating away) if desired
+
+                  // Remove 'link-active' from all other links
+                  filterLinks.forEach(otherLink => {
+                      if (otherLink !== linkElement) {
+                          otherLink.classList.remove('link-active');
+                          // You might want to reset their initial styles here if not handled by CSS default
+                          otherLink.style.fontSize = "16px";
+                          otherLink.style.fontWeight = "normal"; // Reset font weight
+                      }
+                  });
+
+                  // Toggle 'link-active' on the clicked link
+                  linkElement.classList.toggle('link-active');
+
+                  // Apply specific styles for the active link directly (if not fully managed by CSS)
+                  // This part might be redundant if 'link-active' class handles all styling.
+                  if (linkElement.classList.contains('link-active')) {
+                      linkElement.style.fontSize = "22px";
+                      linkElement.style.fontWeight = "bold";
+                  } else {
+                      // If it's toggled off, reset to initial state
+                      linkElement.style.fontSize = "16px";
+                      linkElement.style.fontWeight = "normal";
+                  }
+
+                  // Optional: You can put your navigation logic here, e.g.,
+                  // window.location.href = linkElement.href;
+              });
+          });
+      });
+
+
+
+</script>
+
 
