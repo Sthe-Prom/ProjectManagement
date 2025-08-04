@@ -5,9 +5,9 @@
 
 @{
     ViewData["Title"] = "Manage Projects";
-    
+
     var userId = userManager.GetUserId(User);
-    User user = await userManager.FindByIdAsync(userId); 
+    User user = await userManager.FindByIdAsync(userId);
 }
 
 <style>
@@ -17,21 +17,21 @@
         text-align: center;
         vertical-align: middle;
         transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
-        margin: 0 auto;    
+        margin: 0 auto;
         color: #0F204B;
-        opacity: 0.6;               
+        opacity: 0.6;
     }
 
-    table ul li:hover{        
-        transform: scale(1.5); 
+    table ul li:hover{
+        transform: scale(1.5);
     }
 
-    table ul li .bi{       
+    table ul li .bi{
         color: #0F204B;
-        opacity: 0.6;               
+        opacity: 0.6;
     }
-   
-    table ul li .bi:hover{       
+
+    table ul li .bi:hover{
         color: #0F204B;
         opacity: 1;
     }
@@ -46,7 +46,7 @@
         color: #A71930;
         opacity: 1;
     }
-    
+
     /*Edit*/
     table ul li .safe .bi{
         color: #00675A;
@@ -69,7 +69,7 @@
         opacity: 1;
     }
 
-    
+
      /*Card Footer*/
 
     .card-footer ul li {
@@ -77,13 +77,13 @@
         text-align: center;
         vertical-align: middle;
         transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
-        margin: 0 auto;    
+        margin: 0 auto;
         color: #00675A;
-        opacity: 0.6;               
+        opacity: 0.6;
     }
 
-    .card-footer ul li:hover{        
-        transform: scale(1.5); 
+    .card-footer ul li:hover{
+        transform: scale(1.5);
     }
 
     ul li .card_footer_edit .bi{
@@ -105,9 +105,9 @@
         color: #A71930;
         opacity: 1;
     }
-   
-   
-    
+
+
+
     /* In your custom.css file or within a <style> tag */
     .fs-7 {
       font-size: 0.75rem; /* Adjust this value as needed, 0.75rem is usually smaller than default paragraph */
@@ -132,18 +132,18 @@
       }
 
       .ufs_container ul {
-        margin: 0;        
+        margin: 0;
         font-weight: bold;
         color: transparent;
         transition: 0.2s;
-        visibility: hidden;        
+        visibility: hidden;
         background-color: #3d4a6b;
       }
 
       .ufs_container:hover ul {
         background-color: #fff;
         visibility: visible;
-        
+
       }
 
       /*End Action Hover*/
@@ -157,8 +157,8 @@
       .accordion{
         background-color: transparent !important;
         background: none;
-      } 
-      
+      }
+
       .accordion-flush{
         background-color: transparent !important;
         background: none;
@@ -167,7 +167,7 @@
       .accordion-item{
         background-color: transparent !important;
         background: none;
-        
+
       }
 
       .accordion-button:not(.collapsed),
@@ -185,12 +185,12 @@
         height: 12px;
         border-radius: 100%;
         background-color: var(--bs-danger);
-        background-image: none !important;      
+        background-image: none !important;
 
       }
       .accordion-button.collapsed::after {
         background-color: var(--bs-gray-300);
-        
+
       }
 
     /*Search Table*/
@@ -203,10 +203,10 @@
         font-size: 16px; /* Increase font-size */
         padding: 12px 20px 8px 40px; /* Add some padding */
         border: 1px solid #ddd; /* Add a grey border */
-        /*margin-bottom: 12px;  Add some space below the input */ 
+        /*margin-bottom: 12px;  Add some space below the input */
     }
-      
-   
+
+
     #projectsTable {
       border-collapse: collapse; /* Collapse borders */
       width: 100%; /* Full-width */
@@ -293,7 +293,7 @@
         font-size: 15px !important;
        color: #0f204b !important;
       }
-      
+
       table tr td {
         font-size: 9px;
       }
@@ -308,19 +308,19 @@
 
       select option, textarea::placeholder, input::placeholder {
          font-size: 10px;
-      }   
+      }
 
     }
-    
+
     /* Small Devices (e.g., Phones, Small Tablets) */
     /* From 481px to 768px wide */
     @@media only screen and (min-width: 481px) and (max-width: 768px) {
-      
+
       .header {
         font-size: 15px;
         color: #0f204b !important;
       }
-      
+
       table tr td {
         font-size: 11px;
       }
@@ -336,18 +336,18 @@
       select option, textarea::placeholder, input::placeholder {
          font-size: 11px;
       }
- 
+
     }
 
     /* Medium Devices (e.g., Tablets, Small Laptops) */
     /* From 769px to 960px wide */
     @@media only screen and (min-width: 769px) and (max-width:960px) {
-        
+
         .header {
         font-size: 15px !important;
         color: #0f204b !important;
       }
-      
+
       table tr td {
         font-size: 12px;
       }
@@ -370,12 +370,12 @@
     /* Large Devices (e.g., Laptops, Desktops) - User's example range */
     /* From 961px to 1200px wide */
     @@media  only screen and (min-width: 961px) and (max-width:1200px){
-      
+
        .header {
         font-size: 15px !important;
         color: #0f204b !important;
       }
-      
+
       table tr td {
         font-size: 16px;
       }
@@ -386,23 +386,23 @@
 
       .modal {
          font-size: 14px;
-      } 
+      }
 
       select option, textarea::placeholder, input::placeholder {
          font-size: 14px;
-      }      
-     
+      }
+
     }
 
     /* Extra Large Devices (e.g., Large Desktops, TVs) */
     /* From 1201px and wider */
     @@media only screen and (min-width: 1201px) {
-      
+
        .header {
         font-size: 15px !important;
         color: #0f204b !important;
       }
-      
+
       table tr td {
         font-size: 12px;
       }
@@ -418,20 +418,20 @@
       select option , textarea::placeholder, input::placeholder {
          font-size: 13px;
       }
-      
+
     }
 
-   
+
 </style>
 
  @section Scripts{
     <script>
-        
+
         $(document).ready(function() {
 
                 //Save Project
                 $("#btnSaveProject").on("click", function() {
-                              
+
                     var formData = new FormData(frmAddProject);
                     const values = [...formData.entries()];
                     const user_ids = formData.getAll('ProjectModel.SelectedAssignedUserIds');
@@ -454,10 +454,19 @@
 
                     var f = [];
                     var s = 'The following fields are required: \n------------------------------\n';
-                 
+
+                    var dateStart = formData.get('ProjectModel.ProjectStartDate');
+                    var dateEnd = formData.get('ProjectModel.ProjectEndDate');
+                       
+                    if(dateEnd < dateStart){
+                      s += "Project End Date cannot be earler than Start Date." + '\n';
+                      f.push('1');
+                    }
+
                     for(i = 0; i < values.length;i++){
                       if(values[i][1] === "" && values[i][0] !== 'ProjectModel.SelectedAssignedUserIds' )// || values[i][1].name == "")
-                      {                        
+                      {
+                                     
                         if(values[i][0].includes('.')){
                             s += values[i][0].split('.')[1] + '\n';
                             f.push(values[i][1]);
@@ -465,18 +474,18 @@
                             s += values[i][0] + '\n';
                             f.push(values[i][1]);
                           }
-                        
+
                       }
-                                     
+
                     }
 
                     if(f.length > 0){
                         //validateAddRoadFactorsForm();
                         alert(s);
                         //validatedNew();
-                    }              
+                    }
                     else{
-                                                                             
+
                       $.ajax({
                           type: 'POST',
                           url: '@Url.Action("AddProjectAjax", "Home")',
@@ -489,7 +498,7 @@
                       });
 
                     }
-                
+
 
                 });
 
@@ -499,37 +508,37 @@
 
                 function projectAddSuccess(response) {
                     if (response.responseCode == 0) {
-                        
-                        ProjectAdd("Add Project", "Project Name: " + response.responseMessage 
-                          + " was added successfully."); 
-                        //alert("Project Added Successfully");                       
+
+                        ProjectAdd("Add Project", "Project Name: " + response.responseMessage
+                          + " was added successfully.");
+                        //alert("Project Added Successfully");
                     }
                     else {
                         alert(response.ResponseMessage);
                     }
-                }  
+                }
 
                 //Edit Project Forms
                 const editProjectForms = document.getElementsByClassName("frmEditProject");
 
                 for (const form of editProjectForms) {
 
-                    const id = form.getAttribute("id");   
-                
+                    const id = form.getAttribute("id");
+
                     // Using match with regEx
                     let num_extr = id.match(/(\d+)/);
-                    
+
                     // Display output if number extracted
                     if (num_extr) {
                         console.log('number found:' + num_extr[0]);
-                    }                                
+                    }
 
                     //UPDATE Project
                     $("#btnUpdateProject_"+num_extr[0]).on("click", function() {
-                       
+
                         //var act_id = document.getElementById('projectId_1');
                         //console.log('delete key is:' + num_extr[0]);
-                        
+
                         var formData = new FormData(form);
                         const values = [...formData.entries()];
 
@@ -540,7 +549,6 @@
                           s_user_ids += ',' + id;
                         }
 
-                       
                        // formData.append("ProjectModel_Id", $("#projectID").val() );
                         formData.append("proj_AccountID",  values[1][1] );
                         formData.append("proj_ProjectName", values[2][1] );
@@ -552,10 +560,18 @@
                         formData.append("proj_ProjectEndDate",  formData.get('proj.ProjectEndDate') ) ;
                         formData.append("proj_ProjectStatusID", formData.get('proj.ProjectStatusID') );
                         formData.append("ProjectFiles",  formData.get('ProjectFiles') );
-                       
+
                         var f = [];
                         var s = 'Please correct the following: \n---------------------------------\n';
-                    
+
+                        var dateStart = formData.get('proj.ProjectStartDate');
+                        var dateEnd = formData.get('proj.ProjectEndDate');
+                          
+                        if(dateEnd < dateStart){
+                          s += "Project End Date cannot be earler than Start Date." + '\n';
+                          f.push('1');
+                        }
+
                         for(i = 0; i < values.length;i++){
                           if(values[i][1] === "" || values[i][1] === 0)// || values[i][1].name == "")
                           {
@@ -566,7 +582,7 @@
                                 s += values[i][0] + '\n';
                                 f.push(values[i][1]);
                               }
-                            
+
                           }
                         }
 
@@ -578,14 +594,14 @@
 
                           $.ajax({
                               type: 'POST',
-                              url: '@Url.Action("UpdateProject", "Home")' +'/' + num_extr[0],                       
+                              url: '@Url.Action("UpdateProject", "Home")' +'/' + num_extr[0],
                               contentType: false,
                               processData: false,
                               cache: false,
                               data: formData,
                               success: projectUpdateSuccess,
                               error: projectUpdateError
-                          });       
+                          });
 
                         }
 
@@ -597,17 +613,17 @@
 
                     function projectUpdateSuccess(response) {
                         if (response.responseCode == 0) {
-                            
-                            ProjectEdit("Update Project", "Project Name: " + response.responseMessage 
-                                + " was added successfully."); 
-                            //alert("success");                
+
+                            ProjectEdit("Update Project", "Project Name: " + response.responseMessage
+                                + " was added successfully.");
+                            //alert("success");
                         }
                         else {
                             alert('Error..');
                         }
-                    }  
+                    }
 
-                };  
+                };
 
                 //----------------- Activity --------------------
 
@@ -616,21 +632,21 @@
 
                 for (const form of addActivityForms) {
 
-                    const id = form.getAttribute("id");   
-                
+                    const id = form.getAttribute("id");
+
                     // Using match with regEx
                     let num_extr = id.match(/(\d+)/);
-                    
+
                     // Display output if number extracted
                     if (num_extr) {
                         console.log('number found:' + num_extr[0]);
-                    }                                      
-                                    
+                    }
+
                     //SAVE Activity
                     $("#btnSaveActivity_"+num_extr[0]).on("click", function() {
-                    
+
                         console.log("btnSaveActivity_"+num_extr[0] +" was clicked, but didn;t respond!");
-                        
+
                         var formData_act = new FormData(form);
                         const values = [...formData_act.entries()];
 
@@ -647,20 +663,51 @@
 
                         var f = [];
                         var s = 'The following fields are required: \n------------------------------\n';
-                    
+                        
+                        //Activity Date
+                        var dateStart = formData_act.get('ActivityModel.ActivityStartDate');
+                        var dateEnd = formData_act.get('ActivityModel.ActivityEndDate');
+
+                        //Project Date
+                        var proj_id = formData_act.get('ActivityModel.ProjectID');
+                        var n = document.getElementById('frmEditProject_'+proj_id);
+                        var formData_temp = new FormData(n);
+                        const values_ = [...formData_temp.entries()];
+                       
+                        var dateStart_proj = formData_temp.get('proj.ProjectStartDate');
+                        var dateEnd_proj = formData_temp.get('proj.ProjectEndDate');
+                          
+                        if(dateEnd < dateStart){
+                          s += "Activity End Date cannot be earler than the Activity Start Date." + '\n';
+                          f.push('1');
+                        }                  
+
+                        if(dateStart < dateStart_proj){
+                          s += "Activity Start Date cannot be earlier than the Project Start Sate." + '\n';
+                          f.push('2');
+                        } 
+
+                        if(dateEnd > dateEnd_proj){
+                          s += "Activity End Date cannot be after the Project End Sate." + '\n';
+                          f.push('3');
+                        }     
+
                         for(i = 0; i < values.length;i++){
-                                                    
+
                             if(values[i][1] === "" || values[i][1] === 0 ) //|| values[i][1].name == "")
                             {
                               if(values[i][0].includes('.')){
-                                  if(values[i][0] !== "ActivityModel.ActivityComments" && values[i][0] !== "ActivityModel.ActivityChallenges" && values[i][0] !== "ActivityModel.ActivityHighlights"){
+                                  if(values[i][0] !== "ActivityModel.ActivityComments" && 
+                                    values[i][0] !== "ActivityModel.ActivityChallenges" &&
+                                    values[i][0] !== "ActivityModel.ActivityHighlights" &&
+                                    values[i][0] !== "ActivityModel.MemberProject"){
                                     s += values[i][0].split('.')[1] + '\n';
                                     f.push(values[i][1]);
                                   }
                                 }else{
                                   s += values[i][0] + '\n';
                                   f.push(values[i][1]);
-                                }                            
+                                }
                             }
 
                           //}
@@ -672,7 +719,7 @@
                             //validatedNew();
                         }
                         else{
-                           
+
                             $.ajax({
                                 type: 'POST',
                                 url: '@Url.Action("AddActivityAjax", "Home")',
@@ -682,22 +729,24 @@
                                 data: formData_act,
                                 success: activitySuccess,
                                 error: activityError
-                            });    
+                            });
                         }
 
-                                
-                    });               
-                                
-                    function activityError() {
-                        alert("An error while adding your Action. please try again.");
+
+                    });
+
+                    function activityError(response){
+                      if(response.ResponseCode == 1){
+                        alert("An error occured while updating your Activity. please try again." + '\n' + response.ResponseMessage)
+                      }
                     }
 
                     function activitySuccess(response) {
                         if (response.responseCode == 0) {
-                            
-                            ActivityAdd("Add Activity", "Activity Name: " + response.responseMessage 
-                                + " was added successfully.");   
-                            //alert("Activity Added Successfully.");                     
+
+                            ActivityAdd("Add Activity", "Activity Name: " + response.responseMessage
+                                + " was added successfully.");
+                            //alert("Activity Added Successfully.");
                         }
                         else {
                             alert(response.ResponseMessage);
@@ -706,7 +755,7 @@
 
                     //DELETE Project
                     $("#btnDeleteProject_"+num_extr[0]).on("click", function() {
-                      
+
                             swal({
                                 title: "Are you sure?",
                                 text: "Projects deleted cannot be recovered",
@@ -722,11 +771,11 @@
                                     if (isConfirm) {
                                            $.ajax({
                                                 type: 'DELETE',
-                                                url: '@Url.Action("DeleteProject", "Home")' +'/' + num_extr[0],                       
+                                                url: '@Url.Action("DeleteProject", "Home")' +'/' + num_extr[0],
                                                 cache: false
-                                                
-                                            });                                              
-                              
+
+                                            });
+
                                             swal({
                                                 title: "Deleted",
                                                 text: "Selected Project has been deleted.",
@@ -734,20 +783,20 @@
                                                 confirmButtonColor: "#0F204B",
                                                 confirmButtonText: "Okay",
                                                 closeOnConfirm: false,
-                                                html: true                                                  
+                                                html: true
                                             },
-                                              function(){ 
+                                              function(){
                                                     location.reload();
-                                                }); 
-                                            
+                                                });
+
 
                                     } else {
                                         swal("Cancelled", "No Projects Deleted:)", "error");
                                     }
-                                });  
-                            
+                                });
+
                     });
-                   
+
                 };
 
                 //Activity (All) (Edit + Delete) Forms
@@ -755,14 +804,14 @@
 
                 for (const form of allActivityForms) {
 
-                    const id = form.getAttribute("id");   
-                
+                    const id = form.getAttribute("id");
+
                     // Using match with regEx
                     let num_extr = id.match(/(\d+)/);
-                
+
                      //UPDATE Activity
                     $("#btnUpdateActivity_"+num_extr[0]).on("click", function() {
-                    
+
                         var formData_act = new FormData(form);
                         const values = [...formData_act.entries()];
 
@@ -778,7 +827,15 @@
 
                         var f = [];
                         var s = 'Please correct the following: \n---------------------------------\n';
-                    
+
+                        var dateStart = formData_act.get('act.ActivityStartDate');
+                        var dateEnd = formData_act.get('act.ActivityEndDate');
+                          
+                        if(dateEnd < dateStart){
+                          s += "Activity End Date cannot be earler than Start Date." + '\n';
+                          f.push('1');
+                        } 
+
                         for(i = 0; i < values.length;i++){
                           if(values[i][1] === 0)// || values[i][1].name == "")
                           {
@@ -791,7 +848,7 @@
                                 s += values[i][0] + '\n';
                                 f.push(values[i][1]);
                               }
-                            
+
                           }
                         }
 
@@ -801,7 +858,7 @@
                             //validatedNew();
                         }
                         else{
-                           
+
                             $.ajax({
                                 type: 'POST',
                                 url: '@Url.Action("UpdateActivity", "Home")',
@@ -811,31 +868,33 @@
                                 data: formData_act,
                                 success: activityUpdateSuccess,
                                 error: activityUpdateError
-                            });    
+                            });
                         }
 
-                                
-                    });               
-                                
-                    function activityUpdateError() {
-                        alert("An error while updating your Activity. please try again.");
+
+                    });
+           
+                    function activityUpdateError(response){
+                      if(response.ResponseCode == 1){
+                        alert("An error occured while updating your Activity. please try again." + '\n' + response.ResponseMessage)
+                      }
                     }
 
                     function activityUpdateSuccess(response) {
-                        if (response.responseCode == 0) {
-                            
-                            ActivityUpdate("Update Activity", "Activity Name: " + response.responseMessage 
-                                + " was updated successfully.");   
-                            //alert("Activity Added Successfully.");                     
+                        if (response.ResponseCode == 0) {
+
+                            ActivityUpdate("Update Activity", "Activity Name: " + response.ResponseMessage
+                                + " was updated successfully.");
+                            //alert("Activity Added Successfully.");
                         }
                         else {
                             alert(response.ResponseMessage);
                         }
-                    }       
-                    
+                    }
+
                     //DELETE Activity
                     $("#btnDeleteActivity_"+num_extr[0]).on("click", function() {
-                      
+
                             swal({
                                 title: "Are you sure?",
                                 text: "Activities deleted cannot be recovered",
@@ -851,11 +910,11 @@
                                     if (isConfirm) {
                                            $.ajax({
                                                 type: 'DELETE',
-                                                url: '@Url.Action("DeleteActivity", "Home")' +'/' + num_extr[0],                       
+                                                url: '@Url.Action("DeleteActivity", "Home")' +'/' + num_extr[0],
                                                 cache: false
-                                                
-                                            });                                              
-                              
+
+                                            });
+
                                             swal({
                                                 title: "Deleted",
                                                 text: "Selected Activity has been deleted.",
@@ -863,28 +922,28 @@
                                                 confirmButtonColor: "#0F204B",
                                                 confirmButtonText: "Okay",
                                                 closeOnConfirm: false,
-                                                html: true                                                  
+                                                html: true
                                             },
-                                              function(){ 
+                                              function(){
                                                     location.reload();
-                                                }); 
-                                            
+                                                });
+
 
                                     } else {
                                         swal("Cancelled", "No Activities Deleted:)", "error");
                                     }
-                                });  
-                            
-                    });                          
+                                });
 
-                   
+                    });
+
+
                 };
-              
 
-        });     
+
+        });
 
         //Table Functions
-        
+
         //Search()
         function searchProAct() {
           // Declare variables
@@ -908,81 +967,25 @@
           }
         }
 
-       
 
 
-        //Charts      
+
+        //Charts
         window.onload = function () {
- 
+
           //Projects
-          var chart = new CanvasJS.Chart("projectsContainer", {
-            animationEnabled: true,
-            theme: "light2", // "light1", "light2", "dark1", "dark2"
-           
-          
-            data: [{
-              type: "column",
-              dataPoints: @Html.Raw(ViewBag.DataPoints)
-            }]
-          });
-          chart.render();  
+
           //--------------------------------------------------------
 
-           //Activity Chart
-           var chartAct = new CanvasJS.Chart("activityChart", {
-            animationEnabled: true,
-            theme: "light2", // "light1", "light2", "dark1", "dark2"
-                               
-            data: [{
-              type: "doughnut",    
-		          startAngle: 60,
-              indexLabelFontSize: 11,
-              indexLabel: "{label} - #percent%",
-              toolTipContent: "<b>{label}:</b> {y} (#percent%)",
-              dataPoints: @Html.Raw(ViewBag.DataPointsActivity)
-            }]
-          });
-          chartAct.render();  
-          
-          //------------------------------------------------------
 
-          //projectOverTime
-          var chartLine = new CanvasJS.Chart("projectOverTime", {
-            animationEnabled: true,
-            theme: "light2",
-            title: {
-              text: "Project Trends Over Time"
-            },
-            toolTip: {
-              shared: true
-            },
-            data: [{
-              type: "line",
-              name: "Completed",
-              showInLegend: true,
-              dataPoints: @Html.Raw(ViewBag.DataPointsComplete)
-            }, {
-              type: "line",
-              name: "Incomplete",
-              showInLegend: true,
-              dataPoints: @Html.Raw(ViewBag.DataPointsIncomplete)
-            }, {
-              type: "line",
-              name: "Started",
-              showInLegend: true,
-              dataPoints: @Html.Raw(ViewBag.DataPointsStarted)
-            }]
-          });
-          chartLine.render(); 
 
-           
         }
 
     </script>
 }
 
 
-
+@* H E A D ER *@
 <div class="container-fluid min-height" style="margin-bottom:0 !important;">
   <div class="container p-1">
     @* <h3 class="text-center" style="color: #0F204B; margin: 10px;font-weight: 400;">MIR Projects</h3> *@
@@ -992,25 +995,43 @@
       @* <h5 class="text-center" style="color: #0F204B;">​<strong style="position: relative;">Process workflow</strong></h5> *@
       @*<ul id="itgyf" class="list list-unstyled list-inline-item align-items-center text-center" style="align-content: center;"> *@
       <div class="col-auto">
-        <span >
-        <button class="btn btn-sm" id="btnAddProject" data-bs-toggle="modal" data-bs-target="#modalProject">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-plus-circle" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-          </svg> 
-          <span style="display: inline-flex; align-items: center;margin-right:2px;">Add a project</span>
-          </button>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-          </svg>
-        </span>
+        @if(await userManager.IsInRoleAsync(user,"Admin"))
+        {
+          <span>          
+            <button class="btn btn-sm" >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+              </svg>
+              <span style="display: inline-flex; align-items: center;margin-right:2px;">Add a project</span>
+            </button>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+            </svg>
+          </span>
+        }
+        else
+        {
+          <span>          
+            <button class="btn btn-sm" id="btnAddProject" data-bs-toggle="modal" data-bs-target="#modalProject">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+              </svg>
+              <span style="display: inline-flex; align-items: center;margin-right:2px;">Add a project</span>
+            </button>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+            </svg>
+          </span>
+        }
       </div>
       <div class="col-auto">
         <span >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-diagram-3" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
-          </svg>&nbsp; 
-            <span style="display: inline-flex; align-items: center;margin-right:2px;">Log a project activity</span> 
+          </svg>&nbsp;
+            <span style="display: inline-flex; align-items: center;margin-right:2px;">Log a project activity</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
           </svg>
@@ -1038,20 +1059,20 @@
       @*</ul> *@
     </div>
   </div>
-  
+
 </div>
 
-@* Table *@
+@* DATA PIPELINES *@
 @{
 
       var all_pojects = from p in Model.Projects
                       join acc in Model.Accounts
                       on p.AccountID equals acc.AccountID
                       //where acc.Id == userId
-                  select new { 
-                    AccountID = p.AccountID,    
+                  select new {
+                    AccountID = p.AccountID,
                     UserID = acc.Id,
-                    ProjectID = p.Id,               
+                    ProjectID = p.Id,
                     SelectedAssignedUserIds = p.SelectedAssignedUserIds
                   };
 
@@ -1063,34 +1084,34 @@
 
       foreach(var item in all_pojects)
       {
-          bool isUserAssigned = item.SelectedAssignedUserIds.Contains(currentUser.AccountID);         
+          bool isUserAssigned = item.SelectedAssignedUserIds.Contains(currentUser.AccountID);
           if(isUserAssigned)
-          {   
-            account_lists.Add(item.SelectedAssignedUserIds[0]);      
+          {
+            account_lists.Add(item.SelectedAssignedUserIds[0]);
           }
-         
-      }
-    
-        foreach(var itemId in all_pojects)
-        {           
-            bool isUserAssigned = itemId.SelectedAssignedUserIds.Skip(1).Contains(currentUser.AccountID);
-           
-            if(isUserAssigned)
-            {               
-              project_lists.Add(itemId.ProjectID);                  
-            }    
-        }     
 
-          
+      }
+
+        foreach(var itemId in all_pojects)
+        {
+            bool isUserAssigned = itemId.SelectedAssignedUserIds.Skip(1).Contains(currentUser.AccountID);
+
+            if(isUserAssigned)
+            {
+              project_lists.Add(itemId.ProjectID);
+            }
+        }
+
+
       var projects_data = from acc in Model.Accounts
                     join proj in Model.Projects
                     on acc.AccountID equals proj.AccountID
                     join stat in Model.Statuses
-                    on proj.ProjectStatusID equals stat.Id                   
+                    on proj.ProjectStatusID equals stat.Id
                     where acc.Id == userId ||
                                       //acc.AccountID == proj.SelectedAssignedUserIds[0]
                     (project_lists.Contains(proj.Id))
-                      
+
                   select new {
                     proj.AccountID,
                     proj.Id,
@@ -1105,6 +1126,7 @@
                     proj.ProjectFiles,
                     stat.StatusName,
                     proj.SelectedAssignedUserIds,
+                    proj.CalculatedDisplayStatusId
 
                   };
 
@@ -1112,8 +1134,8 @@
                     join proj in Model.Projects
                     on acc.AccountID equals proj.AccountID
                     join stat in Model.Statuses
-                    on proj.ProjectStatusID equals stat.Id                   
-                  
+                    on proj.ProjectStatusID equals stat.Id           
+
                   select new {
                     proj.AccountID,
                     proj.Id,
@@ -1128,17 +1150,17 @@
                     proj.ProjectFiles,
                     stat.StatusName,
                     proj.SelectedAssignedUserIds,
-
+                    proj.CalculatedDisplayStatusId
                   };
 
-      var activities_data = from proj in Model.Projects 
+      var activities_data = from proj in Model.Projects
                         join act in Model.Activities
                         on proj.Id equals act.ProjectID
                         //where (project_lists.Contains(act.ProjectID))
                         group new { proj, act }
                           by new { act.Id, act.ProjectID, act.ActivityName, act.ActivityComments,
-                                act.ActivityChallenges, act.ActivityHighlights, act.ProjectFiles, 
-                                act.ActivityProgress, act.ActivityUpdateTime, act.ActivityStartDate, 
+                                act.ActivityChallenges, act.ActivityHighlights, act.ProjectFiles,
+                                act.ActivityProgress, act.ActivityUpdateTime, act.ActivityStartDate,
                                 act.ActivityEndDate, act.MemberProject }
                         into g
                         select new {
@@ -1151,25 +1173,25 @@
                             ActivityStartDate = g.Key.ActivityStartDate,
                             ActivityEndDate = g.Key.ActivityEndDate,
                             ActivityProgress = g.Key.ActivityProgress,
-                            ActivityUpdateTime = g.Key.ActivityUpdateTime,      
-                            ProjectFiles = g.Key.ProjectFiles,                            
-                            MemberProject = g.Key.MemberProject,                            
+                            ActivityUpdateTime = g.Key.ActivityUpdateTime,
+                            ProjectFiles = g.Key.ProjectFiles,
+                            MemberProject = g.Key.MemberProject,
                             totalActivities = g.Count()
                         };
 }
 
 
-@if(signInManager.IsSignedIn(User))                                               
+@if(signInManager.IsSignedIn(User))
 {
    @if(await userManager.IsInRoleAsync(user,"Admin"))
     {
 
       @* Admin Main *@
       <div id="main" class="main" style="margin-top:0 !important;">
-        
-        <div class="pagetitle" >         
 
-            <div class="row d-flex flex-row justify-content-center">      
+        <div class="pagetitle" >
+
+            <div class="row d-flex flex-row justify-content-center">
               <div class="col-sm-2">
                   <h1>Dashboard</h1>
                   <nav>
@@ -1177,44 +1199,49 @@
                       <li class="breadcrumb-item active">Projects/Activities Summaries </li>
                     </ol>
                   </nav>
-              </div>  
+              </div>
 
-              @if((signInManager.IsSignedIn(User)) )                                                
-                {   
+              @if((signInManager.IsSignedIn(User)) )
+                {
                   <div class="col-sm-10">
-                  
+
                     <ul class="list-unstyled list-item text-center" style="margin-right:20%;">
 
                         <li class="breadcrumb-item active fw-bold pb-2" style="color:#0f204b"><span class="fs-6 pb-2">Filter by User:</span></li>
-                      
-                        @foreach(var i in Model.Accounts)
-                        {                        
+
+                      <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 20px;border-radius:6px;border:1px solid #0f204b;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
+                        <a href="~/Home/Index" class="" style="color:#0f204b !important;font-size:14px;">Clear Filter</a>
+                      </li>
+
+                        @foreach(var i in Model.Accounts.Where(a => a.AccountID != 1))
+                        {
                           <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #a71930;color:white;padding:4px 20px;border-radius:6px;">
                             <span style="vertical-align:middle;" class="pe-1">
                               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
                             </span>
                               @Html.ActionLink(i.FirstName, "Index", new { Staff = i.AccountID }, new {@class="users"})
-                            
-                          </li>       
-                        }     
+
+                          </li>
+                        }
 
                     </ul>
 
                   </div>
-                                              
-                }  
 
-            </div>             
+                }
+
+            </div>
 
         </div>
-        @* @*End Page Title *@ 
+        @* @*End Page Title *@
 
         <section class="section dashboard" style="margin-top:0;">
           <div class="row">
             @*Left side columns *@
             <div class="col-lg-8">
               <div class="row">
-                
+
                 @*Project Card *@
                 <div class="col-xxl-4 col-md-4">
                   <div class="card info-card sales-card">
@@ -1250,11 +1277,21 @@
                               var p = from p_ in Model.Projects
                                     select new {
                                       p_.Id
-                                    };                       
+                                    };
                             }
                             @p.Count()
                           </h6>
-                          <span class="text-primary small pt-1 fw-bold">12%</span>
+                          <span class="text-primary small pt-1 fw-bold">
+                             @{
+                                var completed_proj = Model.Projects.Where(p => p.ProjectStatusID == 4).ToList();
+                                double getPerc_proj = 0;
+                                if(p.Count() > 0)
+                                {
+                                  getPerc_proj = ((double)completed_proj.Count / p.Count()) *100;
+                                }
+                              }
+                              @getPerc_proj.ToString("F2")%
+                          </span>
                           <span class="text-muted small pt-2 ps-1">Completed</span>
                         </div>
                       </div>
@@ -1290,7 +1327,7 @@
                       <div class="d-flex align-items-center">
                         <div
                           class="card-icon rounded-circle d-flex align-items-center justify-content-center"
-                        >                          
+                        >
                           <i class="bi bi-file-earmark-text"></i>
                         </div>
                         <div class="ps-3">
@@ -1300,13 +1337,22 @@
                                       select new {
                                         act_.Id
                                       };
-                            
                             }
-                            
+
                             @act.Count()
 
                           </h6>
-                          <span class="text-success small pt-1 fw-bold">8%</span>
+                          <span class="text-success small pt-1 fw-bold">
+                             @{
+                              var completed_act = Model.Activities.Where(act => act.ActivityProgress == 4).ToList();
+                              double getPerc_act = 0;
+                              if(act.Count() > 0)
+                              {
+                                getPerc_act = ((double)completed_act.Count / act.Count()) *100;
+                              }
+                            }
+                            @getPerc_act.ToString("F2")%
+                          </span>
                           <span class="text-muted small pt-2 ps-1">Completed</span>
                         </div>
                       </div>
@@ -1355,8 +1401,28 @@
                             }
                             @acc.Count()
                           </h6>
-                          <span class="text-danger small pt-1 fw-bold">80%</span>
-                          <span class="text-muted small pt-2 ps-1">Active</span>
+                          <span class="text-danger small pt-1 fw-bold">
+                             @{
+                                var countActive = new List<int>();
+                                                                
+                                foreach(var i in acc)
+                                {
+                                  if(!countActive.Contains(i.AccountID))
+                                  {
+                                    countActive.Add(i.AccountID);
+                                  }
+                                }
+
+                                double getActiv_staff = 0;
+                                if(acc.Count() > 0)
+                                {
+                                  getActiv_staff = ((double)countActive.Count / acc.Count()) *100;
+                                }
+                              }
+                              @getActiv_staff.ToString("F2")%
+                               
+                          </span>
+                          <span class="text-muted small pt-2 ps-1">Active Staff</span>
                         </div>
                       </div>
                     </div>
@@ -1385,9 +1451,100 @@
 
                     <div class="card-body">
                       <h5 class="card-title">Projects <span>| Progress Status</span></h5>
-                     
-                      <div id="projectsContainer" style="height:280px;width: 100%" ></div>
-                                         
+
+                      <div id="projectsContainer" style="height:280px;max-width: 100%;width:100%;" ></div>
+
+                      <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+
+                            const barColors = [
+                                '#4154f1', // Blue
+                                '#2eca6a', // Green
+                                '#ff771d', // Orange
+                                '#a366ff', // Purple
+                                '#ffd700', // Gold
+                                '#00ced1', // DarkTurquoise
+                                '#ff6347', // Tomato
+                                '#6a5acd', // SlateBlue
+                                '#8b0000', // DarkRed
+                                '#20b2aa'  // LightSeaGreen
+                                // Add more colors as needed
+                            ];
+
+                          // Get the chart container element
+                          const projectsChartDOM = document.querySelector("#projectsContainer");
+
+                          //Initialize the eCharts instance
+                          const projectsChart = echarts.init(projectsChartDOM);
+
+                          projectsChart
+                            .setOption({
+                              tooltip: {
+                                trigger: "item",
+                              },
+                              legend: {
+                                top: "0%",
+                                left: "center",
+                              },
+                              // --- X-Axis Configuration ---
+                              xAxis: {
+                                  type: 'category', // Defines it as a category axis
+                                  data: @Html.Raw(ViewBag.ProjectCategories), // You'll need to provide categories from your C# backend
+                                  axisLabel: {
+                                      // Optional: Rotate labels if they are long and overlap
+                                      // rotate: 45
+                                  }
+                              },
+                              // --- Y-Axis Configuration ---
+                              yAxis: {
+                                  type: 'value', // Defines it as a value axis for numerical data
+                                  interval: 1,
+                                  axisLabel: {
+                                      formatter: function (value) {
+                                          return Math.round(value); // Ensures integer display for y-axis labels
+                                      }
+                                  }
+                              },
+                              series: [
+                                {
+                                  type: "bar",
+                                  itemStyle: {
+                                    color: function(params){
+                                        return barColors[params.dataIndex % barColors.length];
+                                    }
+                                  },
+                                  radius: ["40%", "70%"],
+                                  avoidLabelOverlap: false,
+                                  label: {
+                                    show: false,
+                                    position: "center",
+                                  },
+                                  emphasis: {
+                                    label: {
+                                      show: true,
+                                      fontSize: "18",
+                                      fontWeight: "bold",
+                                    },
+                                  },
+                                  labelLine: {
+                                    show: true,
+                                  },
+
+                                  data: @Html.Raw(ViewBag.projectValues)
+                                },
+                              ],
+                            });
+
+                              window.addEventListener('resize', function () {
+                                // Call the resize method on the chart instance
+                                projectsChart.resize();
+                            });
+
+                        });
+
+
+                      </script>
+
                       @*End Line Chart *@
                     </div>
                   </div>
@@ -1420,10 +1577,16 @@
                         class="echart"  >
                       </div>
 
-                      @*<script>
+                      <script>
                         document.addEventListener("DOMContentLoaded", () => {
-                          echarts
-                            .init(document.querySelector("#trafficChart"))
+
+                          // Get the chart container element
+                          const activityChartDOM = document.querySelector("#activityChart");
+
+                          //Initialize the eCharts instance
+                          const activityChart = echarts.init(activityChartDOM);
+
+                          activityChart
                             .setOption({
                               tooltip: {
                                 trigger: "item",
@@ -1452,20 +1615,25 @@
                                   labelLine: {
                                     show: true,
                                   },
-                                  
-                                  data: [@Html.Raw(ViewBag.dataPoints)]
+
+                                  data: @Html.Raw(ViewBag.DataPointsActivity)
                                 },
                               ],
                             });
+
+                             window.addEventListener('resize', function () {
+                                // Call the resize method on the chart instance
+                                activityChart.resize();
+                            });
+
                         });
-                      </script>*@
+                      </script>
 
                     </div>
                   </div>
                 </div>
                 @*End Website Traffic *@
 
-                 
                 @*Project Over time *@
                 <div class="col-12" style="display:block;">
                   <div class="card">
@@ -1486,13 +1654,67 @@
                     </div>
 
                       @*Line Chart *@
-                      <div id="projectOverTime" class="echarts" style="min-height: 300px;max-width:100%;"  ></div>              
-                     
+                      <div id="projectOverTime" class="echarts" style="min-height: 300px;max-width:100%;"></div>
+
+                      <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                          new ApexCharts(
+                            document.querySelector("#projectOverTime"),
+                            {
+                              series: [
+                                {
+                                  name: "Completed",
+                                  data: @Html.Raw(ViewBag.DataApexComplete_Apex),
+                                },
+                                {
+                                  name: "Incomplete",
+                                  data: @Html.Raw(ViewBag.DataPointsIncomplete_Apex),
+                                },
+                                {
+                                  name: "Started",
+                                  data: @Html.Raw(ViewBag.DataPointsStarted_Apex),
+                                },
+                              ],
+                              chart: {
+                                height: 350,
+                                type: "area",
+                                toolbar: {
+                                  show: false,
+                                },
+                              },
+                              markers: {
+                                size: 4,
+                              },
+                              colors: ["#2eca6a", "#a71930", "#4154f1"],
+                              fill: {
+                                type: "gradient",
+                                gradient: {
+                                  shadeIntensity: 1,
+                                  opacityFrom: 0.3,
+                                  opacityTo: 0.4,
+                                  stops: [0, 90, 100],
+                                },
+                              },
+                              dataLabels: {
+                                enabled: false,
+                              },
+                              stroke: {
+                                curve: "smooth",
+                                width: 2,
+                              },
+                              xaxis: {
+                                categories: @Html.Raw(ViewBag.DataPointsStarted_apexCategory),
+                              },
+
+                            }
+                          ).render();
+                        });
+                      </script>
+
                   </div>
                 </div>
                 @*End Project *@
-               
-                              
+
               </div>
             </div>
             @*End Left side columns *@
@@ -1520,7 +1742,7 @@
                   <h5 class="card-title">Recent Projects <span>| All</span></h5>
 
                   <div class="activity">
-                    
+
                     @{
                       var recent_projects = from rec_proj in Model.Projects
                                     select new {
@@ -1532,10 +1754,10 @@
                                       rec_proj.ProjectStartDate
                                     };
 
-                         
+
                     }
 
-                    @foreach(var rec_p in recent_projects.Take(5).OrderByDescending(p => p.ProjectUpdateTime))
+                    @foreach(var rec_p in recent_projects.OrderByDescending(p => p.ProjectUpdateTime).Take(5))
                     {
                         DateTime now = DateTime.UtcNow;
                         DateTime prevDate = rec_p.ProjectUpdateTime;
@@ -1547,41 +1769,41 @@
 
                         <div class="activity-item d-flex">
                           <div class="activite-label">
-                            @*ActivityUpdateTime.Minute *@  
+                            @*ActivityUpdateTime.Minute *@
 
                             @if(totalMinutes <= 60)
-                              {                                         
-                                <span class="" style="display: inline-flex; align-items: center;">  
-                                    <span style="font-weight:100">@totalMinutes min</span>
-                                </span> 
+                              {
+                                <span class="" style="display: inline-flex; align-items: center;">
+                                    <span style="font-weight:100">@Convert.ToInt32(totalMinutes) mins</span>
+                                </span>
                                 col = "text-success";
                               }else
                                 if(totalMinutes > 60 && (totalMinutes <= 1440) )
-                                {                                   
-                                  timeDis = Convert.ToInt32(totalMinutes/60);      
-                                  <span class="" style="display: inline-flex; align-items: center;">  
+                                {
+                                  timeDis = Convert.ToInt32(totalMinutes/60);
+                                  <span class="" style="display: inline-flex; align-items: center;">
                                       <span style="font-weight:100">@timeDis hrs</span>
-                                  </span> 
+                                  </span>
                                   col = "text-warning";
-                                }else                                 
+                                }else
                                   if(totalMinutes > 1440 && (totalMinutes < 10080) )
                                   {
-                                      timeDis = Convert.ToInt32(totalMinutes / 1440);      
-                                      <span class="" style="display: inline-flex; align-items: center;">               
-                                        <span style="font-weight:100">@timeDis Days</span> 
+                                      timeDis = Convert.ToInt32(totalMinutes / 1440);
+                                      <span class="" style="display: inline-flex; align-items: center;">
+                                        <span style="font-weight:100">@timeDis Days</span>
                                       </span>
                                       col = "text-info";
                                   }
                                   else
                                     if(totalMinutes > 10080 && (totalMinutes < 40320) )
                                     {
-                                        timeDis = Convert.ToInt32(totalMinutes / 10080);      
-                                        <span class="" style="display: inline-flex; align-items: center;">               
-                                          <span style="font-weight:100">@timeDis weeks</span> 
+                                        timeDis = Convert.ToInt32(totalMinutes / 10080);
+                                        <span class="" style="display: inline-flex; align-items: center;">
+                                          <span style="font-weight:100">@timeDis weeks</span>
                                         </span>
                                         col = "text-primary";
-                                    }   
-                             
+                                    }
+
 
                           </div>
                           <i class="bi bi-circle-fill activity-badge align-self-start @col"></i>
@@ -1593,12 +1815,12 @@
                         @*End activity item*@
                     }
 
-                    
+
                   </div>
                 </div>
               </div>
               @*End Recent Projects *@
-              
+
               @*Recent Activity *@
               <div class="card">
                 <div class="filter">
@@ -1619,7 +1841,7 @@
                   <h5 class="card-title">Recent Activities <span>| All</span></h5>
 
                   <div class="activity">
-                    
+
                     @{
                       var recent_activities = from rec_act in Model.Activities
                                     select new {
@@ -1630,7 +1852,7 @@
                                       rec_act.ActivityUpdateTime,
                                       rec_act.ActivityHighlights
                                     };
-                         
+
                     }
 
                     @foreach(var a in recent_activities.OrderByDescending(a => a.Id).Take(10))
@@ -1645,41 +1867,41 @@
 
                         <div class="activity-item d-flex">
                           <div class="activite-label">
-                            @*ActivityUpdateTime.Minute *@  
+                            @*ActivityUpdateTime.Minute *@
 
                             @if(totalMinutes <= 60)
-                              {                                         
-                                <span class="" style="display: inline-flex; align-items: center;">  
+                              {
+                                <span class="" style="display: inline-flex; align-items: center;">
                                     <span style="font-weight:100">@Convert.ToInt32(totalMinutes) min</span>
-                                </span> 
+                                </span>
                                 col = "text-success";
                               }else
                                 if(totalMinutes > 60 && (totalMinutes <= 1440) )
-                                {                                   
-                                  timeDis = Convert.ToInt32(totalMinutes/60);      
-                                  <span class="" style="display: inline-flex; align-items: center;">  
+                                {
+                                  timeDis = Convert.ToInt32(totalMinutes/60);
+                                  <span class="" style="display: inline-flex; align-items: center;">
                                       <span style="font-weight:100">@timeDis hrs</span>
-                                  </span> 
+                                  </span>
                                   col = "text-warning";
-                                }else                                 
+                                }else
                                   if(totalMinutes > 1440 && (totalMinutes < 10080) )
                                   {
-                                      timeDis = Convert.ToInt32(totalMinutes / 1440);      
-                                      <span class="" style="display: inline-flex; align-items: center;">               
-                                        <span style="font-weight:100">@timeDis Days</span> 
+                                      timeDis = Convert.ToInt32(totalMinutes / 1440);
+                                      <span class="" style="display: inline-flex; align-items: center;">
+                                        <span style="font-weight:100">@timeDis Days</span>
                                       </span>
                                       col = "text-info";
                                   }
                                   else
                                     if(totalMinutes > 10080 && (totalMinutes < 40320) )
                                     {
-                                        timeDis = Convert.ToInt32(totalMinutes / 10080);      
-                                        <span class="" style="display: inline-flex; align-items: center;">               
-                                          <span style="font-weight:100">@timeDis weeks</span> 
+                                        timeDis = Convert.ToInt32(totalMinutes / 10080);
+                                        <span class="" style="display: inline-flex; align-items: center;">
+                                          <span style="font-weight:100">@timeDis weeks</span>
                                         </span>
                                         col = "text-primary";
-                                    }   
-                             
+                                    }
+
 
                           </div>
                           <i class="bi bi-circle-fill activity-badge align-self-start @col"></i>
@@ -1691,19 +1913,19 @@
                         </div>
                         @*End activity item*@
                     }
-                    
+
                   </div>
                 </div>
               </div>
               @*End Recent Activity *@
-            
+
             </div>
             @*End Right side columns *@
 
             @* Full Project Table *@
             @*Projects & Activities *@
             <div class="col-12">
-              <div class="card recent-sales overflow-auto">
+              <div class="card overflow-auto">
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"
                     ><i class="bi bi-three-dots"></i></a>
@@ -1725,35 +1947,33 @@
                     Projects & Activities <span>| All</span>
                   </h5>
 
-                
                   <div class="col-sm table-responsive" style="margin:0;padding:0;">
 
-                                  
-                    <input type="text" style="width:100%" id="searchInput" onkeyup="searchProAct()" placeholder="Search..." aria-label="Search" >                
-                    
-                    <table id="projectsTable" class="table table-striped table-bordered align-middle searchTable" style="margin:0;padding:0;">
-                
+                    <input type="text" style="width:100%" id="searchInput" onkeyup="searchProAct()" placeholder="Search..." aria-label="Search" >
+
+                    <table id="projectsTable" class="table table-striped table-bordered align-middle " style="margin:0;padding:0;">
+
                         <thead >
-                            <tr class="">                                               
+                            <tr class="">
                                 <th rowspan="1" class="header text-center align-middle text-align:center">Activity Name</th>
                                 <th rowspan="1" class="header text-center align-middle text-align:center">Comments</th>
                                 <th rowspan="1" class="header text-center align-middle text-align:center">Challenges</th>
                                 <th rowspan="1" class="header text-center align-middle text-align:center">Start Date</th>
                                 <th rowspan="1" class="header text-center align-middle text-align:center">Activity Duration</th>
-                                <th colspan="1" class="header text-center align-middle text-align:center">Progress Details</th>                
-                                <th rowspan="1" class="header text-center align-middle text-align:center">Files</th>                                      
-                            </tr>                       
-                            
+                                <th colspan="1" class="header text-center align-middle text-align:center">Progress Details</th>
+                                <th rowspan="1" class="header text-center align-middle text-align:center">Files</th>
+                            </tr>
+
                         </thead>
-                        <tbody >           
+                        <tbody >
                             @{
                                 var countProject = 0;
-                                                      
+
                                 foreach(var proj in projects_data_admin.OrderBy(p => p.ProjectUpdateTime))
-                                {                              
+                                {
                                   countProject++;
                                   var tot_act = activities_data.Where(c => c.ProjectID == proj.Id).Count();
-                                  
+
                                   var getTTCompletion = @proj.ProjectEndDate - @proj.ProjectStartDate;
 
                                   // Option A: Using TimeSpan properties (most common and readable)
@@ -1771,14 +1991,14 @@
                                   if (proj.SelectedAssignedUserIds.Count() > 0)
                                   {
                                       // 2. Split the string by comma
-                                                            
+
                                       // 3. Parse each string part into an integer and add to the list
                                       foreach (var member in proj.SelectedAssignedUserIds)
-                                      {                           
+                                      {
                                           var name = Model.Accounts.FirstOrDefault(c => c.AccountID == member);
-                                          getProjectMembers += ", " + name.FirstName ;                
-                                          
-                                      }               
+                                          getProjectMembers += ", " + name.FirstName ;
+
+                                      }
                                   }
                                   else
                                   {
@@ -1786,141 +2006,268 @@
                                       var project_owner = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
                                       getProjectMembers = project_owner.FirstName;
                                   }
-                                
+
                                   @* HEADER - PROJECT *@
                                   <tr class="">
-                                                      
+
                                       <td colspan="100%" style="background-color:#0F204B;opacity:0.8;color:#fff;" >
 
-                                          <div class="align-middle accordion accordion-flush" id="accordionFlush" style="background-color: transparent !important;background: none !important;">                                   
+                                          <div class="align-middle accordion accordion-flush" id="accordionFlush" style="background-color: transparent !important;background: none !important;">
                                             <div class="accordion-item" style="background-color:#0F204B;opacity:0.8;color:#fff;">
-                                              
+
                                               @* Main *@
                                               <div class="d-flex flex-row justify-content-between ufs_container">
-                                                
-                                                <div class="col-sm-6" >                                          
-                                                  
+
+                                                @* Project Name *@
+                                                <div class="col-sm-6" >
                                                     <span class="accordion-button collapsed fw-semibold" data-bs-toggle="collapse" data-bs-target="#flush-collapse_@proj.Id" aria-expanded="false" aria-controls="flush-collapse_@proj.Id">
                                                       <span class="fw-bold">@countProject. &nbsp;</span>@proj.ProjectName
-                                                    </span>                                                                                               
-                                              
+                                                    </span>
                                                 </div>
-                                                
+
                                                 @* Project Members *@
                                                 <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
-                                                                                      
-                                                    <span class="ps-2 pe-2" style="display: inline-flex; align-items: center;">                                            
+
+                                                    <span class="ps-2 pe-2" style="display: inline-flex; align-items: center;">
                                                         <i class="bi bi-people-fill fs-6"></i>
                                                         <span style="margin-left: 0.30rem;font-weight:100">@proj.SelectedAssignedUserIds.Count() Members</span>
-                                                    </span> 
-                                                                                            
-                                                </div> 
+                                                    </span>
+
+                                                </div>
 
                                                 @* Project Duration *@
                                                 <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
                                                   @if(totalDays <= 7)
-                                                  {                                         
-                                                    <span class="ps-3" style="display: inline-flex; align-items: center;">                                            
-                                                        <i class="bi bi-clock-history fs-6"></i> 
+                                                  {
+                                                    <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                        <i class="bi bi-clock-history fs-6"></i>
                                                         <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
-                                                    </span> 
+                                                    </span>
                                                   }else
                                                       if(totalDays > 7 && totalWeeks <= 4 )
                                                       {
-                                                                                    
+
                                                         <span class="ps-3" style="display: inline-flex; align-items: center;">
                                                           <i class="bi bi-clock-history fs-6"></i>
                                                           <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
                                                         </span>
-                                                    
+
                                                       }
                                                       else
                                                         if(totalWeeks > 4 )
                                                         {
                                                             <span class="ps-3" style="display: inline-flex; align-items: center;">
-                                                              <i class="bi bi-clock-history fs-6"></i>                                       
-                                                              <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span> 
+                                                              <i class="bi bi-clock-history fs-6"></i>
+                                                              <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span>
                                                             </span>
                                                         }
-                                                    
-                                                </div> 
+
+                                                </div>
 
                                                 @* Project Status *@
                                                 <div class="col-sm-2" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:120px;" >
-                                                  
-                                                    @if(proj.StatusName == "Started")
-                                                    {               
-                                                      <div class="progress" style="height:100%;" >                                  
-                                                        <div class="progress-bar" role="progressbar"  style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>                                                
-                                                      </div>
-                                                    }
-                                                    else
-                                                    @if(proj.StatusName == "Upcoming")
-                                                    {
-                                                        <div class="progress" style="height:100%;" >                                  
-                                                          <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar"  style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>                                                
-                                                        </div>
-                                                    }
-                                                    else
-                                                    @if(proj.StatusName == "Ongoing")
-                                                    {
-                                                      <div class="progress" style="height:100%;" >                                  
-                                                        <div class="progress-bar bg-warning" role="progressbar"  style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>                                                
-                                                      </div>
-                                                    }
-                                                    else
-                                                    @if(proj.StatusName == "Completed")
-                                                    { 
-                                                        <div class="progress" style="height:100%;" >                                  
-                                                          <div class="progress-bar bg-success" role="progressbar"  style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>                                                
-                                                        </div>
-                                                    }
-                                                    else
-                                                    @if(proj.StatusName == "Incomplete")
-                                                    { 
-                                                        <div class="progress" style="height:100%;" >                                  
-                                                          <div class="progress-bar bg-danger" role="progressbar"  style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">15%</div>                                                
-                                                        </div>
-                                                    }
-                                                    else
-                                                    @if(proj.StatusName == "On-Hold")
-                                                    {
-                                                        <div class="progress" style="height:100%;" >                                  
-                                                          <div class="progress-bar bg-secondary" role="progressbar"  style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>                                                
-                                                        </div>
-                                                    }
-                                                    else
-                                                    @if(proj.StatusName == "Sent for Review")
-                                                    { 
-                                                        <div class="progress" style="height:100%;" >                                  
-                                                          <div class="progress-bar bg-info" role="progressbar"  style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>                                                
-                                                        </div>
-                                                    }
-                                                </div>
-                                                                                
-                                                
-                                              </div> 
 
-                                              @* Side *@  
+                                                   @{
+
+                                                      var act_statues = Model.Activities.Where(a => a.ProjectID == proj.Id);
+                                                     
+                                                      int displayStatusId = proj.CalculatedDisplayStatusId;
+                                                                                                        
+                                                          @if(displayStatusId == (int)ProjectActivityStatus.Started) // Assumes ProjectActivityStatus enum is accessible
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Upcoming)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar" style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Ongoing)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-warning" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Completed)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Incomplete)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-danger" role="progressbar" style="width: 15%;" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100">15%</div> @* Note: You have 15% here but aria-valuenow is 25% *@
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.OnHold)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-secondary" role="progressbar" style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.SentForReview)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-info" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                                                              </div>
+                                                          }
+                                                          @* Add a default for unknown/other statuses if necessary *@
+                                                      
+
+                                                      @*if(act_statues.Count() > 0) 
+                                                      {                      
+                                                        foreach(var act_sta in act_statues)                                                             
+                                                        {
+                                                    
+                                                          @if(act_sta.ActivityProgress == 2)
+                                                          {
+                                                            <div class="progress" style="height:100%;" >
+                                                              <div class="progress-bar" role="progressbar"  style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                            </div>
+                                                          }
+                                                          else
+                                                          @if(act_sta.ActivityProgress == 1)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar"  style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(act_sta.ActivityProgress == 3)
+                                                          {
+                                                            <div class="progress" style="height:100%;" >
+                                                              <div class="progress-bar bg-warning" role="progressbar"  style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                            </div>
+                                                          }
+                                                          else
+                                                          @if(act_sta.ActivityProgress == 4)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-success" role="progressbar"  style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(act_sta.ActivityProgress == 5)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-danger" role="progressbar"  style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">15%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(act_sta.ActivityProgress == 6)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-secondary" role="progressbar"  style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(act_sta.ActivityProgress == 7)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-info" role="progressbar"  style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                                                              </div>
+                                                          }
+                                                              
+                                                        }
+                                                      }
+                                                      else
+                                                      {
+                                                        @if(proj.StatusName == "Started")
+                                                          {
+                                                            <div class="progress" style="height:100%;" >
+                                                              <div class="progress-bar" role="progressbar"  style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                            </div>
+                                                          }
+                                                          else
+                                                          @if(proj.StatusName == "Upcoming")
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar"  style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(proj.StatusName == "Ongoing")
+                                                          {
+                                                            <div class="progress" style="height:100%;" >
+                                                              <div class="progress-bar bg-warning" role="progressbar"  style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                            </div>
+                                                          }
+                                                          else
+                                                          @if(proj.StatusName == "Completed")
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-success" role="progressbar"  style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(proj.StatusName == "Incomplete")
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-danger" role="progressbar"  style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">15%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(proj.StatusName == "On-Hold")
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-secondary" role="progressbar"  style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                                                              </div>
+                                                          }
+                                                          else
+                                                          @if(proj.StatusName == "Sent for Review")
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                <div class="progress-bar bg-info" role="progressbar"  style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                                                              </div>
+                                                          }
+                                                      }*@
+                                                      
+                                                    }
+
+                                                </div>
+
+                                              </div>
+
+                                              @* Side *@
                                               <div id="flush-collapse_@proj.Id" style="color:#0f204b;background-color:#e7f1ff;" class="accordion-collapse collapse mt-2" data-bs-parent="#accordionFlush">
-                                                <div class="accordion-body" >   
-                                                    <div class="d-flex flex-row justify-content-center">   
-                                                      <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;color:#a71930;">   
-                                                        <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Details</h6>                                   
+                                                <div class="accordion-body" >
+                                                    <div class="d-flex flex-row justify-content-center">
+                                                      <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;color:#a71930;">
+                                                        <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Details</h6>
                                                         <p class="fw-light" style="color:#000;">@proj.ProjectDetails</p>
                                                       </div>
                                                       <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;">
+                                                        <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Dates</h6>
+                                                        <div class="d-flex flex-row justify-content-between">
+                                                          <div class="col-auto"> 
+                                                            <p>Start Date</p>
+                                                            <p class="fw-bold">@proj.ProjectStartDate.ToString("MMM-d-yyyy")</p>
+                                                          </div>
+                                                          <div class="col-auto text-center"> 
+                                                              |
+                                                          </div>
+                                                          <div class="col-auto"> 
+                                                            <p>End Date</p>
+                                                            <p class="fw-bold">@proj.ProjectEndDate.ToString("MMM-d-yyyy")</p>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
                                                         <h6 class="fw-semibold mb-1" style="color:#a71930;">Area of Work</h6>
                                                         <p class="fw-light">@proj.ProjectAreaOfWork</p>
-                                                      </div> 
-                                                      <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;">
+                                                      </div>
+                                                      <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
                                                         <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
                                                         <p class="fw-light">@getProjectMembers.Substring(1)</p>
-                                                      </div> 
-                                                      <div class="col-sm-3 ps-3 pe-3">
+                                                      </div>
+                                                      <div class="col-sm-2 ps-3 pe-3">
                                                         <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</h6>
                                                         @if(proj.ProjectFiles.Length > 2)
-                                                        {                                                          
+                                                        {
                                                           <p class="fw-light">
                                                             <a href="~/Attachments/Projects/@proj.ProjectFiles" class="clip" download>
                                                               <span>
@@ -1935,8 +2282,8 @@
                                                         {
                                                           <p class="fw-light">No files</p>
                                                         }
-                                                        
-                                                      </div> 
+
+                                                      </div>
 
                                                     </div>
                                                 </div>
@@ -1944,9 +2291,9 @@
 
                                             </div>
                                           </div>
-                                                                                      
-                                      </td>                                        
-                                  </tr>   
+
+                                      </td>
+                                  </tr>
 
                                   var countActivity = 0;
                                   foreach(var act_ in Model.Activities
@@ -1955,10 +2302,10 @@
                                   {
 
                                       countActivity++;
-                                      @* ACTIVITIES *@                                
-                                      <tr>              
-                                        
-                                        @* ActivityName *@                      
+                                      @* ACTIVITIES *@
+                                      <tr>
+
+                                        @* ActivityName *@
                                         <td class="align-middle">
                                             <span>
                                               <span class="fw-bold">@countActivity.</span> @act_.ActivityName
@@ -1980,9 +2327,44 @@
 
                                         @* Activity Durarion *@
                                         <td class="align-middle text-center">
-                                          <small class="text-muted" > 
-                                            <span style="font-size:11px;"> Days </span></small><span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> | <small class="text-muted"><span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span><span style="font-size:11px;"> Weeks </span></small> 
-                                        </td>                                   
+                                            @* <small class="text-muted" >
+                                            <span style="font-size:11px;"> Days </span></small><span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> | <small class="text-muted"><span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span><span style="font-size:11px;"> Weeks </span></small> *@
+
+                                            @{
+                                              var getTTCompletion_act = act_.ActivityEndDate - act_.ActivityStartDate;
+
+                                              // Option A: Using TimeSpan properties (most common and readable)
+                                              int totalDays_act = getTTCompletion_act.Days;
+                                              int totalWeeks_act = totalDays / 7;
+                                              int totalMonths_act = totalDays / 30;                                   
+                                            }
+
+                                            @if(totalDays_act <= 7)
+                                            {
+                                              <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                  <i class="bi bi-clock-history fs-6"></i>
+                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalDays_act Days</span>
+                                              </span>
+                                            }else
+                                                if(totalDays_act > 7 && totalWeeks_act <= 4 )
+                                                {
+
+                                                  <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_act Wks</span>
+                                                  </span>
+
+                                                }
+                                                else
+                                                  if(totalWeeks_act > 4 )
+                                                  {
+                                                      <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                        <i class="bi bi-clock-history fs-6"></i>
+                                                        <span style="margin-left: 0.30rem;font-weight:100">@totalMonths_act Mnt</span>
+                                                      </span>
+                                                  }
+
+                                        </td>
 
                                         @* Activity Status *@
                                         <td class="align-middle text-center">
@@ -2020,22 +2402,22 @@
                                           {
                                               <span class="badge rounded-pill bg-warning">Sent for Review</span>
                                           }
-                                        
+
                                         </td>
 
                                         @* Activity Count *@
                                         @*<td class="text-center align-middle">
                                           <ul class="list-unstyled d-flex" style="margin: 0 !important; padding: 0 !important;">
-                                            <li class="align-middle" >                                         
-                                              <span class="badge bg-light text-danger fs-6">@tot_act.ToString()</span>  
-                                            </li>               
+                                            <li class="align-middle" >
+                                              <span class="badge bg-light text-danger fs-6">@tot_act.ToString()</span>
+                                            </li>
                                             <li class="align-middle" data-bs-toggle="modal" data-bs-target="#activityDetails_@proj.Id">
                                               <i class="bi bi-view-list fs-5"></i>
                                             </li>
-                                            <li class="align-middle" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">  
+                                            <li class="align-middle" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">
                                                 <i class="bi bi-plus-circle fs-5"></i>
-                                            </li>  
-                                          </ul>                   
+                                            </li>
+                                          </ul>
                                         </td>*@
 
                                         @* Attachments *@
@@ -2053,7 +2435,7 @@
                                             }
                                             else
                                             {
-                                              <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project."> 
+                                              <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project.">
                                                 <a class="" aria-disabled="true" disabled>
                                                     <i class="bi bi-paperclip fs-5"></i>
                                                 </a>
@@ -2065,71 +2447,284 @@
 
                                         </td>
 
-                                      
                                       </tr>
-
 
                                   }
 
-                                                                        
                                 }
 
                             }
 
                         </tbody>
-                      
+
 
                     </table>
 
-                  </div>     
-                     
+                  </div>
+
 
                 </div>
               </div>
             </div>
             @*End Recent Sales *@
 
-
           </div>
         </section>
 
       </div>
       @* End #main *@
-         
+
     }
     else
     {
-        <div class="" style="margin-top: 20px;background-color: #fafafa; border: 1px lightgray solid; border-radius: 4px;">
+        <section class="section dashboard mt-4" style="margin-bottom:0;">
+          
+          <div class="row">
+            @*Mini User Dashboard *@
+            <div class="col-lg-8 mx-auto" style="margin-bottom:0 !important;padding-bottom:0 !important;">
+              <div class="row">
+
+                @*Project Card *@
+                <div class="col-xxl-4 col-md-4" >
+                  <div class="card info-card sales-card">
+                    <div class="filter">
+                      <a class="icon" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots"></i>
+                      </a>
+                      <ul
+                        class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
+                      >
+                        <li class="dropdown-header text-start">
+                          <h6>Filter</h6>
+                        </li>
+
+                        <li><a class="dropdown-item" href="#">Today</a></li>
+                        <li><a class="dropdown-item" href="#">This Month</a></li>
+                        <li><a class="dropdown-item" href="#">This Year</a></li>
+                      </ul>
+                    </div>
+
+                    <div class="card-body">
+                      <h5 class="card-title">Projects <span>| All</span></h5>
+
+                      <div class="d-flex align-items-center">
+                        <div
+                          class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                        >
+                          <i class="bi bi-folder2"></i>
+                        </div>
+                        <div class="ps-3">
+                          <h6>
+                            @{
+                              var p = from p_ in projects_data
+                                    select new {
+                                      p_.Id
+                                    };
+                            }
+                            @p.Count()
+                          </h6>
+                          <span class="text-primary small pt-1 fw-bold">
+                            @{
+                              var completed_proj = projects_data.Where(p => p.ProjectStatusID == 4).ToList();
+                              double getPerc_proj = 0;
+                              if(p.Count() > 0)
+                              {
+                                getPerc_proj = ((double)completed_proj.Count / p.Count()) *100;
+                              }
+                            }
+                            @getPerc_proj.ToString("F2")%
+                          </span>
+                          <span class="text-muted small pt-2 ps-1">Completed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @*End Project Card *@
+
+                @*Activities Card *@
+                <div class="col-xxl-4 col-md-4">
+                  <div class="card info-card revenue-card">
+                    <div class="filter">
+                      <a class="icon" href="#" data-bs-toggle="dropdown"
+                        ><i class="bi bi-three-dots"></i></a>
+                      <ul
+                        class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
+                      >
+                        <li class="dropdown-header text-start">
+                          <h6>Filter</h6>
+                        </li>
+
+                        <li><a class="dropdown-item" href="#">Today</a></li>
+                        <li><a class="dropdown-item" href="#">This Month</a></li>
+                        <li><a class="dropdown-item" href="#">This Year</a></li>
+                      </ul>
+                    </div>
+
+                    <div class="card-body">
+                      <h5 class="card-title">
+                        Activities <span>| All</span>
+                      </h5>
+
+                      <div class="d-flex align-items-center">
+                        <div
+                          class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                        >
+                          <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <div class="ps-3">
+                          <h6>
+                            @{
+                              var useract = from act_ in activities_data
+                                      select new {
+                                        act_.Id
+                                      };
+
+                            }
+
+                            @useract.Count()
+
+                          </h6>
+                          <span class="text-success small pt-1 fw-bold">
+                            @{
+                              var completed_act = activities_data.Where(a => a.ActivityProgress == 4).ToList();
+                              double getPerc = 0;
+                             
+                              if(useract.Count() > 0)
+                              {
+                                getPerc = ((double)completed_act.Count / useract.Count()) * 100;
+                              }
+                            }
+                            @getPerc.ToString("F2")%
+                            
+                          </span>
+                          <span class="text-muted small pt-2 ps-1">Completed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @*End Activities Card *@
+
+                @*Staff Card *@
+                <div class="col-xxl-4 col-md-4">
+                  <div class="card info-card customers-card">
+                    <div class="filter">
+                      <a class="icon" href="#" data-bs-toggle="dropdown"
+                        ><i class="bi bi-three-dots"></i></a>
+                      <ul
+                        class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
+                      >
+                        <li class="dropdown-header text-start">
+                          <h6>Filter</h6>
+                        </li>
+
+                        <li><a class="dropdown-item" href="#">Today</a></li>
+                        <li><a class="dropdown-item" href="#">This Month</a></li>
+                        <li><a class="dropdown-item" href="#">This Year</a></li>
+                      </ul>
+                    </div>
+
+                    <div class="card-body">
+                      <h5 class="card-title">
+                        Ad-hoc Activities <span>| All</span>
+                      </h5>
+
+                      <div class="d-flex align-items-center">
+                        <div
+                          class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                        >
+                          <i class="bi bi-people"></i>
+                        </div>
+                        <div class="ps-3">
+                          <h6>
+                            @{
+                              var acc = from acc_ in Model.Accounts
+                                      select new {
+                                        acc_.AccountID
+                                      };
+                            }
+                            @acc.Count()
+                          </h6>
+                          <span class="text-danger small pt-1 fw-bold">0%</span>
+                          <span class="text-muted small pt-2 ps-1">Completed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @*End Staff Card *@
+              </div>
+            </div>
+
+            @if((signInManager.IsSignedIn(User)) )
+            {
+              <div class="col-sm-12 mx-auto" style="margin-top:0 !important;padding-top:0 !important;">
+
+                <ul class="list-unstyled list-item text-center" style="margin-top:0 !important;padding-top:0 !important;">
+
+                    <li class="breadcrumb-item active fw-bold pb-2" style="color:#0f204b"><span class="fs-6 pb-2">Filter by Status:</span></li>
+
+                    <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 20px;border-radius:6px;border:1px solid #0f204b;">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
+                      <a href="~/Home/Index" class="" style="color:#0f204b !important;font-size:14px;">Clear Filter</a>
+                    </li>
+
+                    @foreach(var i in Model.Statuses)
+                    {
+                      <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #a71930;color:white;padding:4px 20px;border-radius:6px;">
+                        <span style="vertical-align:middle;" class="pe-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                        </span>
+                          @Html.ActionLink(i.StatusName, "Index", new { Status = i.Id }, new {@class="statuses"})
+
+                      </li>
+                    }
+
+                </ul>
+
+              </div>
+
+            }
+
+          </div>
+
+         
+         
+     
+        </section>
+
+        <div class="mt-1" style="background-color: #fafafa; border: 1px lightgray solid; border-radius: 4px;">
           <div class="row" style="margin:0;padding:0;">
               <div class="col-sm table-responsive" style="margin:0;padding:0;">
 
-                               
-                <input type="text" style="width:100%" id="searchInput" onkeyup="searchProAct()" placeholder="Search..." aria-label="Search" >                
-                
+
+                <input type="text" style="width:100%" id="searchInput" onkeyup="searchProAct()" placeholder="Search..." aria-label="Search" >
+
                 <table id="projectsTable" class="table table-striped table-bordered align-middle searchTable" style="margin:0;padding:0;">
-            
+
                     <thead >
-                        <tr class="">                                               
+                        <tr class="">
                             <th rowspan="1" class="header text-center align-middle text-align:center">Activity Name</th>
                             <th rowspan="1" class="header text-center align-middle text-align:center">Comments</th>
                             <th rowspan="1" class="header text-center align-middle text-align:center">Challenges</th>
                             <th rowspan="1" class="header text-center align-middle text-align:center">Start Date</th>
                             <th rowspan="1" class="header text-center align-middle text-align:center">Activity Duration</th>
-                            <th colspan="1" class="header text-center align-middle text-align:center">Progress Details</th>                
+                            <th colspan="1" class="header text-center align-middle text-align:center">Progress Details</th>
                             <th rowspan="1" class="header text-center align-middle text-align:center">Files</th>
                             <th rowspan="1" style="color:#dc3545 !important;" class="header text-danger text-center align-middle">Action</th>
-                        </tr>                       
-                        
+                        </tr>
+
                     </thead>
-                    <tbody >           
+                    <tbody >
                         @{
                             var countProject = 0;
-                                                   
+
                             foreach(var proj in projects_data.OrderBy(p => p.ProjectUpdateTime))
-                            {                              
+                            {
                               countProject++;
                               var tot_act = activities_data.Where(c => c.ProjectID == proj.Id).Count();
-                              
+
                               var getTTCompletion = @proj.ProjectEndDate - @proj.ProjectStartDate;
 
                               // Option A: Using TimeSpan properties (most common and readable)
@@ -2147,14 +2742,14 @@
                               if (proj.SelectedAssignedUserIds.Count() > 0)
                               {
                                   // 2. Split the string by comma
-                                                        
+
                                   // 3. Parse each string part into an integer and add to the list
                                   foreach (var member in proj.SelectedAssignedUserIds)
-                                  {                           
+                                  {
                                       var name = Model.Accounts.FirstOrDefault(c => c.AccountID == member);
-                                      getProjectMembers += ", " + name.FirstName ;                
-                                      
-                                  }               
+                                      getProjectMembers += ", " + name.FirstName ;
+
+                                  }
                               }
                               else
                               {
@@ -2162,137 +2757,153 @@
                                   var project_owner = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
                                   getProjectMembers = project_owner.FirstName;
                               }
-                            
+
                               @* HEADER - PROJECT *@
                               <tr class="">
-                                                  
-                                  <td colspan="100%" style="background-color:#0F204B;opacity:0.8;color:#fff;" >
 
-                                      <div class="align-middle accordion accordion-flush" id="accordionFlush" style="background-color: transparent !important;background: none !important;">                                   
+                                  @{
+                                    var project_owner_style = "";
+
+                                    //Project Owner Style
+                                    if(proj.AccountID == currentUser.AccountID)
+                                    {
+                                      project_owner_style = "background-color:#0F204B;opacity:0.8;color:#fff;";
+                                    }
+                                    else
+                                    {
+                                      project_owner_style = "background-color:#c59217;opacity:1;color:#fff;";
+                                    }
+                                  }
+
+
+                                  <td colspan="100%" style="@project_owner_style" >
+
+                                      <div class="align-middle accordion accordion-flush" id="accordionFlush" style="background-color: transparent !important;background: none !important;">
                                         <div class="accordion-item" style="background-color:#0F204B;opacity:0.8;color:#fff;">
-                                          
+
                                           @* Main *@
                                           <div class="d-flex flex-row justify-content-between ufs_container">
-                                            
-                                            <div class="col-sm-6" >                                          
-                                               
+
+                                            @* Project Name *@
+                                            <div class="col-sm-6" >
                                                 <span class="accordion-button collapsed fw-semibold" data-bs-toggle="collapse" data-bs-target="#flush-collapse_@proj.Id" aria-expanded="false" aria-controls="flush-collapse_@proj.Id">
                                                   <span class="fw-bold">@countProject. &nbsp;</span>@proj.ProjectName
-                                                </span>                                                                                               
-                                           
+                                                </span>
                                             </div>
-                                            
+
                                             @* Project Members *@
                                             <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
-                                                                                  
-                                                <span class="ps-2 pe-2" style="display: inline-flex; align-items: center;">                                            
+
+                                                <span class="ps-2 pe-2" style="display: inline-flex; align-items: center;">
                                                     <i class="bi bi-people-fill fs-6"></i>
                                                     <span style="margin-left: 0.30rem;font-weight:100">@proj.SelectedAssignedUserIds.Count() Members</span>
-                                                </span> 
-                                                                                        
-                                            </div> 
+                                                </span>
+
+                                            </div>
 
                                             @* Project Duration *@
                                             <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
                                               @if(totalDays <= 7)
-                                              {                                         
-                                                <span class="ps-3" style="display: inline-flex; align-items: center;">                                            
-                                                    <i class="bi bi-clock-history fs-6"></i> 
+                                              {
+                                                <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                    <i class="bi bi-clock-history fs-6"></i>
                                                     <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
-                                                </span> 
+                                                </span>
                                               }else
                                                   if(totalDays > 7 && totalWeeks <= 4 )
                                                   {
-                                                                                
+
                                                     <span class="ps-3" style="display: inline-flex; align-items: center;">
                                                       <i class="bi bi-clock-history fs-6"></i>
                                                       <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
                                                     </span>
-                                                
+
                                                   }
                                                   else
                                                     if(totalWeeks > 4 )
                                                     {
                                                         <span class="ps-3" style="display: inline-flex; align-items: center;">
-                                                          <i class="bi bi-clock-history fs-6"></i>                                       
-                                                          <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span> 
+                                                          <i class="bi bi-clock-history fs-6"></i>
+                                                          <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span>
                                                         </span>
                                                     }
-                                                
-                                            </div> 
+
+                                            </div>
 
                                             @* Project Status *@
                                             <div class="col-sm-2" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:120px;" >
-                                              
-                                                @if(proj.StatusName == "Started")
-                                                {               
-                                                  <div class="progress" style="height:100%;" >                                  
-                                                    <div class="progress-bar" role="progressbar"  style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>                                                
-                                                  </div>
-                                                }
-                                                else
-                                                @if(proj.StatusName == "Upcoming")
-                                                {
-                                                    <div class="progress" style="height:100%;" >                                  
-                                                      <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar"  style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>                                                
-                                                    </div>
-                                                }
-                                                else
-                                                @if(proj.StatusName == "Ongoing")
-                                                {
-                                                  <div class="progress" style="height:100%;" >                                  
-                                                    <div class="progress-bar bg-warning" role="progressbar"  style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>                                                
-                                                  </div>
-                                                }
-                                                else
-                                                @if(proj.StatusName == "Completed")
-                                                { 
-                                                    <div class="progress" style="height:100%;" >                                  
-                                                      <div class="progress-bar bg-success" role="progressbar"  style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>                                                
-                                                    </div>
-                                                }
-                                                else
-                                                @if(proj.StatusName == "Incomplete")
-                                                { 
-                                                    <div class="progress" style="height:100%;" >                                  
-                                                      <div class="progress-bar bg-danger" role="progressbar"  style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">15%</div>                                                
-                                                    </div>
-                                                }
-                                                else
-                                                @if(proj.StatusName == "On-Hold")
-                                                {
-                                                    <div class="progress" style="height:100%;" >                                  
-                                                      <div class="progress-bar bg-secondary" role="progressbar"  style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>                                                
-                                                    </div>
-                                                }
-                                                else
-                                                @if(proj.StatusName == "Sent for Review")
-                                                { 
-                                                    <div class="progress" style="height:100%;" >                                  
-                                                      <div class="progress-bar bg-info" role="progressbar"  style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>                                                
-                                                    </div>
-                                                }
+
+                                                 @{
+                                                      var act_statues = Model.Activities.Where(a => a.ProjectID == proj.Id);
+                                                     
+                                                      int displayStatusId = proj.CalculatedDisplayStatusId;
+                                                                                                        
+                                                          @if(displayStatusId == (int)ProjectActivityStatus.Started) // Assumes ProjectActivityStatus enum is accessible
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Upcoming)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar" style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Ongoing)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-warning" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Completed)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.Incomplete)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-danger" role="progressbar" style="width: 15%;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">15%</div> @* Note: You have 15% here but aria-valuenow is 25%*@ 
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.OnHold)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-secondary" role="progressbar" style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                                                              </div>
+                                                          }
+                                                          else if(displayStatusId == (int)ProjectActivityStatus.SentForReview)
+                                                          {
+                                                              <div class="progress" style="height:100%;" >
+                                                                  <div class="progress-bar bg-info" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                                                              </div>
+                                                          }
+                                                        
+                                                    }
+
                                             </div>
-                                                                                    
+
                                             @* Project Actions *@
                                             <div class="col-auto d-none d-lg-block" style="vertical-align:middle;float:right;">
 
                                               <ul class="list-unstyled d-flex" style="margin:0;padding:0;border:1px solid grey;border-radius:4px;">
                                                   @* Add Project *@
-                                                  <li class="align-middle ps-4 pe-4" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">  
-                                                      <span class="clip" style="color: blue;">  
+                                                  <li class="align-middle ps-4 pe-4" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">
+                                                      <span class="clip" style="color: blue;">
                                                         <i class="bi bi-plus-circle"></i>
                                                       </span>
-                                                  </li>  
-                                                  
-                                                  @{   
+                                                  </li>
+
+                                                  @{
                                                       //Project Owner Action
                                                       if(proj.AccountID == currentUser.AccountID)
-                                                      { 
+                                                      {
 
                                                         @* Edit Project *@
                                                         <li class="align-middle ps-4 pe-4" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="modal" data-bs-target="#modalProjectEdit_@proj.Id">
-                                                          <span class="safe" style="color: green;">                               
+                                                          <span class="safe" style="color: green;">
                                                               <i class="bi bi-pencil-square" ></i>
                                                           </span>
                                                         </li>
@@ -2320,7 +2931,7 @@
                                                       {
                                                           @* Edit Project *@
                                                           <li class="align-middle ps-4 pe-4" style="margin:0;padding:0;display: inline-flex; align-items: center;" disabled>
-                                                            <span class="" style="color: grey !important;" >                               
+                                                            <span class="" style="color: grey !important;" >
                                                                 <i class="bi bi-pencil-square" ></i>
                                                             </span>
                                                           </li>
@@ -2335,30 +2946,46 @@
 
                                                   }
                                               </ul>
-                                            </div>                                          
-                                            
-                                          </div> 
+                                            </div>
 
-                                          @* Side *@  
+                                          </div>
+
+                                          @* Side *@
                                           <div id="flush-collapse_@proj.Id" style="color:#0f204b;background-color:#e7f1ff;" class="accordion-collapse collapse mt-2" data-bs-parent="#accordionFlush">
-                                            <div class="accordion-body" >   
-                                                <div class="d-flex flex-row justify-content-center">   
-                                                  <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;color:#a71930;">   
-                                                    <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Details</h6>                                   
+                                            <div class="accordion-body" >
+                                                <div class="d-flex flex-row justify-content-center">
+                                                  <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;color:#a71930;">
+                                                    <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Details</h6>
                                                     <p class="fw-light" style="color:#000;">@proj.ProjectDetails</p>
                                                   </div>
                                                   <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;">
+                                                    <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Dates</h6>
+                                                    <div class="d-flex flex-row justify-content-between">
+                                                      <div class="col-auto"> 
+                                                        <p>Start Date</p>
+                                                        <p class="fw-bold">@proj.ProjectStartDate.ToString("MMM-d-yyyy")</p>
+                                                      </div>
+                                                      <div class="col-auto text-center"> 
+                                                          |
+                                                      </div>
+                                                      <div class="col-auto"> 
+                                                        <p>End Date</p>
+                                                        <p class="fw-bold">@proj.ProjectEndDate.ToString("MMM-d-yyyy")</p>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                  <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
                                                     <h6 class="fw-semibold mb-1" style="color:#a71930;">Area of Work</h6>
                                                     <p class="fw-light">@proj.ProjectAreaOfWork</p>
-                                                  </div> 
-                                                  <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;">
+                                                  </div>
+                                                  <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
                                                     <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
                                                     <p class="fw-light">@getProjectMembers.Substring(1)</p>
-                                                  </div> 
-                                                  <div class="col-sm-3 ps-3 pe-3">
+                                                  </div>
+                                                  <div class="col-sm-2 ps-3 pe-3">
                                                     <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</h6>
                                                     @if(proj.ProjectFiles.Length > 2)
-                                                    {                                                 
+                                                    {
                                                       <p class="fw-light">
                                                         <a href="~/Attachments/Projects/@proj.ProjectFiles" class="clip" download>
                                                           <span>
@@ -2367,14 +2994,13 @@
                                                           @proj.ProjectFiles.Substring(4)
                                                         </a>
                                                       </p>
-
                                                     }
                                                     else
                                                     {
                                                       <p class="fw-light">No project files</p>
                                                     }
-                                                    
-                                                  </div> 
+
+                                                  </div>
 
                                                 </div>
                                             </div>
@@ -2382,21 +3008,21 @@
 
                                         </div>
                                       </div>
-                                                                                   
-                                  </td>                                        
-                              </tr>   
+
+                                  </td>
+
+                              </tr>
 
                               var countActivity = 0;
                               foreach(var act in activities_data
                                       .Where(a => a.ProjectID == proj.Id)
                                       .OrderBy(a => a.ActivityUpdateTime))
                               {
-
                                   countActivity++;
-                                  @* ACTIVITIES *@                                
-                                  <tr>              
-                                    
-                                    @* ActivityName *@                      
+                                  @* ACTIVITIES *@
+                                  <tr>
+
+                                    @* ActivityName *@
                                     <td class="align-middle">
                                         <span>
                                           <span class="fw-bold">@countActivity.</span> @act.ActivityName
@@ -2418,9 +3044,44 @@
 
                                     @* Activity Durarion *@
                                     <td class="align-middle text-center">
-                                      <small class="text-muted" > 
-                                        <span style="font-size:11px;"> Days </span></small><span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> | <small class="text-muted"><span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span><span style="font-size:11px;"> Weeks </span></small> 
-                                    </td>                                   
+                                      @*<small class="text-muted" >
+                                        <span style="font-size:11px;"> Days </span></small><span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> | <small class="text-muted"><span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span><span style="font-size:11px;"> Weeks </span></small> *@
+
+                                       @{
+                                          var getTTCompletion_useract = act.ActivityEndDate - act.ActivityStartDate;
+
+                                          // Option A: Using TimeSpan properties (most common and readable)
+                                          int totalDays_useract = getTTCompletion_useract.Days;
+                                          int totalWeeks_useract = totalDays / 7;
+                                          int totalMonths_useract = totalDays / 30;                                   
+                                        }
+
+                                        @if(totalDays_useract <= 7)
+                                              {
+                                                <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalDays_useract Days</span>
+                                                </span>
+                                              }else
+                                                  if(totalDays_useract > 7 && totalWeeks_useract <= 4 )
+                                                  {
+
+                                                    <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                      <i class="bi bi-clock-history fs-6"></i>
+                                                      <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_useract Wks</span>
+                                                    </span>
+
+                                                  }
+                                                  else
+                                                    if(totalWeeks_useract > 4 )
+                                                    {
+                                                        <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                          <i class="bi bi-clock-history fs-6"></i>
+                                                          <span style="margin-left: 0.30rem;font-weight:100">@totalMonths_useract Mnt</span>
+                                                        </span>
+                                                    }
+
+                                    </td>
 
                                     @* Activity Status *@
                                     <td class="align-middle text-center">
@@ -2458,22 +3119,22 @@
                                       {
                                           <span class="badge rounded-pill bg-warning">Sent for Review</span>
                                       }
-                                    
+
                                     </td>
 
                                     @* Activity Count *@
                                     @*<td class="text-center align-middle">
                                       <ul class="list-unstyled d-flex" style="margin: 0 !important; padding: 0 !important;">
-                                        <li class="align-middle" >                                         
-                                          <span class="badge bg-light text-danger fs-6">@tot_act.ToString()</span>  
-                                        </li>               
+                                        <li class="align-middle" >
+                                          <span class="badge bg-light text-danger fs-6">@tot_act.ToString()</span>
+                                        </li>
                                         <li class="align-middle" data-bs-toggle="modal" data-bs-target="#activityDetails_@proj.Id">
                                           <i class="bi bi-view-list fs-5"></i>
                                         </li>
-                                        <li class="align-middle" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">  
+                                        <li class="align-middle" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">
                                             <i class="bi bi-plus-circle fs-5"></i>
-                                        </li>  
-                                      </ul>                   
+                                        </li>
+                                      </ul>
                                     </td>*@
 
                                     @* Attachments *@
@@ -2491,7 +3152,7 @@
                                         }
                                         else
                                         {
-                                          <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project."> 
+                                          <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project.">
                                             <a class="" aria-disabled="true" disabled>
                                                 <i class="bi bi-paperclip fs-5"></i>
                                             </a>
@@ -2505,63 +3166,63 @@
 
                                     @* Actions *@
                                     <td class="text-center align-middle">
-                                      @{        
-                                          var act2 = Model.Activities.Where(c => c.ProjectID == act.ProjectID).FirstOrDefault();
-                                          var proj2 = Model.Projects.Where(c => c.Id == act2.ProjectID & c.AccountID != currentUser.AccountID).FirstOrDefault();
+                                      @{
+                                          //var act2 = Model.Activities.Where(c => c.ProjectID == act.ProjectID).FirstOrDefault();
+                                          //var proj2 = Model.Projects.Where(c => c.Id == act2.ProjectID & c.AccountID != currentUser.AccountID).FirstOrDefault();
                                           //var b = new List<int>{8,9,10};
 
-                                          if(proj.AccountID == currentUser.AccountID && proj.Id != act.MemberProject)
-                                          {                                            
+                                          if(proj.AccountID == currentUser.AccountID)
+                                          {
                                               <ul class="list-unstyled d-flex" style="margin: 0 !important; padding: 0 !important;">
-                                                
+
                                                 @* EDIT *@
                                                 <li class="align-middle" data-bs-toggle="modal" data-bs-target="#btnEditActivity_@act.Id" >
-                                                  <span class="safe">                               
+                                                  <span class="safe">
                                                       <i class="bi bi-pencil-square"></i>
                                                   </span>
                                                 </li>
 
-                                                @* DELETE *@                                          
-                                                <li id="btnDeleteActivity_@proj.Id">
+                                                @* DELETE *@
+                                                <li id="btnDeleteActivity_@act.Id">
                                                   <span class="danger">
                                                       <i class="bi bi-trash3"></i>
                                                   </span>
                                                 </li>
-                                              
-                                              
-                                              </ul>                                            
+
+
+                                              </ul>
                                           }
-                                          else                                          
+                                          else
                                           if(proj.SelectedAssignedUserIds[0] != currentUser.AccountID && proj.Id == act.MemberProject)
                                           {
                                             <ul class="list-unstyled d-flex" style="margin: 0 !important; padding: 0 !important;">
-                                              
+
                                               @* EDIT *@
                                               <li class="align-middle" data-bs-toggle="modal" data-bs-target="#btnEditActivity_@act.Id" >
-                                                <span class="safe">                               
+                                                <span class="safe">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </span>
                                               </li>
 
-                                              @* DELETE *@                                          
-                                              <li id="btnDeleteActivity_@proj.Id">
+                                              @* DELETE *@
+                                              <li id="btnDeleteActivity_@act.Id">
                                                 <span class="danger">
                                                     <i class="bi bi-trash3"></i>
                                                 </span>
                                               </li>
-                                            
-                                            
-                                            </ul>   
+
+
+                                            </ul>
                                           }
-                                          
+
                                         }
                                     </td>
 
                                   </tr>
 
-                                  @* Update Activity *@                                   
+                                  @* Update Activity *@
                                   <div class="modal modal-md fade" id="btnEditActivity_@act.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel1" aria-hidden="true">
-                                      
+
                                       <div class="modal-dialog">
                                         <form class="act_form" enctype="multipart/form-data" id="act_form_@act.Id" >
 
@@ -2571,7 +3232,7 @@
                                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                  
+
                                                   <input type="hidden" value="@act.Id" asp-for="@Model.ActivityModel.Id" class="form-control" />
 
                                                   <div class="mb-3 form-group">
@@ -2593,7 +3254,7 @@
                                                       <label class="col-form-label fw-bold">Activity Highlights</label>
                                                       <input type="text" placeholder="Highlights" asp-for="@act.ActivityHighlights" class="form-control"  />
                                                   </div>
-                                                
+
                                                   <div class="row mb-3">
                                                       <div class="col-sm-6">
                                                           <label class="col-form-label fw-bold">Start Date</label>
@@ -2607,10 +3268,10 @@
                                                   </div>
 
                                                   <div class="form-group mb-3">
-                                                      <label asp-for="@act.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>                                    
+                                                      <label asp-for="@act.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>
                                                       <select class="form-select mb-3" asp-for="@act.ActivityProgress" asp-items="Model.ActivityStatuses" required>
-                                                          <option value="" selected>@act.ActivityProgress</option>                                    
-                                                      </select>                                         
+                                                          <option value="" selected>@act.ActivityProgress</option>
+                                                      </select>
 
                                                   </div>
 
@@ -2622,29 +3283,29 @@
 
                                                         @if(act.ProjectFiles.Count() > 5)
                                                         {
-                                                          <div class="ps-1">                                                                
+                                                          <div class="ps-1">
                                                                 Current document: <a href="~/Attachments/Projects/@act.ProjectFiles" target="_blank">@act.ProjectFiles.Substring(4)</a>
                                                                 <br />
                                                                 <span style="vertical-align:center;color:#A71930;">
                                                                   <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
                                                                 </span>
                                                           </div>
-                                                        }    
-                                                      
+                                                        }
+
                                                     </div>
 
                                                   </div>
 
                                                   <div class="card-footer">
                                                         <a href="javascript:void(0)" id="btnUpdateActivity_@act.Id" class="btn btn-sm btn-primary" style="background-color:#A71930;color:white;">Update Activity</a>
-                                                        <a href="javascript:void(0)" data-bs-dismiss="modal" class="btn btn-sm btn-secondary">Cancel</a>                                                
+                                                        <a href="javascript:void(0)" data-bs-dismiss="modal" class="btn btn-sm btn-secondary">Cancel</a>
                                                   </div>
-                                                  
+
                                                 </div>
                                               </div>
 
                                         </form>
-                                      </div>     
+                                      </div>
 
                                   </div>
 
@@ -2654,7 +3315,7 @@
                               <div class="modal modal-md fade" id="modalActivity_@proj.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <form enctype="multipart/form-data" class="frm_Activity" id="frm_Activity_@proj.Id" >
-                                  
+
                                         <div class="modal-content">
                                           <div class="modal-header">
                                             <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Activity</h1>
@@ -2662,9 +3323,9 @@
                                           </div>
                                           <div class="modal-body">
 
-                                              
+
                                               <input type="hidden" asp-for="@Model.ActivityModel.ProjectID" value="@proj.Id" class="form-control" />
-                                             
+
 
                                               <div class="mb-3 form-group">
                                                   <label class="col-form-label fw-bold">Activity Name:</label>
@@ -2685,7 +3346,7 @@
                                                   <label class="col-form-label fw-bold">Activity Highlights</label>
                                                   <input type="text" placeholder="Highlights..." asp-for="@Model.ActivityModel.ActivityHighlights" class="form-control"  />
                                               </div>
-                                            
+
                                               <div class="row mb-3">
                                                   <div class="col-sm-6">
                                                       <label class="col-form-label fw-bold">Start Date</label>
@@ -2704,10 +3365,10 @@
                                               </div> *@
 
                                               <div class="form-group mb-3">
-                                                  <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>                                    
+                                                  <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>
                                                   <select class="form-select mb-3" asp-for="@Model.ActivityModel.ActivityProgress" asp-items="Model.ActivityStatuses" required>
-                                                      <option value="" selected>Select Activity Status</option>                                    
-                                                  </select>                                         
+                                                      <option value="" selected>Select Activity Status</option>
+                                                  </select>
 
                                               </div>
 
@@ -2719,28 +3380,36 @@
                                                   </div>
                                               </div>
 
-                                              <input type="hidden" asp-for="@Model.ActivityModel.MemberProject" value="@proj.Id" class="form-control" />
+                                              @if(proj.AccountID != currentUser.AccountID)
+                                              {
+                                                <input type="hidden" asp-for="@Model.ActivityModel.MemberProject" value="@proj.Id" class="form-control" />
+                                              }
+                                              else
+                                              {
+                                                <input type="hidden" asp-for="@Model.ActivityModel.MemberProject" value="" class="form-control" />
+                                              }
+                                              
 
                                           </div>
                                           <div class="modal-footer">
 
                                             <div class="mt-2 col-sm-12">
                                                 <a href="javascript:void(0)" id="btnSaveActivity_@proj.Id" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Save Activity</a>
-                                                <a href="javascript:void(0)" id="cancelButActivity_@proj.Id" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
-                                            </div>    
+                                                <a href="javascript:void(0)" id="cancelButActivity_@proj.Id" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>
+                                            </div>
 
                                           </div>
                                         </div>
 
                                     </form>
                                 </div>
-                              </div> 
-                            
+                              </div>
+
                               //@*Update Modal Project*@
                               <div class="modal modal-md fade" id="modalProjectEdit_@proj.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                       <form enctype="multipart/form-data" class="frmEditProject" id="frmEditProject_@proj.Id">
-                                    
+
                                           <div class="modal-content">
                                             <div class="modal-header">
                                               <h1 class="modal-title fs-5" id="staticBackdropLabel">Update Project</h1>
@@ -2749,7 +3418,7 @@
                                             <div class="modal-body">
 
                                                 <input type="hidden" id="projectID" value="@proj.Id" asp-for="@Model.ProjectModel.Id" class="form-control" />
-                                                
+
                                                 <input type="hidden" asp-for="@proj.AccountID" class="form-control" />
 
                                                 <div class="mb-3 form-group">
@@ -2770,12 +3439,12 @@
                                                 </div>
 
                                                 <input type="hidden" asp-for="@proj.ProjectWorkInConj" value="null" class="form-control"  />
-                                                
+
                                                 <div class="mb-3 form-group">
-                                                    <label asp-for="@proj.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>                                        
+                                                    <label asp-for="@proj.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>
                                                     <select class="form-select mb-3" size="3" asp-for="@proj.SelectedAssignedUserIds" asp-items="Model.UserAccounts" multiple required>
-                                                        <option selected>Select Project Members</option>                                            
-                                                    </select> 
+                                                        <option selected>Select Project Members</option>
+                                                    </select>
                                                 </div>
 
                                                 <div class="row mb-3">
@@ -2792,13 +3461,13 @@
 
                                                 <div class="form-group mb-3">
                                                     <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress</label>
-                                              
+
                                                     <select class="form-select mb-3" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
-                                                        <option value="" selected> @proj.StatusName</option>                                    
+                                                        <option value="" selected> @proj.StatusName</option>
                                                     </select>
 
                                                 </div>
-                                            
+
                                                 <div class="form-group mb-3">
 
                                                     <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Project Attachments:</label>
@@ -2812,11 +3481,11 @@
                                                               <br />
                                                               <span style="vertical-align:center;color:#A71930;">
                                                                 <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
-                                                              </span>                                                           
+                                                              </span>
                                                             </p>
                                                           </div>
-                                                        }                                                                                                        
-                                                        
+                                                        }
+
                                                     </div>
 
                                                 </div>
@@ -2825,8 +3494,8 @@
 
                                               <div class="mt-2 col-sm-12">
                                                   <a href="javascript:void(0)" id="btnUpdateProject_@proj.Id" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Update Project</a>
-                                                  <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
-                                              </div>    
+                                                  <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>
+                                              </div>
 
                                             </div>
                                           </div>
@@ -2840,24 +3509,24 @@
                         }
 
                     </tbody>
-                   
+
 
                 </table>
 
-              </div>     
+              </div>
           </div>
-        </div>        
+        </div>
     }
 
   //@*Modal Project*@
-  @if(Model.Accounts.Where(c => c.Id == userId).FirstOrDefault() != null) 
-  { 
+  @if(Model.Accounts.Where(c => c.Id == userId).FirstOrDefault() != null)
+  {
     var cc = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
 
     <div class="modal modal-md fade" id="modalProject" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
             <form enctype="multipart/form-data" id="frmAddProject">
-          
+
                 <div class="modal-content">
                   <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Project</h1>
@@ -2884,12 +3553,12 @@
                           <input type="text" placeholder="SAS, DHET, HR, Faculties, Snr Director, Rector, ect." asp-for="@Model.ProjectModel.ProjectAreaOfWork" class="form-control"  required/>
                           @* <div><span asp-validation-for="@Model.ProjectModel.ProjectAreaOfWork" class="text-danger"></span></div> *@
                       </div>
-                      
+
                       <div class="mb-3 form-group">
-                          <label asp-for="@Model.ProjectModel.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>                                        
+                          <label asp-for="@Model.ProjectModel.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>
                           <select class="form-select mb-3" size="3" asp-for="@Model.ProjectModel.SelectedAssignedUserIds" asp-items="Model.UserAccounts" multiple required>
-                              <option value="" selected>Select Project Members</option>                                            
-                          </select> 
+                              <option value="" selected>Select Project Members</option>
+                          </select>
                           @* <div><span asp-validation-for="@Model.ProjectModel.SelectedAssignedUserIds" class="text-danger"></span></div> *@
                       </div>
 
@@ -2904,20 +3573,20 @@
                               <label class="col-form-label fw-bold">End Date</label>
                               <input type="date" asp-for="@Model.ProjectModel.ProjectEndDate" class="form-control" required/>
                               @* <div><span asp-validation-for="@Model.ProjectModel.ProjectEndDate" class="text-danger"></span></div> *@
-                              <p id="endDateHint" class="text-xs text-gray-500 mt-1">Please select a start date first.</p>
+                              
                           </div>
                       </div>
 
                       <div class="form-group mb-3">
                           <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress</label>
-                    
+
                           <select class="form-select mb-3" asp-for="@Model.ProjectModel.ProjectStatusID" asp-items="Model.StatusList" required>
-                              <option value="" selected>Select Project Status</option>                                    
+                              <option value="" selected>Select Project Status</option>
                           </select>
                           @* <div><span asp-validation-for="@Model.ProjectModel.ProjectStatusID" class="text-danger"></span></div> *@
 
                       </div>
-                  
+
                       <div class="form-group mb-3">
 
                           <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Project Attachments:</label>
@@ -2934,8 +3603,8 @@
 
                     <div class="mt-2 col-sm-12">
                         <a href="javascript:void(0)" id="btnSaveProject" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Save Project</a>
-                        <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
-                    </div>    
+                        <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>
+                    </div>
 
                   </div>
                 </div>
@@ -2960,16 +3629,16 @@
               <div class="modal-footer">
                 <div class="mt-2 col-sm-12">
                     <a href="javascript:void(0)" id="btnSaveProject" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;" disabled>Save Project</a>
-                    <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>  
-                </div>    
+                    <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>
+                </div>
 
               </div>
           </div>
-      </div>  
+      </div>
     </div>
   }
 
-}      
+}
 
 <script>
 
@@ -2980,8 +3649,61 @@
           filterLinks.forEach(linkElement => {
               // Set initial styles (better to do this in CSS, but keeping it for consistency with your original intent)
               linkElement.style.fontSize = "16px";
-              linkElement.style.color = "white";      
-             
+              linkElement.style.color = "white";
+
+              // Add hover effect using classes
+              linkElement.addEventListener('mouseover', function() {
+                  linkElement.classList.add('link-hover');
+              });
+
+              linkElement.addEventListener('mouseout', function() {
+                  linkElement.classList.remove('link-hover');
+              });
+
+              // Add click behavior for active state
+              linkElement.addEventListener('click', function(event) {
+                 // event.preventDefault(); // Prevent default link behavior (e.g., navigating away) if desired
+
+                  // Remove 'link-active' from all other links
+                  filterLinks.forEach(otherLink => {
+                      if (otherLink !== linkElement) {
+                          otherLink.classList.remove('link-active');
+                          // You might want to reset their initial styles here if not handled by CSS default
+                          otherLink.style.fontSize = "16px";
+                          otherLink.style.fontWeight = "normal"; // Reset font weight
+                      }
+                  });
+
+                  // Toggle 'link-active' on the clicked link
+                  linkElement.classList.toggle('link-active');
+
+                  // Apply specific styles for the active link directly (if not fully managed by CSS)
+                  // This part might be redundant if 'link-active' class handles all styling.
+                  if (linkElement.classList.contains('link-active')) {
+                      linkElement.style.fontSize = "22px";
+                      linkElement.style.fontWeight = "bold";
+                  } else {
+                      // If it's toggled off, reset to initial state
+                      linkElement.style.fontSize = "16px";
+                      linkElement.style.fontWeight = "normal";
+                  }
+
+                  // Optional: You can put your navigation logic here, e.g.,
+                  // window.location.href = linkElement.href;
+              });
+          });
+      });
+
+       document.addEventListener('DOMContentLoaded', function() {
+          const filterLinks = Array.from(document.getElementsByClassName('statuses')); // Convert HTMLCollection to Array
+
+          // Define initial styles and event listeners for each link
+          filterLinks.forEach(linkElement => {
+              // Set initial styles (better to do this in CSS, but keeping it for consistency with your original intent)
+              linkElement.style.fontSize = "14px";
+              linkElement.style.color = "white";
+              linkElement.style.paddingBottom = "2px";
+
               // Add hover effect using classes
               linkElement.addEventListener('mouseover', function() {
                   linkElement.classList.add('link-hover');

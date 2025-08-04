@@ -1,0 +1,103 @@
+@model RoleEditModel
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@{
+    ViewBag.Title = "Edit Roles";
+    Layout = "_Layout";
+    
+}
+
+<div class="container-fluid p-0">
+
+    <h1 class="h3 mb-3">Assign Users to Roles</h1>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Managing role (<span class="fw-bold"> @Model.role.Name)</span></h5>
+                </div>
+                <div class="card-body">              
+   
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <form asp-action="Edit" method="post">
+
+                        
+                            <div class="col-sm-12 col-md-10 col-lg-10 text-center" style="float:none; margin: 0 auto;">
+                                <input type="hidden" name="roleName" value="@Model.role.Name" />
+                                <input type="hidden" name="roleId" value="@Model.role.Id" />
+                                <h6 class="bg-info p-1 text-white">Add To @Model.role.Name</h6>
+
+                                <table class="table table-bordered table-sm">
+
+                                    @if (Model.NonMembers.Count() == 0)
+                                    {
+                                        <tr><td colspan="2">All Users Are Members</td></tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (User user in Model.NonMembers)
+                                        {
+                                           @* @if(await userManager.IsInRoleAsync(user,"Officer") || await userManager.IsInRoleAsync(user,"Admins") || await userManager.IsInRoleAsync(user,"Data Manager"))
+                                            {*@
+                                                <tr>
+                                                    <td>@user.UserName</td>
+                                                    <td>
+                                                        <input type="checkbox" name="IDstoAdd" value="@user.Id">
+                                                    </td>
+                                                </tr>
+                                            @*}*@
+                                        }
+                                    }
+                                </table>
+                            </div>
+                        
+                            <div class="col-sm-12 col-md-10 col-lg-10 text-center" style="float:none; margin: 0 auto;">
+                                <h6 class="bg-info p-1 text-white">Remove From @Model.role.Name</h6>
+
+                                <table class="table table-bordered table-sm">
+                                    @if (Model.members.Count() == 0)
+                                    {
+                                        <tr><td colspan="2">No Users Are Members</td></tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (User user in Model.members)
+                                        {
+                                            @if(await userManager.IsInRoleAsync(user,"MIR") || await userManager.IsInRoleAsync(user,"Admin") || await userManager.IsInRoleAsync(user,"AP") || await userManager.IsInRoleAsync(user,"IIS"))
+                                            {
+                                                <tr>
+                                                    <td>@user.UserName</td>
+                                                    <td>
+                                                        <input type="checkbox" name="IDstoDelete" value="@user.Id">
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </table>
+                            </div>
+                        
+                            
+                            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                                <br />
+                                <button type="submit" class="btn btn-sm btn-primary">Save Changes</button>
+                                <a asp-action="Index" class="btn btn-sm  btn-secondary">Cancel</a>
+                                <a class="btn btn-sm btn-outline-info" href="~/UserAdmin/Index">
+                                    Manage Users
+                                </a>   
+                                <hr /><br />
+                            </div>
+
+                    </form>
+                    
+                </div>
+            
+            </div>
+           
+        </div>
+    </div>
+
+</div>

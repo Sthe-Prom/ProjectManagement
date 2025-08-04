@@ -275,7 +275,7 @@ h6 {
 }
 
 .card-body {
-    padding: 0 20px 20px 20px;
+    padding: 0 20px 5px 20px;
 }
 
 .card-img-overlay {
@@ -744,7 +744,7 @@ h6 {
 /* Info Cards */
 
 .dashboard .info-card {
-    padding-bottom: 10px;
+    padding-bottom: 5px;
 }
 
 .dashboard .info-card h6 {
@@ -817,7 +817,7 @@ h6 {
 
 .dashboard .activity .activity-item .activity-content {
     padding-left: 10px;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
 }
 
 .dashboard .activity .activity-item:first-child .activite-label::before {
@@ -832,7 +832,7 @@ h6 {
 /* News & Updates */
 
 .dashboard .news .post-item+.post-item {
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .dashboard .news img {

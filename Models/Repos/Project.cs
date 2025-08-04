@@ -35,8 +35,18 @@ namespace ProjectManagement.Models
         [ForeignKey("ProjectStatusID")]
         public virtual Status Status { get; set; }
 
-         [ForeignKey("AccountID")]
+        [ForeignKey("AccountID")]
         public virtual Account Account { get; set; }
+
+        public ICollection<Activity> Activities {get; set;} = new List<Activity>();
+
+        // NEW: Property to hold the calculated display status, not mapped to the database
+        [NotMapped]
+        public int CalculatedDisplayStatusId { get; set; }
+
+        // NEW: Optional - A string version of the calculated status for easier display
+        [NotMapped]
+        public string CalculatedDisplayStatusName { get; set; }
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ProjectManagement.Models;
+using ProjectManagement.Services;
 using ProjectManagement.Interfaces;
 using Newtonsoft.Json;
 using System.IO;
@@ -17,12 +18,12 @@ using System;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
+using System.Linq;
 
 namespace ProjectManagement.Controllers;
 
 public class HomeController : Controller
-{
-    
+{    
     private readonly IAccount account_context;
     private readonly ISubdept subdept_context;
     private readonly IProject project_context;
@@ -31,6 +32,9 @@ public class HomeController : Controller
     private readonly IWebHostEnvironment HostEnvironment;
     public BaseViewModel BaseViewModel { get; set; }
     private readonly ILogger<HomeController> _logger;
+
+    //Services
+    private readonly IProjectAction project_service;
 
     //User Login
     private UserManager<User> UserManager;
@@ -53,7 +57,8 @@ public class HomeController : Controller
 
     public HomeController(ILogger<HomeController> logger, IAccount account_context_, ISubdept subdept_context_,
                           IProject project_context_, IActivity activity_context_, IStatus status_context_,
-                          UserManager<User> userManager_, SignInManager<User> signInManager_, IWebHostEnvironment he)
+                          UserManager<User> userManager_, SignInManager<User> signInManager_, IWebHostEnvironment he,
+                          IProjectAction project_service_)
     {
         _logger = logger;
 
@@ -71,33 +76,32 @@ public class HomeController : Controller
         //Context
         HostEnvironment = he;
 
+        //Services
+        project_service = project_service_;
+
         this.BaseViewModel = new BaseViewModel();
         this.BaseViewModel.Accounts = account_context.Accounts;
         this.ViewData["BaseViewModel"] = this.BaseViewModel;
     }
 
-    public IActionResult Index(ProjectViewModel vm, int Staff )
+    public async Task<IActionResult> Index(ProjectViewModel vm, int? Status, int? Staff)
     {
+        //IEnumerable<Project> projects = project_context.Projects;
+        //var projects_ = projects;
+      
         vm.ProjectModel = new Project();
         vm.fileModel = new FileViewModel();
         vm.ActivityModel = new ProjectManagement.Models.Activity();
-        vm.Projects = project_context.Projects;
+        vm.Projects = project_context.Projects;       
         vm.Activities = activity_context.Activities;
         vm.Accounts = account_context.Accounts;
         vm.Statuses = status_context.Statuses;
         vm.UserAccounts = getAccounts();
         vm.StatusList = getStatuses();
         vm.ActivityStatuses = getActivityStatus();
-
-        List<DataPoint> dataPoints = new List<DataPoint>();
-        List<DataPoint> dataPointsActivity = new List<DataPoint>();
-        List<DataPoint> dataPointsCompleted = new List<DataPoint>();
-        List<DataPoint> dataPointsIncomplete = new List<DataPoint>();
-        List<DataPoint> dataPointsStarted = new List<DataPoint>();
-        List<DataPoint> dataPointsOther = new List<DataPoint>();
-
+        
         var Project_ = project_context.Projects;
-
+        
         //Filter By User 
         if (!string.IsNullOrEmpty(Request.Query["Staff"]))
         {            
@@ -114,20 +118,43 @@ public class HomeController : Controller
             Project_ = project_context.Projects
                     .Where(a => a.AccountID == Staff) ;       
             
-        }
-        else
-            if(Staff == 1)
-            { 
-                vm.Projects = project_context.Projects;     
-                Project_ = project_context.Projects;  
-                vm.Activities = activity_context.Activities;                  
-            }   
-            else
-                {
-                    vm.Projects = project_context.Projects;     
-                    Project_ = project_context.Projects;  
-                    vm.Activities = activity_context.Activities;    
-                }     
+        }            
+
+        //Filter by Stasues 
+        if (!string.IsNullOrEmpty(Request.Query["Status"]))
+        {            
+            vm.Projects = project_context.Projects
+                    .Where(p => p.ProjectStatusID == Status);   
+            
+            var p = project_context.Projects
+                    .Where(p => p.ProjectStatusID == Status)
+                    .Select(p => p.Id);
+
+            vm.Activities = activity_context.Activities
+                    .Where(a => p.Contains(a.ProjectID));
+
+            Project_ = project_context.Projects
+                    .Where(a => a.ProjectStatusID == Status) ;       
+            
+        }                     
+
+        List<DataPoint> dataPoints = new List<DataPoint>();
+        List<DataPoint> dataPointsActivity = new List<DataPoint>();
+        List<DataPoint> dataPointsCompleted = new List<DataPoint>();
+        List<DataPoint> dataPointsIncomplete = new List<DataPoint>();
+        List<DataPoint> dataPointsStarted = new List<DataPoint>();
+        List<DataPoint> dataPointsOther = new List<DataPoint>();
+
+        //Apex
+        List<int> dataPointsCompleted_apex = new List<int>();
+        List<int> dataPointsIncomplete_apex = new List<int>();
+        List<int> dataPointsStarted_apex = new List<int>();
+        List<string> dataPointsStarted_apexCategory = new List<string>();
+
+        //Echarts
+        List<DataPointE> dataPoints_eCharts = new List<DataPointE>();
+        List<string> projectCategories = new List<string>();
+        List<int> projectValues = new List<int>();
 
         var projects_data = from acc in account_context.Accounts
                     join proj in Project_
@@ -145,8 +172,7 @@ public class HomeController : Controller
 
                   };
 
-        var projects_sortedMonthly = projects_data.OrderBy(m => m.SortDate).ToList();
-                  
+        var projects_sortedMonthly = projects_data.OrderBy(m => m.SortDate).ToList();                  
 
         var activities_data = from acc in account_context.Accounts
                     join proj in Project_
@@ -165,30 +191,54 @@ public class HomeController : Controller
 
                   };
 
-        foreach(var item in projects_sortedMonthly)
+        foreach(var item in projects_data)
         {
             //Main Projects
-            dataPoints.Add(new DataPoint(item.Status, item.ProjectCount) );  
-            //DayOfWeek day_ = item.ProjectDate.DayOfWeek;
+            dataPoints.Add(new DataPoint(item.Status, item.ProjectCount) ); 
+            var c = item.ProjectCount;
+
+            //Projects Categories (Status)
+            if(!projectCategories.Contains(item.Status))
+            {
+                projectCategories.Add(item.Status);
+                projectValues.Add(c);
+            } 
+            else
+            {
+                c = c+c;
+                projectValues.Add(c);
+            }
+        }
+
+        foreach(var item in projects_sortedMonthly)
+        {                               
+            //Apex Categories (Months)
+            if(!dataPointsStarted_apexCategory.Contains(item.ProjectDate))
+            {
+                dataPointsStarted_apexCategory.Add(item.ProjectDate);
+            }
 
             //Line Charts
             switch (item.Status)
             {
                 case "Completed":
                     dataPointsCompleted.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
+                    dataPointsCompleted_apex.Add(item.ProjectCount);          
                     break;
                 case "Incomplete":
                     dataPointsIncomplete.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
+                    dataPointsIncomplete_apex.Add(item.ProjectCount);
                     break;
                 case "Started":
                     dataPointsStarted.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
+                    dataPointsStarted_apex.Add(item.ProjectCount);                   
                     break;
                 default:
                     dataPointsOther.Add(new DataPoint(item.ProjectDate, item.ProjectCount));
                     break;
-            }          
-        }
+            }    
 
+        }
        
         foreach(var item in activities_data)
         {
@@ -201,9 +251,43 @@ public class HomeController : Controller
         ViewBag.DataPointsComplete = JsonConvert.SerializeObject(dataPointsCompleted); 
         ViewBag.DataPointsIncomplete = JsonConvert.SerializeObject(dataPointsIncomplete); 
         ViewBag.DataPointsStarted = JsonConvert.SerializeObject(dataPointsStarted); 
-        ViewBag.DataPointsOther = JsonConvert.SerializeObject(dataPointsOther);         
+        ViewBag.DataPointsOther = JsonConvert.SerializeObject(dataPointsOther);  
+
+        //Apex charts
+        ViewBag.DataApexComplete_Apex = JsonConvert.SerializeObject(dataPointsCompleted_apex); 
+        ViewBag.DataPointsIncomplete_Apex = JsonConvert.SerializeObject(dataPointsIncomplete_apex); 
+        ViewBag.DataPointsStarted_Apex = JsonConvert.SerializeObject(dataPointsStarted_apex); 
+        ViewBag.DataPointsStarted_apexCategory = JsonConvert.SerializeObject(dataPointsStarted_apexCategory);       
+
+        //ECharts
+        ViewBag.DataPoints_eCharts_Projects = JsonConvert.SerializeObject(dataPoints_eCharts);       
+        ViewBag.ProjectCategories = JsonConvert.SerializeObject(projectCategories);    
+        ViewBag.ProjectValues = JsonConvert.SerializeObject(projectValues);      
+
+        foreach(var project in Project_)
+        {
+            project.CalculatedDisplayStatusId = await project_service.GetProjectDisplayStatus(project);
+            project.CalculatedDisplayStatusName = GetStatusNameById(project.CalculatedDisplayStatusId);
+        } 
 
         return View(vm);
+    }
+
+    // Helper method to get status name (can also be in ProjectService or a separate utility)
+    private string GetStatusNameById(int statusId)
+    {
+        // Use your ProjectActivityStatus enum or a lookup table/dictionary
+        switch (statusId)
+        {
+            case (int)ProjectActivityStatus.Upcoming: return "Upcoming";
+            case (int)ProjectActivityStatus.Started: return "Started";
+            case (int)ProjectActivityStatus.Ongoing: return "Ongoing";
+            case (int)ProjectActivityStatus.Completed: return "Completed";
+            case (int)ProjectActivityStatus.Incomplete: return "Incomplete";
+            case (int)ProjectActivityStatus.OnHold: return "On-Hold";
+            case (int)ProjectActivityStatus.SentForReview: return "Sent for Review";
+            default: return "Unknown";
+        }
     }
 
     [HttpPost]
@@ -373,6 +457,16 @@ public class HomeController : Controller
                 vm.ProjectFiles.CopyTo(fileStream);
             }        
         }
+
+        var memberProject = 0;
+        if(!String.IsNullOrEmpty(formCollection["ActivityModel_MemberProject"]))
+        {
+            memberProject = Convert.ToInt32(formCollection["ActivityModel_MemberProject"]);
+        }
+        else
+        {
+            memberProject = 0;
+        }
         
         var Activity = new ProjectManagement.Models.Activity()
         {            
@@ -386,13 +480,14 @@ public class HomeController : Controller
             ActivityEndDate =  Convert.ToDateTime(formCollection["ActivityModel_ActivityEndDate"]),
             ActivityProgress = Convert.ToInt32(formCollection["ActivityModel_ActivityProgress"]),
             ProjectID = Convert.ToInt32(formCollection["ActivityModel_ProjectID"]),
-            MemberProject = Convert.ToInt32(formCollection["ActivityModel_MemberProject"])
+            MemberProject = memberProject,          
             
         };
-       
+              
         try
         {
-            await activity_context.SaveActivity(Activity);
+            await activity_context.SaveActivity(Activity);      
+            
         }
         catch (Exception ex)
         {
@@ -413,7 +508,7 @@ public class HomeController : Controller
         else
         {
             model.ResponseCode = 1;
-            //model.ResponseMessage = "No record available";
+            model.ResponseMessage = "No record available";
         }
 
         return Json(model);
@@ -477,7 +572,10 @@ public class HomeController : Controller
                 {
                     if (int.TryParse(idStr.Trim(), out int userId))
                     {
-                        selectedUserIds.Add(userId);
+                        if(!selectedUserIds.Contains(userId))
+                        {
+                            selectedUserIds.Add(userId);
+                        }
                     }
                     else
                     {
@@ -790,5 +888,19 @@ public class HomeController : Controller
         return ActivityStatusSelectList = new SelectList(ActivityStatusList, "Id", "Name");
     }
 
+    public async Task<Project> GetProjectForDisplay(int projectId)
+    {
+        var project = project_context.Projects                                       
+                .FirstOrDefault(c => c.Id == projectId);       
+        
+        if (project == null)
+        {                 
+            return null;
+        }
+
+        int calculatedDisplayStatusId = await project_service.GetProjectDisplayStatus(project);
+        
+        return project;
+    }
 
 }

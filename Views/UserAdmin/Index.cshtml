@@ -9,9 +9,7 @@
 
 
 <div class="container-fluid p-0">
-
-    <h1 class="h3 mb-3">User Management</h1>
-
+   
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -27,7 +25,6 @@
                             </div>
                             
                     </div>
-                    <hr />
                 </div>
                 <div class="card-body">
             
@@ -41,10 +38,10 @@
                                 <table class="table table-sm table-bordered" >
                                     <tr>
                                         @*<th>ID</th>*@
-                                        <th>Name</th>
+                                        <th>Username</th>
                                         <th>Email</th>
                                         @*<th>Logged in</th>*@
-                                        <th class="text-info">Action</th>
+                                        <th class="text-danger text-center">Action</th>
                                     </tr>
 
                                     @foreach (User user in Model.Users)
@@ -55,21 +52,20 @@
                                         }
                                         else
                                         {
-                                            @if(await userManager.IsInRoleAsync(user,"Officer") || await userManager.IsInRoleAsync(user,"Admins") || await userManager.IsInRoleAsync(user,"Data Manager"))
+                                            @if(await userManager.IsInRoleAsync(user,"MIR") || await userManager.IsInRoleAsync(user,"Admin") || await userManager.IsInRoleAsync(user,"IIS")|| await userManager.IsInRoleAsync(user,"AP"))
                                             {
                                                 <tr>
                                                 @* <td>@user.Id</td> *@
                                                 <td>@user.UserName</td>
                                                 <td>@user.Email</td>
                                                 @*<td>@User.Identity.Name</td>*@
-                                                <td>
+                                                <td class="align-middle text-center">
                                                     <form asp-action="Delete" asp-route-id="@user.Id" method="post">
                                                         <a asp-action="Edit" asp-route-Id="@user.Id">
-                                                            <i class="align-middle" data-feather="edit" style="color: #00675A;"></i>&nbsp;
+                                                            <i class="bi bi-pencil-square"></i>
                                                         </a>
-                                                        <a type="submit"
-                                                                class="">
-                                                            <i class="align-middle" data-feather="delete" aria-hidden="true"></i>
+                                                        <a type="submit" class="">
+                                                           <i class="bi bi-trash3"></i>
                                                         </a>
                                                     </form>
 

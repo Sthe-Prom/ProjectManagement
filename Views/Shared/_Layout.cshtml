@@ -95,10 +95,10 @@
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Users</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="UserAdmin" asp-action="Index">Users</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Roles</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="RoleAdmin" asp-action="Index">Roles</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Projects</a>
@@ -121,6 +121,9 @@
                         @* @{
                             var user_acc = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
                         } *@
+                    
+                    @if(Model.Accounts != null && Model.Accounts.Count() != 0)
+                    {
                     
                         @if(Model.Accounts.Where(c => c.Id == userId).FirstOrDefault() != null) 
                         {                                        
@@ -177,7 +180,7 @@
                             @* </div> *@
                                 
                         }
-                    
+                    }
 
                 </div>
             </nav>
@@ -240,10 +243,6 @@
    
     <script src="~/assets/tinymce/tinymce.min.js"></script>
 
-   
-
-  
-  
     @await RenderSectionAsync("Scripts", required: false)   
 
 </body>

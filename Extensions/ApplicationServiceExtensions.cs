@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectManagement.Interfaces;
+using ProjectManagement.Services;
 using ProjectManagement.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -71,6 +72,7 @@ namespace ProjectManagement.Extensions
 
             //Application Service Registration
             services.AddTransient<IProject, EFProject>();
+            services.AddTransient<IProjectAction, ProjectService>();
             services.AddTransient<IActivity, EFActivity>();
             services.AddTransient<IStatus, EFStatus>();
             services.AddTransient<ISubdept, EFSubdept>();
