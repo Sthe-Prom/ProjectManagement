@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjectManagement.Controllers;
 
@@ -96,7 +97,7 @@ public class HomeController : Controller
         vm.Activities = activity_context.Activities;
         vm.Accounts = account_context.Accounts;
         vm.Statuses = status_context.Statuses;
-        vm.UserAccounts = getAccounts();
+        vm.UserAccounts = GetAccountsAsync();
         vm.StatusList = getStatuses();
         vm.ActivityStatuses = getActivityStatus();
         
@@ -755,34 +756,34 @@ public class HomeController : Controller
     }
 
 
-    public SelectList getAccounts()
+    public SelectList GetAccountsAsync()
     {
-        List<Account> models = new List<Account>();
-        var currentUser = UserManager.GetUserId(User);
-        //var project_owner = account_context.Where(c => c.Id = currentUser.Id);
-       
-        var AllUsers = from acc in account_context.Accounts
-                    select new
-                    {
-                        AccountID = acc.AccountID,
-                        FullName = acc.FirstName + " " + acc.LastName,
-                        Id = acc.Id
-                    };
+        // Get the ID of the current user
+        // No need to await here, as GetUserId is not an async method
+        var currentUserId = UserManager.GetUserId(User);
 
-            foreach (var item in AllUsers.Where(c => c.Id != currentUser))
-            {
-                var m = new Account();
-                
-                m.AccountID = item.AccountID;
-                m.FirstName = item.FullName;
+        // Get the IDs of all users who are in the "Admin" role
+        // This is done once and asynchronously for better performance
+        var adminUsers = UserManager.GetUsersInRoleAsync("Admin").Result;
+        var adminUserIds = adminUsers.Select(u => u.Id).ToList();
 
-                models.Add(m);
-                
-            }        
-               
-        SelectList userSelect = new SelectList(models, "AccountID", "FirstName");
+        // Use a single LINQ query to filter out the current user and admin users
+        // and select the necessary data for the SelectList
+        var allOtherUsers = account_context.Accounts
+                                            .Where(acc => acc.Id != currentUserId && !adminUserIds.Contains(acc.Id))
+                                            .Select(acc => new
+                                            {
+                                                AccountId = acc.AccountID,
+                                                FullName = acc.FirstName + " " + acc.LastName,
+                                            }).ToList();
+                                             // Execute the query and get the results
+
+     
+        // Create the SelectList directly from the filtered, projected data
+        // The SelectList constructor is perfect for this scenario
+        SelectList userSelect = new SelectList(allOtherUsers, "AccountId", "FullName");
+        
         return userSelect;
-
     }
 
     public SelectList getStatuses()

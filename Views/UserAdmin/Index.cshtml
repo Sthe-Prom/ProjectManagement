@@ -60,11 +60,11 @@
                                                 <td>@user.Email</td>
                                                 @*<td>@User.Identity.Name</td>*@
                                                 <td class="align-middle text-center">
-                                                    <form asp-action="Delete" asp-route-id="@user.Id" method="post">
+                                                    <form asp-action="Delete" asp-route-id="@user.Id" method="post" id="frm1">
                                                         <a asp-action="Edit" asp-route-Id="@user.Id">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
-                                                        <a type="submit" class="">
+                                                        <a type="submit" class="" onclick="delUser()">
                                                            <i class="bi bi-trash3"></i>
                                                         </a>
                                                     </form>

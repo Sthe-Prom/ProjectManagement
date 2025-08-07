@@ -17,6 +17,20 @@ function ProjectAdd(tit,msg) {
 }
 
 
+function ProjectAddError(tit,msg) {
+
+    swal({
+        title: tit ,
+        text: '<div style="text-align: left;padding: 0 10px;">' + msg + '</div>',
+        type: "error",
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Okay",
+        closeOnConfirm: false,
+        html: true           
+    },
+    );   
+}
+
 //Success Edit
 function ProjectEdit(tit,msg) {
 
@@ -52,6 +66,20 @@ function ActivityAdd(tit,msg) {
     });   
 }
 
+function ActivityAddError(tit,msg) {
+
+    swal({
+        title: tit,
+        text: '<div style="text-align: left;padding: 0 10px;">' + msg + '</div>',
+        type: "error",
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Okay",
+        closeOnConfirm: true,
+        html: true           
+    },
+   );   
+}
+
 function ActivityUpdate(tit,msg) {
 
     swal({
@@ -66,6 +94,29 @@ function ActivityUpdate(tit,msg) {
     function(){ 
         location.reload();
     });   
+}
+
+function delUser(){
+    swal({
+        title: "Are you sure?",
+        text: "Are you sure you want to delete this user?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes, delete user!",
+        cancelButtonText: "No, cancel!",
+        closeOnConfirm: false,
+        closeOnCancel: false
+    },
+        function (isConfirm) {
+            if (isConfirm) {
+                document.getElementById('frm1').submit();
+                swal("Deleted!", "Selected user deleted.", "success");
+            } else {
+                swal("Cancelled", "user not deleted:)", "error");
+            }
+        });    
+     
 }
 
  //Filter()

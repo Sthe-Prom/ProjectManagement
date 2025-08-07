@@ -11,7 +11,7 @@ namespace ProjectManagement.Models
     public class EFAccount: IAccount
     {
         public AppDbContext context;
-
+               
         public IEnumerable<Account> Accounts => context.Account;
 
         public EFAccount(AppDbContext ctx)
