@@ -1,3 +1,3 @@
-DELETE FROM Account;
+DELETE FROM Project;
 
-DELETE FROM sqlite_sequence WHERE name = 'Account';
+DELETE FROM sqlite_sequence WHERE name = 'Project';

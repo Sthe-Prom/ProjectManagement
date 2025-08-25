@@ -504,8 +504,8 @@
                 });
 
                 function projectAddError(response) {
-                    //alert(response.ResponseMessage);
-                    ProjectAddError('',response.ResponseMessage);
+                    //alert(response.responseMessage);
+                    ProjectAddError('',response.responseMessage);
                 }
 
                 function projectAddSuccess(response) {
@@ -516,7 +516,7 @@
                         //alert("Project Added Successfully");
                     }
                     else {
-                        alert(response.ResponseMessage);
+                        alert(response.responseMessage);
                     }
                 }
 
@@ -741,9 +741,9 @@
                     });
 
                     function activityError(response){
-                      if(response.ResponseCode == 1){
-                        alert("An error occured while updating your Activity. please try again." + '\n' + response.ResponseMessage)
-                        //ActivityAddError(response.ResponseMessage);
+                      if(response.responseCode == 1){
+                        alert("An error occured while updating your Activity. please try again." + '\n' + response.responseMessage)
+                        //ActivityAddError(response.responseMessage);
                       }
                     }
 
@@ -755,7 +755,7 @@
                             //alert("Activity Added Successfully.");
                         }
                         else {
-                            alert(response.ResponseMessage);
+                            alert(response.responseMessage);
                         }
                     }
 
@@ -882,20 +882,20 @@
                     });
            
                     function activityUpdateError(response){
-                      if(response.ResponseCode == 1){
-                        alert("An error occured while updating your Activity. please try again." + '\n' + response.ResponseMessage)
+                      if(response.responseCode == 1){
+                        alert("An error occured while updating your Activity. please try again." + '\n' + response.responseMessage)
                       }
                     }
 
                     function activityUpdateSuccess(response) {
-                        if (response.ResponseCode == 0) {
+                        if (response.responseCode == 0) {
 
-                            ActivityUpdate("Update Activity", "Activity Name: " + response.ResponseMessage
+                            ActivityUpdate("Update Activity", "Activity Name: " + response.responseMessage
                                 + " was updated successfully.");
                             //alert("Activity Added Successfully.");
                         }
                         else {
-                            alert(response.ResponseMessage);
+                            alert(response.responseMessage);
                         }
                     }
 
@@ -2033,30 +2033,38 @@
 
                                                         @* Project Duration *@
                                                         <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
-                                                          @if(totalDays <= 7)
+                                                          @if(totalDays <= 0)
                                                           {
                                                             <span class="ps-3" style="display: inline-flex; align-items: center;">
                                                                 <i class="bi bi-clock-history fs-6"></i>
-                                                                <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
+                                                                <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
                                                             </span>
                                                           }else
-                                                              if(totalDays > 7 && totalWeeks <= 4 )
-                                                              {
-
-                                                                <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                            if(totalDays > 0 && totalDays <= 7)
+                                                            {
+                                                              <span class="ps-3" style="display: inline-flex; align-items: center;">
                                                                   <i class="bi bi-clock-history fs-6"></i>
-                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
-                                                                </span>
-
-                                                              }
-                                                              else
-                                                                if(totalWeeks > 4 )
+                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
+                                                              </span>
+                                                            }
+                                                            else
+                                                                if(totalDays > 7 && totalWeeks <= 4 )
                                                                 {
-                                                                    <span class="ps-3" style="display: inline-flex; align-items: center;">
-                                                                      <i class="bi bi-clock-history fs-6"></i>
-                                                                      <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span>
-                                                                    </span>
+
+                                                                  <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
+                                                                  </span>
+
                                                                 }
+                                                                else
+                                                                  if(totalWeeks > 4 )
+                                                                  {
+                                                                      <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                        <i class="bi bi-clock-history fs-6"></i>
+                                                                        <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span>
+                                                                      </span>
+                                                                  }
 
                                                         </div>
 
@@ -2335,30 +2343,38 @@
                                                       int totalMonths_act = totalDays / 30;                                   
                                                     }
 
-                                                    @if(totalDays_act <= 7)
+                                                    @if(totalDays_act <= 0)
                                                     {
                                                       <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
                                                           <i class="bi bi-clock-history fs-6"></i>
-                                                          <span style="margin-left: 0.30rem;font-weight:100">@totalDays_act Days</span>
+                                                          <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
                                                       </span>
                                                     }else
-                                                        if(totalDays_act > 7 && totalWeeks_act <= 4 )
-                                                        {
-
-                                                          <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                      if(totalDays_act >= 0 && totalDays_act <= 7)
+                                                      {
+                                                        <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
                                                             <i class="bi bi-clock-history fs-6"></i>
-                                                            <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_act Wks</span>
-                                                          </span>
-
-                                                        }
-                                                        else
-                                                          if(totalWeeks_act > 4 )
+                                                            <span style="margin-left: 0.30rem;font-weight:100">@totalDays_act Days</span>
+                                                        </span>
+                                                      } 
+                                                      else
+                                                          if(totalDays_act > 7 && totalWeeks_act <= 4 )
                                                           {
-                                                              <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
-                                                                <i class="bi bi-clock-history fs-6"></i>
-                                                                <span style="margin-left: 0.30rem;font-weight:100">@totalMonths_act Mnt</span>
-                                                              </span>
+
+                                                            <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                              <i class="bi bi-clock-history fs-6"></i>
+                                                              <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_act Wks</span>
+                                                            </span>
+
                                                           }
+                                                          else
+                                                            if(totalWeeks_act > 4 )
+                                                            {
+                                                                <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                  <i class="bi bi-clock-history fs-6"></i>
+                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalMonths_act Mnt</span>
+                                                                </span>
+                                                            }
 
                                                 </td>
 
@@ -2814,30 +2830,38 @@
 
                                                     @* Project Duration *@
                                                     <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
-                                                      @if(totalDays <= 7)
+                                                      
+                                                       @if(totalDays <= 0)
                                                       {
                                                         <span class="ps-3" style="display: inline-flex; align-items: center;">
                                                             <i class="bi bi-clock-history fs-6"></i>
-                                                            <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
+                                                            <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
                                                         </span>
                                                       }else
-                                                          if(totalDays > 7 && totalWeeks <= 4 )
-                                                          {
-
-                                                            <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                        if(totalDays > 0 && totalDays <= 7)
+                                                        {
+                                                          <span class="ps-3" style="display: inline-flex; align-items: center;">
                                                               <i class="bi bi-clock-history fs-6"></i>
-                                                              <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
-                                                            </span>
-
-                                                          }
-                                                          else
-                                                            if(totalWeeks > 4 )
+                                                              <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
+                                                          </span>
+                                                        }else
+                                                            if(totalDays > 7 && totalWeeks <= 4 )
                                                             {
-                                                                <span class="ps-3" style="display: inline-flex; align-items: center;">
-                                                                  <i class="bi bi-clock-history fs-6"></i>
-                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span>
-                                                                </span>
+
+                                                              <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                <i class="bi bi-clock-history fs-6"></i>
+                                                                <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
+                                                              </span>
+
                                                             }
+                                                            else
+                                                              if(totalWeeks > 4 )
+                                                              {
+                                                                  <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalMonths Month</span>
+                                                                  </span>
+                                                              }
 
                                                     </div>
 
@@ -3049,8 +3073,7 @@
                                               else
                                               {
                                                   act_style = "border-left:2px solid #c59217;";
-                                              }
-                                            
+                                              }                                            
                                             }
 
                                             @* ActivityName *@
@@ -3087,30 +3110,37 @@
                                                   int totalMonths_useract = totalDays / 30;                                   
                                                 }
 
-                                                @if(totalDays_useract <= 7)
-                                                      {
-                                                        <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
-                                                            <i class="bi bi-clock-history fs-6"></i>
-                                                            <span style="margin-left: 0.30rem;font-weight:100">@totalDays_useract Days</span>
-                                                        </span>
-                                                      }else
-                                                          if(totalDays_useract > 7 && totalWeeks_useract <= 4 )
-                                                          {
-
-                                                            <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                 @if(totalDays_useract <= 0)
+                                                    {
+                                                      <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                          <i class="bi bi-clock-history fs-6"></i>
+                                                          <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
+                                                      </span>
+                                                    }else
+                                                        if(totalDays_useract > 0 && totalDays_useract <= 7)
+                                                        {
+                                                          <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
                                                               <i class="bi bi-clock-history fs-6"></i>
-                                                              <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_useract Wks</span>
-                                                            </span>
-
-                                                          }
-                                                          else
-                                                            if(totalWeeks_useract > 4 )
+                                                              <span style="margin-left: 0.30rem;font-weight:100">@totalDays_useract Days</span>
+                                                          </span>
+                                                        }else
+                                                            if(totalDays_useract > 7 && totalWeeks_useract <= 4 )
                                                             {
-                                                                <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
-                                                                  <i class="bi bi-clock-history fs-6"></i>
-                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalMonths_useract Mnt</span>
-                                                                </span>
+
+                                                              <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                <i class="bi bi-clock-history fs-6"></i>
+                                                                <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_useract Wks</span>
+                                                              </span>
+
                                                             }
+                                                            else
+                                                              if(totalWeeks_useract > 4 )
+                                                              {
+                                                                  <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalMonths_useract Mnt</span>
+                                                                  </span>
+                                                              }
 
                                             </td>
 
