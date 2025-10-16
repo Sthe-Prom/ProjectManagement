@@ -30,6 +30,7 @@ namespace ProjectManagement.Models
         public SelectList UserAccounts { get; set; }
         public SelectList StatusList { get; set; }        
         public SelectList ActivityStatuses { get; set; }
+        
        
     }
 }

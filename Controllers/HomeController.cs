@@ -85,7 +85,8 @@ public class HomeController : Controller
         this.ViewData["BaseViewModel"] = this.BaseViewModel;
     }
 
-    public async Task<IActionResult> Index(ProjectViewModel vm, int? Status, int? Staff)
+    public async Task<IActionResult> Index(ProjectViewModel vm, string searchString, int? Status, 
+                                    int? Staff, DateTime? StartDate, DateTime? EndDate, string sortOrder)
     {
         //IEnumerable<Project> projects = project_context.Projects;
         //var projects_ = projects;
@@ -102,42 +103,142 @@ public class HomeController : Controller
         vm.ActivityStatuses = getActivityStatus();
         
         var Project_ = project_context.Projects;
+
+        // Chart
+        // Get filters from query string
+        string staff = Request.Query["Staff"];
+        string status = Request.Query["Status"];
+        string startDate = Request.Query["StartDate"];
+        string endDate = Request.Query["EndDate"];
+                
+        // Prepare base query
+        var projectQuery = project_context.Projects.AsQueryable();
+
+        //Search
+        if (!String.IsNullOrEmpty(searchString))
+        {
+            projectQuery = projectQuery.Where(p => p.ProjectName.Contains(searchString)
+                        || p.ProjectDetails.Contains(searchString));
+        }
+
+        //Sort
+        ViewData["NameSortParm"] = sortOrder == "Project Name (A-Z)" ? "Project Name (Z-A)" : "Project Name (A-Z)";
+        ViewData["DateSortParm"] = sortOrder == "Recent Update" ? "Start Date" : "Recent Update";
+        ViewData["StatusSortParam"] = sortOrder == "Project Status(A-Z)" ? "Project Status(Z-A)" : "Project Status(A-Z)";
+    
+        switch (sortOrder)
+        {
+            case "Project Name (A-Z)":
+                projectQuery = projectQuery.OrderBy(p => p.ProjectName);
+                break;
+            case "Project Name (Z-A)":
+                projectQuery = projectQuery.OrderByDescending(p => p.ProjectName);
+                break;
+            case "Start Date":
+                projectQuery = projectQuery.OrderByDescending(p => p.ProjectStartDate);
+                break;
+            case "Recent Update":
+                projectQuery = projectQuery.OrderByDescending(p => p.ProjectUpdateTime);
+                break;
+            case "Project Status(A-Z)":
+                projectQuery = projectQuery.OrderBy(p => p.ProjectStatusID);
+                break;
+            case "Project Status(Z-A)":
+                projectQuery = projectQuery.OrderByDescending(p => p.ProjectStatusID);
+                break;
+            default:
+                projectQuery = projectQuery.OrderByDescending(p => p.ProjectUpdateTime);
+                break;
+        }
+
+
+        //Filter
+        if (!string.IsNullOrWhiteSpace(staff) && int.TryParse(staff, out int _staff))
+        {
+            projectQuery = projectQuery.Where(p => p.AccountID == _staff);
+        }
+
+        if (!string.IsNullOrWhiteSpace(status) && int.TryParse(status, out int _status))
+        {
+            projectQuery = projectQuery.Where(p => p.ProjectStatusID == _status);
+        }
+
+        if (!string.IsNullOrWhiteSpace(startDate) && DateTime.TryParse(startDate, out DateTime _startDate) && !string.IsNullOrWhiteSpace(endDate) && DateTime.TryParse(endDate, out DateTime _endDate))
+        {
+            projectQuery = projectQuery.Where(p => p.ProjectStartDate >= _startDate && p.ProjectEndDate <= _endDate);
+        }
+
+        var filteredProjects = projectQuery.ToList();
+      
+        // Assign filtered projects to the ViewModel
+        vm.Projects = filteredProjects;
+
+        // Get matching project IDs
+        var projectIds = filteredProjects.Select(p => p.Id).ToList();
+
+        // Filter activities based on those projects
+        vm.Activities = activity_context.Activities
+            .Where(a => projectIds.Contains(a.ProjectID))
+            .ToList();
+
+        // Optionally assign to Project_ if needed
+        Project_ = filteredProjects;
         
-        //Filter By User 
-        if (!string.IsNullOrEmpty(Request.Query["Staff"]))
-        {            
-            vm.Projects = project_context.Projects
-                    .Where(a => a.AccountID == Staff);   
+        
+        //Filter By User & Status
+        // if ((!string.IsNullOrEmpty(Request.Query["Staff"])) && (!string.IsNullOrEmpty(Request.Query["Status"])) )
+        // {            
             
-            var p = project_context.Projects
-                    .Where(a => a.AccountID == Staff)
-                    .Select(a => a.Id);
-
-            vm.Activities = activity_context.Activities
-                    .Where(a => p.Contains(a.ProjectID));
-
-            Project_ = project_context.Projects
-                    .Where(a => a.AccountID == Staff) ;       
+        //     vm.Projects = project_context.Projects
+        //             .Where(a => a.AccountID == Staff && a.ProjectStatusID == Status);   
             
-        }            
+        //     var p = project_context.Projects
+        //             .Where(a => a.AccountID == Staff && a.ProjectStatusID == Status)
+        //             .Select(a => a.Id);
 
-        //Filter by Stasues 
-        if (!string.IsNullOrEmpty(Request.Query["Status"]))
-        {            
-            vm.Projects = project_context.Projects
-                    .Where(p => p.ProjectStatusID == Status);   
+        //     vm.Activities = activity_context.Activities
+        //             .Where(a => p.Contains(a.ProjectID));
+
+        //     Project_ = project_context.Projects
+        //             .Where(a => a.AccountID == Staff && a.ProjectStatusID == Status) ;       
             
-            var p = project_context.Projects
-                    .Where(p => p.ProjectStatusID == Status)
-                    .Select(p => p.Id);
+        // }                         
 
-            vm.Activities = activity_context.Activities
-                    .Where(a => p.Contains(a.ProjectID));
-
-            Project_ = project_context.Projects
-                    .Where(a => a.ProjectStatusID == Status) ;       
+        // //Filter by Stasues 
+        // if (!string.IsNullOrEmpty(Request.Query["Status"]))
+        // {            
+        //     vm.Projects = project_context.Projects
+        //             .Where(p => p.ProjectStatusID == Status);   
             
-        }                     
+        //     var p = project_context.Projects
+        //             .Where(p => p.ProjectStatusID == Status)
+        //             .Select(p => p.Id);
+
+        //     vm.Activities = activity_context.Activities
+        //             .Where(a => p.Contains(a.ProjectID));
+
+        //     Project_ = project_context.Projects
+        //             .Where(a => a.ProjectStatusID == Status) ;       
+            
+        // }                     
+
+        // //Filter By User 
+        // if (!string.IsNullOrEmpty(Request.Query["Staff"]))
+        // {            
+        //     vm.Projects = project_context.Projects
+        //             .Where(a => a.AccountID == Staff);   
+            
+        //     var p = project_context.Projects
+        //             .Where(a => a.AccountID == Staff)
+        //             .Select(a => a.Id);
+
+        //     vm.Activities = activity_context.Activities
+        //             .Where(a => p.Contains(a.ProjectID));
+
+        //     Project_ = project_context.Projects
+        //             .Where(a => a.AccountID == Staff) ;       
+            
+        // } 
 
         List<DataPoint> dataPoints = new List<DataPoint>();
         List<DataPoint> dataPointsActivity = new List<DataPoint>();
@@ -270,6 +371,13 @@ public class HomeController : Controller
             project.CalculatedDisplayStatusId = await project_service.GetProjectDisplayStatus(project);
             project.CalculatedDisplayStatusName = GetStatusNameById(project.CalculatedDisplayStatusId);
         } 
+
+        // View Data Variables
+        ViewBag.Staff = Staff;
+        ViewBag.Status = Status;
+        ViewBag.StartDate = StartDate;
+        ViewBag.EndDate = EndDate;
+        ViewBag.Statuses = new SelectList(ActivityStatusList, "Id", "Name");
 
         return View(vm);
     }
@@ -770,7 +878,8 @@ public class HomeController : Controller
         // Use a single LINQ query to filter out the current user and admin users
         // and select the necessary data for the SelectList
         var allOtherUsers = account_context.Accounts
-                                            .Where(acc => acc.Id != currentUserId && !adminUserIds.Contains(acc.Id))
+                                            .Where(acc => acc.Id != currentUserId && !adminUserIds.Contains(acc.Id)
+                                                && acc.FirstName != "System")
                                             .Select(acc => new
                                             {
                                                 AccountId = acc.AccountID,

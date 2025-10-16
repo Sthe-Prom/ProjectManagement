@@ -12,7 +12,7 @@ namespace ProjectManagement.Models
 {
     public class AccountViewModel: BaseViewModel
     {
-         public int AccountID { get; set; }
+        public int AccountID { get; set; }
 
         [Required(ErrorMessage = "Please enter your First Name:")]
         public string FirstName { get; set; }
