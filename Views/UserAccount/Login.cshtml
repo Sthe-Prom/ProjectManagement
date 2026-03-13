@@ -1,7 +1,13 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
 @model LoginModel
 @{
     Layout = null;
-    ViewData["Title"] = "Login";
+	ViewData["Title"] = "Login";
+
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
 }
 
 <!DOCTYPE html>
@@ -47,25 +53,26 @@
 									<form asp-action="Login" asp-controller="UserAccount" method="post" class="row g-3 ">
 										<div class="mb-3">
      
-											<div asp-validation-summary="All"></div>
-
+	 									
+											<div asp-validation-summary="All"></div>	
 											<input type="hidden" value="~/" asp-for="ReturnUrl" />                  
 
 											<label class="form-label">Username</label>
-											<input asp-for="Email" class="form-control form-control-md" type="email" placeholder="Enter your email" />
-											<!-- <div asp-validation-for="Email" class="text-danger">Please enter your username.</div> -->
-										</div>
+											<input asp-for="Email" class="form-control form-control-md" type="email" required placeholder="Enter your email" />
+											@* <div asp-validation-for="Email" class="text-danger">Please enter your Email address.</div>  *@
+									
 										<div class="mb-3">
 											<label class="form-label">Password</label>
-											<input asp-for="Password" class="form-control form-control-md" type="password" placeholder="Enter your password" />                   
-											<!-- <div asp-validation-for="Password" class="text-danger">Please enter your password!</div> -->
-											
-											<p style="color:#A71930;" class="small mt-1">												
+											<input asp-for="Password" class="form-control form-control-md" type="password" required placeholder="Enter your password" />                   
+											@* <div asp-validation-for="Password" class="text-danger">Please enter your password!</div>  *@
+																			
+											<a asp-action="Edit" asp-controller="UserAdmin" asp-route-Id="@userId" style="color:#A71930;" class="small mt-1">												
 												Forgot password?
-												<span data-toggle="tooltip" data-placement="top" title="Please Check Your Email as sent by Enna on the 21st of October">													
+												<span data-toggle="tooltip" data-placement="top" title="Click Here Please / Check Your Email as sent by Enna on the 21st of October">													
 													<svg xmlns="http://www.w3.org/2000/svg"  style="vertical-align:middle;" viewBox="0 0 24 24" width="18" height="18" fill="rgba(15,32,75,1)"><path d="M12 22C6.47715 22 2 17.5228 2 12 2 6.47715 6.47715 2 12 2 17.5228 2 22 6.47715 22 12 22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12 20 7.58172 16.4183 4 12 4 7.58172 4 4 7.58172 4 12 4 16.4183 7.58172 20 12 20ZM13 10.5V15H14V17H10V15H11V12.5H10V10.5H13ZM13.5 8C13.5 8.82843 12.8284 9.5 12 9.5 11.1716 9.5 10.5 8.82843 10.5 8 10.5 7.17157 11.1716 6.5 12 6.5 12.8284 6.5 13.5 7.17157 13.5 8Z"></path></svg>
 												</span>
-											</p>									
+											</a>			
+													
 
 										</div>
 									

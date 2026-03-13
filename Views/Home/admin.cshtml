@@ -1,0 +1,1226 @@
+ @* Admin Main *@
+ @{/*
+              <div id="main" class="main" style="margin-top:0 !important;">
+
+                <div class="pagetitle" >
+
+                    <div class="row gap-2 d-flex flex-row justify-content-center mt-1">
+                      
+                      <div class="col-sm-2 col-md-2 d-none d-sm-block align-content-center mt-1 mb-4" >
+                          <h1>Dashboard</h1>
+                          <nav>
+                            <ol class="breadcrumb">
+                              <li class="breadcrumb-item active">Projects/Activities Summaries </li>
+                            </ol>
+                          </nav>
+                      </div>
+
+                      @* Staff *@
+                      <div class="col-sm rounded-2 align-content-center mt-1 mb-4" style="border:1px solid lightgrey;">
+      
+                            @if(!string.IsNullOrEmpty(Context.Request.Query["Staff"] ))
+                            {
+                              <li class="list-inline-item filter-active m-2 " style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                                                                    
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
+                                                                  
+                                      @Html.ActionLink(
+                                          "Clear Filter", 
+                                          "Index", 
+                                          new {Status = ViewBag.Status  }, 
+                                          new { @class="clear_filter" }
+                                      )                               
+                                  
+                              </li>
+                            }
+
+                          @{var AccountFilter = ViewBag.Staff;}
+
+                          <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                            @if(AccountFilter != null)
+                            {
+                              <span style="vertical-align:middle;" >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#00D100"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                              </span>  
+                              <span class="apply_filter">Filters Applied</span>
+                            }
+                            else
+                            {
+                              <span style="vertical-align:middle;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#969696"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                              </span> 
+                              <span class="no_apply_filter">No Filters</span>
+                            }
+                          </li>      
+
+                          @{
+                              var statusId = ViewBag.Status;
+
+                              var StartDateStaff = ViewBag.StartDate;
+                              var EndDateStaff = ViewBag.EndDate;
+                            
+                            }
+                        
+                          <select id="staff-filter"  class="form-select ms-2 mb-2 ">
+
+                            <option value="" selected>Filter by Staff</option>
+                        
+                            @foreach(var account in Model.Accounts )
+                            {                        
+                                var selected = account.AccountID == (ViewBag.Staff) ? "selected" : "";   
+                                var url = "";                                             
+                                
+                                @if(statusId != 0 || (StartDateStaff != null && EndDateStaff != null) )
+                                {
+                                  url = Url.Action( "Index", 
+                                          new {Status = statusId, Staff = account.AccountID, StartDate = StartDateStaff, EndDateStaff = EndDateStaff })   ;  
+                                  
+                                  @:  <option value="@url" @selected>@account.FirstName   </option>                                  
+                                
+                                }
+                                else
+                                {
+                                  url = Url.Action("Index", new { Staff = account.AccountID });                                    
+                                  @: <option value="@url" @selected >  @account.FirstName </option>
+                                  
+                                }
+
+                            }   
+
+                          </select>                          
+
+                      </div>
+
+                      @* Status Filter *@
+                      <div class="col-sm rounded-2 align-content-center mt-1 mb-4" style="border:1px solid lightgrey;">
+                                            
+                        @if(!string.IsNullOrEmpty(Context.Request.Query["Status"] ))
+                        {
+                          <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
+                                                            
+                                @Html.ActionLink(
+                                    "Clear Filter", 
+                                    "Index", 
+                                    new {Staff = ViewBag.Staff }, 
+                                    new { @class="clear_filter" }
+                                )                                    
+                              
+                          </li>
+                        }
+
+                          @{var StatusFilter = ViewBag.Status;}
+
+                          <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                            
+                            @if(StatusFilter != null)
+                            {
+                              <span style="vertical-align:middle;" class="pe-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#00D100"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                              </span>
+                              <span class="apply_filter">Filters Applied</span>
+                            }
+                            else
+                            {
+                              <span style="vertical-align:middle;" class="pe-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#969696"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                              </span>
+                              <span class="no_apply_filter">No Filters</span>
+                            }
+                          </li>
+                          
+                        
+                          <select id="status-filter"  class="form-select ms-2 mb-2 ">
+
+                            @{
+                              var staffId = ViewBag.Staff;
+                              
+                              var StartDateStatus = ViewBag.StartDate;
+                              var EndDateStatus = ViewBag.EndDate;
+                            }
+                            
+                            <option value="" selected>Filter by Status</option>
+
+                            @foreach(var status in Model.Statuses)
+                            {
+                              var selected = status.Id == (ViewBag.Status) ? "selected" : ""; 
+                              var url = "";                                                               
+
+                                  @if(staffId != 0 || (StartDateStatus != null && EndDateStatus != null) )
+                                  {
+                                    url = Url.Action("Index", new {Staff = staffId, Status = status.Id, StartDate = StartDateStatus, EndDate = EndDateStatus }); 
+                                    @: <option value="@url" @selected>@status.StatusName </option>
+                                  }
+                                  else
+                                  {
+                                    url = Url.Action("Index", new { Status = status.Id });
+                                    @: <option value="@url" @selected > @status.StatusName</option>
+                                  }
+
+                            }
+                          </select>
+
+                        
+                      </div>
+
+                      @* Date Filter *@
+                      <div class="col-sm rounded-2 align-content-center mt-1 mb-4" style="border:1px solid lightgrey;">
+
+                        @if((!string.IsNullOrEmpty(Context.Request.Query["StartDate"] )) && (!string.IsNullOrEmpty(Context.Request.Query["EndDate"] )) )
+                        {
+                            <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
+
+                                  @if(ViewBag.Staff != null && ViewBag.Status != null)
+                                  {     
+                                    @Html.ActionLink(
+                                        "Clear Filter", 
+                                        "Index", 
+                                        new {Staff = ViewBag.Staff, Status = ViewBag.Status }, 
+                                        new { @class="clear_filter" }
+                                    )         
+                                  }     
+                                  else
+                                  if(ViewBag.Staff != null)
+                                  {
+                                     @Html.ActionLink(
+                                        "Clear Filter", 
+                                        "Index", 
+                                        new {Staff = ViewBag.Staff }, 
+                                        new { @class="clear_filter" }
+                                    ) 
+                                  }   
+                                  else
+                                  if(ViewBag.Status != null)
+                                  {
+                                     @Html.ActionLink(
+                                        "Clear Filter", 
+                                        "Index", 
+                                        new {Status = ViewBag.Status }, 
+                                        new { @class="clear_filter" }
+                                    ) 
+                                  }                      
+                                
+                            </li>
+                        }    
+
+                          @{
+                              var StartDate = ViewBag.StartDate;
+                              var EndDate = ViewBag.EndDate;
+                            }
+
+                          <li class="list-inline-item filter-active mt-0 mb-2 ms-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                            
+                              @if(StartDate != null || EndDate != null)
+                              {
+                                <span style="vertical-align:middle;" class="pe-1">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#00D100"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                                </span>
+                                <span class="apply_filter">Filters Applied</span>
+                              }
+                              else
+                              {
+                                <span style="vertical-align:middle;" class="pe-1">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#969696"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                                </span>
+                                <span class="no_apply_filter">No Filters</span>
+                              }
+
+                          </li>            
+
+                           @{
+                              var StatusDate = ViewBag.Status;
+                              var StaffDate = ViewBag.Staff;
+                            }      
+                         
+                          <form method="get" class="d-flex align-items-center ms-1 me-1 pe-1 ps-1">
+
+                              @if (StatusDate != null && StaffDate != null)
+                              {
+                                  <input type="hidden" name="Status" class="form-control" value="@Context.Request.Query["Status"]" />
+
+                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+
+                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                      
+                                  <input type="hidden" name="Staff" class="form-control" value="@Context.Request.Query["Staff"]" />
+                                 
+                              }
+                              else
+                              if(StatusDate != null)
+                              {
+                                  <input type="hidden" name="Status" class="form-control" value="@Context.Request.Query["Status"]" />
+
+                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+
+                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />                      
+                              }
+                              else
+                              if(StaffDate != null)
+                              {
+                                  <input type="hidden" name="Staff" class="form-control" value="@Context.Request.Query["Staff"]" />
+
+                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+
+                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                              }
+                              else
+                              {
+                                  <input type="date" id="start_date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+
+                                  <input type="date" id="end_date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                              }
+
+                              <button type="submit" class="btn btn-outline-secondary">
+                                  <i class="bi bi-funnel-fill"></i>
+                              </button>
+
+                          </form>
+
+                      </div>
+                   
+                    </div>
+
+                </div>
+
+                @* @*End Page Title *@
+
+                <section class="section dashboard" style="margin-top:0;">
+                  
+                  <div class="row">
+
+                    @*Left side columns *@
+                    <div class="col-lg-8">
+                      <div class="row">
+
+                        @*Project Card *@
+                        <div class="col-xxl-4 col-md-4">
+                          <div class="card info-card sales-card">
+                            <div class="filter">
+                              <a class="icon" href="#" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots"></i>
+                              </a>
+                              <ul
+                                class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
+                              >
+                                <li class="dropdown-header text-start">
+                                  <h6>Filter</h6>
+                                </li>
+
+                                <li><a class="dropdown-item" href="#">Today</a></li>
+                                <li><a class="dropdown-item" href="#">This Month</a></li>
+                                <li><a class="dropdown-item" href="#">This Year</a></li>
+                              </ul>
+                            </div>
+
+                            <div class="card-body">
+                              <h5 class="card-title">Projects <span>| All</span></h5>
+
+                              <div class="d-flex align-items-center">
+                                <div
+                                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                                >
+                                  <i class="bi bi-folder2"></i>
+                                </div>
+                                <div class="ps-3">
+                                  <h6>
+                                    @{
+                                      var p = from p_ in Model.Projects
+                                            select new {
+                                              p_.Id
+                                            };
+                                    }
+                                    @p.Count()
+                                  </h6>
+                                  <span class="text-primary small pt-1 fw-bold">
+                                    @{
+                                        var completed_proj = Model.Projects.Where(p => p.ProjectStatusID == 4).ToList();
+                                        double getPerc_proj = 0;
+                                        if(p.Count() > 0)
+                                        {
+                                          getPerc_proj = ((double)completed_proj.Count / p.Count()) *100;
+                                        }
+                                      }
+                                      @getPerc_proj.ToString("F2")%
+                                  </span>
+                                  <span class="text-muted small pt-2 ps-1">Completed</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        @*End Project Card *@
+
+                        @*Activities Card *@
+                        <div class="col-xxl-4 col-md-4">
+                          <div class="card info-card revenue-card">
+                            <div class="filter">
+                              <a class="icon" href="#" data-bs-toggle="dropdown"
+                                ><i class="bi bi-three-dots"></i></a>
+                              <ul
+                                class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
+                              >
+                                <li class="dropdown-header text-start">
+                                  <h6>Filter</h6>
+                                </li>
+
+                                <li><a class="dropdown-item" href="#">Today</a></li>
+                                <li><a class="dropdown-item" href="#">This Month</a></li>
+                                <li><a class="dropdown-item" href="#">This Year</a></li>
+                              </ul>
+                            </div>
+
+                            <div class="card-body">
+                              <h5 class="card-title">
+                                Activities <span>| All</span>
+                              </h5>
+
+                              <div class="d-flex align-items-center">
+                                <div
+                                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                                >
+                                  <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                                <div class="ps-3">
+                                  <h6>
+                                    @{
+                                      var act = from act_ in Model.Activities
+                                              select new {
+                                                act_.Id
+                                              };
+                                              
+                                    }
+
+                                    @act.Count()
+
+                                  </h6>
+                                  <span class="text-success small pt-1 fw-bold">
+                                    @{
+                                      var completed_act = Model.Activities.Where(act => act.ActivityProgress == 4).ToList();
+                                      double getPerc_act = 0;
+                                      if(act.Count() > 0)
+                                      {
+                                        getPerc_act = ((double)completed_act.Count / act.Count()) *100;
+                                      }
+                                    }
+                                    @getPerc_act.ToString("F2")%
+                                  </span>
+                                  <span class="text-muted small pt-2 ps-1">Completed</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        @*End Activities Card *@
+
+                        @*Staff Card *@
+                        <div class="col-xxl-4 col-md-4">
+                          <div class="card info-card customers-card">
+                            <div class="filter">
+                              <a class="icon" href="#" data-bs-toggle="dropdown"
+                                ><i class="bi bi-three-dots"></i></a>
+                              <ul
+                                class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
+                              >
+                                <li class="dropdown-header text-start">
+                                  <h6>Filter</h6>
+                                </li>
+
+                                <li><a class="dropdown-item" href="#">Today</a></li>
+                                <li><a class="dropdown-item" href="#">This Month</a></li>
+                                <li><a class="dropdown-item" href="#">This Year</a></li>
+                              </ul>
+                            </div>
+
+                            <div class="card-body">
+                              <h5 class="card-title">
+                                Active Personnel <span>| All</span>
+                              </h5>
+
+                              <div class="d-flex align-items-center">
+                                <div
+                                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                                >
+                                  <i class="bi bi-people"></i>
+                                </div>
+                                <div class="ps-3">
+                                  <h6>
+                                    @{
+                                      var acc = from acc_ in Model.Accounts
+                                              select new {
+                                                acc_.AccountID
+                                              };
+
+                                       var projects_ = from acc_ in Model.Projects
+                                              select new {
+                                                acc_.AccountID
+                                              };
+                                    }
+                                    @acc.Count()
+                                  </h6>
+                                  <span class="text-danger small pt-1 fw-bold">
+                                    @{
+                                        var countActive = new List<int>();
+                                                                        
+                                        foreach(var i in projects_)
+                                        {
+                                          if(!countActive.Contains(i.AccountID))
+                                          {
+                                            countActive.Add(i.AccountID);
+                                          }
+                                        }
+
+                                        double getActiv_staff = 0;
+                                        if(acc.Count() > 0)
+                                        {
+                                          getActiv_staff = ((double)countActive.Count / acc.Count()) *100;
+                                        }
+                                      }
+                                      @getActiv_staff.ToString("F2")%
+                                      
+                                  </span>
+                                  <span class="text-muted small pt-2 ps-1">Active Staff</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        @*End Staff Card *@
+
+                                                                      
+
+                      </div>
+                    </div>
+                    @*End Left side columns *@
+                 
+
+                    @* Full Project Table *@
+                    @*Projects & Activities *@
+                    <div class="col-12" >
+                      <div class="card">
+                        
+                        <div class="filter">
+                          <a class="icon" href="#" data-bs-toggle="dropdown"
+                            ><i class="bi bi-three-dots"></i></a>
+                          <ul
+                            class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
+                          >
+                            <li class="dropdown-header text-start">
+                              <h6>Filter</h6>
+                            </li>
+
+                            <li><a class="dropdown-item" href="#">Today</a></li>
+                            <li><a class="dropdown-item" href="#">This Month</a></li>
+                            <li><a class="dropdown-item" href="#">This Year</a></li>
+                          </ul>
+                        </div>
+
+                        <div class="card-body" style="margin:0;padding:0;">
+                          <h5 class="card-title p-3 m-0">
+                            Projects & Activities <span>| All</span>                           
+                          </h5>
+                          
+                          @using (Html.BeginForm())
+                          {
+                            <div class="d-flex flex-row row justify-content-between align-content-center m-1 p-1">
+                            
+                                  <div class="col-sm-4 row border-secondary mx-right">
+                                      @Html.TextBox("searchString")  
+                                      <button value="Search" class="col-auto btn btn-md btn-outline-primary">
+                                          <i class="bi bi-search"></i>
+                                      </button>
+                                  </div>
+
+                                  <div class="col-sm-8 row border-secondary mx-right gap-1" >
+
+                                      @if(!string.IsNullOrEmpty(Context.Request.Query["sortOrder"] ))
+                                      {
+                                        <label class="col-sm col-form-label rounded-2 text-center" style="border-bottom:1px solid green;font-size:11px;">
+                                          Sorted by: <span style="color:green">@Context.Request.Query["sortOrder"] </span> </label>
+                                      }
+                                      else
+                                      {                                        
+                                          <label class="col-sm col-form-label rounded-2 text-center" style="border-bottom:1px solid #ffc107">
+                                          Sort Projects by: </label>
+                                      }
+
+                                        @{
+                                          var StaffFilter_Sort = Context.Request.Query["Staff"];
+                                          var StatusFilter_Sort = Context.Request.Query["Status"];
+                                        }
+                                                                          
+                                      <select class="col-sm form-select-sm border-warning" id="sortOrder"> 
+
+                                         <option value="" selected>-- Project Name --</option> 
+
+                                          @{
+                                            var NameSortOrder = Context.Request.Query["sortOrder"];                                            
+                                            var url_sortName = "";
+
+                                            if(!string.IsNullOrEmpty(StaffFilter_Sort) && !string.IsNullOrEmpty(StatusFilter_Sort))
+                                            {
+                                                url_sortName = Url.Action("Index", new {Staff = StaffFilter_Sort, Status = StatusFilter_Sort, sortOrder = ViewData["NameSortParm"]});
+                                            }
+                                            else
+                                            if(!string.IsNullOrEmpty(StaffFilter_Sort))
+                                            {
+                                                url_sortName  = Url.Action("Index", new {Staff = StaffFilter_Sort, sortOrder = ViewData["NameSortParm"]});
+                                            }
+                                            else
+                                            if(!string.IsNullOrEmpty(StatusFilter_Sort))
+                                            {
+                                                url_sortName  = Url.Action("Index", new {Status = StatusFilter_Sort, sortOrder = ViewData["NameSortParm"]});
+                                            }  
+                                            else
+                                            {
+                                                url_sortName  = Url.Action("Index", new {sortOrder = ViewData["NameSortParm"]});
+                                            }                                          
+                                                  
+                                            @: <option value="@url_sortName" >@ViewData["NameSortParm"]</option>  
+                                          
+                                          }    
+
+                                          <option value="/Home/Index" >Clear Sort</option>                                
+                                          
+                                      </select>                           
+                                                                                                                                                                          
+                                      <select class="col-sm form-select-sm border-warning" id="sortDate">                                                         
+
+                                            <option value="" selected>-- Project Date --</option>                         
+
+                                          @{  
+                                              var DateSortOrder = Context.Request.Query["sortOrder"];
+                                              var url_sortDate = "";
+                                            
+                                              if(!string.IsNullOrEmpty(StaffFilter_Sort) && !string.IsNullOrEmpty(StatusFilter_Sort))
+                                              {
+                                                  url_sortDate = Url.Action("Index", new {Staff = StaffFilter_Sort, Status = StatusFilter_Sort, sortOrder = ViewData["DateSortParm"]});
+                                              }
+                                              else
+                                              if(!string.IsNullOrEmpty(StaffFilter_Sort))
+                                              {
+                                                  url_sortDate  = Url.Action("Index", new {Staff = StaffFilter_Sort, sortOrder = ViewData["DateSortParm"]});
+                                              }
+                                              else
+                                              if(!string.IsNullOrEmpty(StatusFilter_Sort))
+                                              {
+                                                  url_sortDate  = Url.Action("Index", new {Status = StatusFilter_Sort, sortOrder = ViewData["DateSortParm"]});
+                                              }
+                                              else
+                                              {
+                                                  url_sortDate  = Url.Action("Index", new {sortOrder = ViewData["DateSortParm"]});
+                                              }
+                                              
+                                              @: <option value="@url_sortDate" >@ViewData["DateSortParm"]</option>  
+
+                                          } 
+
+                                          <option value="/Home/Index">Clear Sort</option>
+                                                                                      
+                                      </select> 
+
+                                      <select class="col-sm form-select-sm border-warning" id="sortStatus">                                                         
+
+                                          <option value="" selected>-- Project Status --</option>                         
+
+                                        @{  
+                                            var StatusSortOrder = Context.Request.Query["sortOrder"];                                            
+                                            var url_sortStatus = "";
+                                            
+                                              if(!string.IsNullOrEmpty(StaffFilter_Sort) && !string.IsNullOrEmpty(StatusFilter_Sort))
+                                              {
+                                                  url_sortStatus = Url.Action("Index", new {Staff = StaffFilter_Sort, Status = StatusFilter_Sort, sortOrder = ViewData["StatusSortParam"]});
+                                              }
+                                              else
+                                              if(!string.IsNullOrEmpty(StaffFilter_Sort))
+                                              {
+                                                  url_sortStatus  = Url.Action("Index", new {Staff = StaffFilter_Sort, sortOrder = ViewData["StatusSortParam"]});
+                                              }
+                                              else
+                                              if(!string.IsNullOrEmpty(StatusFilter_Sort))
+                                              {
+                                                  url_sortStatus  = Url.Action("Index", new {Status = StatusFilter_Sort, sortOrder = ViewData["StatusSortParam"]});
+                                              }
+                                              else
+                                              {
+                                                url_sortStatus  = Url.Action("Index", new {sortOrder = ViewData["StatusSortParam"]});
+                                              }
+                                          
+                                          @: <option value="@url_sortStatus" >@ViewData["StatusSortParam"]</option>  
+
+                                        } 
+
+                                        <option value="/Home/Index">Clear Sort</option>
+                                                                                    
+                                      </select>     
+                                    
+                                  </div>
+                              
+                            </div>
+                          }
+
+                          @* Admin Project Table *@
+                          <div class="table-responsive-lg" style="margin:0;padding:0;">
+
+                            <table id="projectsTable" class="table table-striped table-bordered align-middle table-hover m-0 p-0">
+
+                                <thead >
+                                    <tr class="">
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:15%">Activity Name</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:30%">Comments</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:20%">Challenges</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:10%">Start Date</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:10%">Duration</th>
+                                        <th colspan="1" class="header text-center align-middle text-align:center" style="width:10%">Progress</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:5%">Files</th>
+                                    </tr>
+
+                                </thead>
+          
+                                <tbody >
+                                    @{
+                                        var countProject = 0;
+
+                                        foreach(var proj in projects_data_admin)
+                                        {
+                                          countProject++;
+                                          var tot_act = activities_data.Where(c => c.ProjectID == proj.Id).Count();
+
+                                          var getTTCompletion = @proj.ProjectEndDate - @proj.ProjectStartDate;
+
+                                          // Option A: Using TimeSpan properties (most common and readable)
+                                          int totalDays = getTTCompletion.Days;
+                                          int totalWeeks = totalDays / 7;
+                                          int totalMonths = totalDays / 30;
+                                          int remainingDays = totalDays % 7;
+
+                                          int hours = getTTCompletion.Hours;
+                                          int minutes = getTTCompletion.Minutes;
+                                          int seconds = getTTCompletion.Seconds;
+
+                                          var getProjectMembers = "";
+
+                                          if (proj.SelectedAssignedUserIds.Count() > 0)
+                                          {
+                                              // 2. Split the string by comma
+
+                                              // 3. Parse each string part into an integer and add to the list
+                                              foreach (var member in proj.SelectedAssignedUserIds)
+                                              {
+                                                  var name = Model.Accounts.FirstOrDefault(c => c.AccountID == member);
+                                                  getProjectMembers += ", " + name.FirstName ;
+
+                                              }
+                                          }
+                                          else
+                                          {
+                                              // No users were selected or the input was empty
+                                              var project_owner = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
+                                              getProjectMembers = project_owner.FirstName;
+                                          }
+
+                                          @* HEADER - PROJECT *@
+                                          <tr class="">
+
+                                              <td colspan="100%" style="background-color:#0F204B;opacity:0.8;color:#fff;" >
+
+                                                  <div class="align-middle accordion accordion-flush" id="accordionFlush" style="background-color: transparent !important;background: none !important;">
+                                                    <div class="accordion-item" style="background-color:#0F204B;opacity:0.8;color:#fff;">
+
+                                                      @* Main *@
+                                                      <div class="d-flex flex-row justify-content-between ufs_container">
+
+                                                        @* Project Name *@
+                                                        <div class="col-sm-6" >
+                                                            <span class="accordion-button collapsed fw-semibold" data-bs-toggle="collapse" data-bs-target="#flush-collapse_@proj.Id" aria-expanded="false" aria-controls="flush-collapse_@proj.Id">
+                                                              <span class="fw-bold">@countProject. &nbsp;</span>@proj.ProjectName
+                                                            </span>
+                                                        </div>
+
+                                                        @* Project Members *@
+                                                        <div class="col-sm-2 d-none d-lg-block" 
+                                                              style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;"
+                                                              data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                              title="@getProjectMembers.Substring(1)">
+
+                                                            <span class="ps-2 pe-2" style="display: inline-flex; align-items: center;">
+                                                                <i class="bi bi-people-fill fs-6"></i>
+                                                                <span style="margin-left: 0.30rem;font-weight:100">@proj.SelectedAssignedUserIds.Count() Members</span>
+                                                            </span>
+
+                                                        </div>
+
+                                                        @* Project Duration *@
+                                                        <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
+                                                          @if(totalDays <= 0)
+                                                          {
+                                                            <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                <i class="bi bi-clock-history fs-6"></i>
+                                                                <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
+                                                            </span>
+                                                          }else
+                                                            if(totalDays > 0 && totalDays <= 7)
+                                                            {
+                                                              <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                  <i class="bi bi-clock-history fs-6"></i>
+                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
+                                                              </span>
+                                                            }
+                                                            else
+                                                                if(totalDays > 7 && totalWeeks <= 5 )
+                                                                {
+
+                                                                  <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
+                                                                  </span>
+
+                                                                }
+                                                                else
+                                                                  if(totalWeeks > 5 )
+                                                                  {
+                                                                      int months = 0;
+                                                                      DateTime endDate = proj.ProjectEndDate;
+                                                                      DateTime startDate = proj.ProjectStartDate;
+                                                                      while(startDate < endDate)
+                                                                      {
+                                                                        DateTime checkDate = startDate.AddMonths(1);
+                                                                        if(checkDate <= endDate)
+                                                                        {
+                                                                            months++;
+                                                                            startDate = checkDate;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            break;
+                                                                        }
+                                                                      }
+                                                                      
+                                                                      <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                        <i class="bi bi-clock-history fs-6"></i>
+                                                                        <span style="margin-left: 0.30rem;font-weight:100">@months Month</span>
+                                                                      </span>
+                                                                  }
+
+                                                        </div>
+
+                                                        @* Project Status *@
+                                                        <div class="col-sm-2" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:120px;" >
+
+                                                          @{
+
+                                                              var act_statues = Model.Activities.Where(a => a.ProjectID == proj.Id);
+                                                            
+                                                              int displayStatusId = proj.CalculatedDisplayStatusId;
+                                                                                                                
+                                                                  @if(displayStatusId == (int)ProjectActivityStatus.Started) // Assumes ProjectActivityStatus enum is accessible
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                          <div class="progress-bar" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else if(displayStatusId == (int)ProjectActivityStatus.Upcoming)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                          <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar" style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else if(displayStatusId == (int)ProjectActivityStatus.Ongoing)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                          <div class="progress-bar bg-warning" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else if(displayStatusId == (int)ProjectActivityStatus.Completed)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                          <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else if(displayStatusId == (int)ProjectActivityStatus.Incomplete)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                          <div class="progress-bar bg-danger" role="progressbar" style="width: 15%;" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100">15%</div> @* Note: You have 15% here but aria-valuenow is 25% *@
+                                                                      </div>
+                                                                  }
+                                                                  else if(displayStatusId == (int)ProjectActivityStatus.OnHold)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                          <div class="progress-bar bg-secondary" role="progressbar" style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else if(displayStatusId == (int)ProjectActivityStatus.SentForReview)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                          <div class="progress-bar bg-info" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                                                                      </div>
+                                                                  }
+                                                                  @* Add a default for unknown/other statuses if necessary *@
+                                                              
+
+                                                              @*if(act_statues.Count() > 0) 
+                                                              {                      
+                                                                foreach(var act_sta in act_statues)                                                             
+                                                                {
+                                                            
+                                                                  @if(act_sta.ActivityProgress == 2)
+                                                                  {
+                                                                    <div class="progress" style="height:100%;" >
+                                                                      <div class="progress-bar" role="progressbar"  style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                                    </div>
+                                                                  }
+                                                                  else
+                                                                  @if(act_sta.ActivityProgress == 1)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar"  style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(act_sta.ActivityProgress == 3)
+                                                                  {
+                                                                    <div class="progress" style="height:100%;" >
+                                                                      <div class="progress-bar bg-warning" role="progressbar"  style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                                    </div>
+                                                                  }
+                                                                  else
+                                                                  @if(act_sta.ActivityProgress == 4)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-success" role="progressbar"  style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(act_sta.ActivityProgress == 5)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-danger" role="progressbar"  style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">15%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(act_sta.ActivityProgress == 6)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-secondary" role="progressbar"  style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(act_sta.ActivityProgress == 7)
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-info" role="progressbar"  style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                                                                      </div>
+                                                                  }
+                                                                      
+                                                                }
+                                                              }
+                                                              else
+                                                              {
+                                                                @if(proj.StatusName == "Started")
+                                                                  {
+                                                                    <div class="progress" style="height:100%;" >
+                                                                      <div class="progress-bar" role="progressbar"  style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                                    </div>
+                                                                  }
+                                                                  else
+                                                                  @if(proj.StatusName == "Upcoming")
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar"  style="width: 5%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100">5%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(proj.StatusName == "Ongoing")
+                                                                  {
+                                                                    <div class="progress" style="height:100%;" >
+                                                                      <div class="progress-bar bg-warning" role="progressbar"  style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                                                    </div>
+                                                                  }
+                                                                  else
+                                                                  @if(proj.StatusName == "Completed")
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-success" role="progressbar"  style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(proj.StatusName == "Incomplete")
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-danger" role="progressbar"  style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">15%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(proj.StatusName == "On-Hold")
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-secondary" role="progressbar"  style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                                                                      </div>
+                                                                  }
+                                                                  else
+                                                                  @if(proj.StatusName == "Sent for Review")
+                                                                  {
+                                                                      <div class="progress" style="height:100%;" >
+                                                                        <div class="progress-bar bg-info" role="progressbar"  style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                                                                      </div>
+                                                                  }
+                                                              }*@
+                                                              
+                                                            }
+
+                                                        </div>
+
+                                                      </div>
+
+                                                      @* Side *@
+                                                      <div id="flush-collapse_@proj.Id" style="color:#0f204b;background-color:#e7f1ff;" class="accordion-collapse collapse mt-2" data-bs-parent="#accordionFlush">
+                                                        <div class="accordion-body" >
+                                                            <div class="d-flex flex-row justify-content-center">
+                                                              <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;color:#a71930;">
+                                                                <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Details</h6>
+                                                                <p class="fw-light" style="color:#000;">@proj.ProjectDetails</p>
+                                                              </div>
+                                                              <div class="col-sm-3 ps-3 pe-3" style="border-right:1px solid grey;">
+                                                                <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Dates</h6>
+                                                                <div class="d-flex flex-row justify-content-between">
+                                                                  <div class="col-auto"> 
+                                                                    <p>Start Date</p>
+                                                                    <p class="fw-bold">@proj.ProjectStartDate.ToString("MMM-d-yyyy")</p>
+                                                                  </div>
+                                                                  <div class="col-auto text-center"> 
+                                                                      |
+                                                                  </div>
+                                                                  <div class="col-auto"> 
+                                                                    <p>End Date</p>
+                                                                    <p class="fw-bold">@proj.ProjectEndDate.ToString("MMM-d-yyyy")</p>
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                              <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
+                                                                <h6 class="fw-semibold mb-1" style="color:#a71930;">Area of Work</h6>
+                                                                <p class="fw-light">@proj.ProjectAreaOfWork</p>
+                                                              </div>
+                                                              <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
+                                                                <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
+                                                                <p class="fw-light">@getProjectMembers.Substring(1)</p>
+                                                              </div>
+                                                              <div class="col-sm-2 ps-3 pe-3">
+                                                                <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</h6>
+                                                                @if(proj.ProjectFiles.Length > 2)
+                                                                {
+                                                                  <p class="fw-light">
+                                                                    <a href="~/Attachments/Projects/@proj.ProjectFiles" class="clip" download>
+                                                                      <span>
+                                                                        <i class="bi bi-paperclip fs-5"></i>
+                                                                      </span>
+                                                                      @proj.ProjectFiles.Substring(4)
+                                                                    </a>
+                                                                  </p>
+
+                                                                }
+                                                                else
+                                                                {
+                                                                  <p class="fw-light">No files</p>
+                                                                }
+
+                                                              </div>
+
+                                                            </div>
+                                                        </div>
+                                                      </div>
+
+                                                    </div>
+                                                  </div>
+
+                                              </td>
+                                          </tr>
+
+                                          var countActivity = 0;
+                                          foreach(var act_ in Model.Activities
+                                                  .Where(a => a.ProjectID == proj.Id)
+                                                  .OrderBy(a => a.ActivityStartDate))
+                                          {
+
+                                              countActivity++;
+                                              @* ACTIVITIES *@
+                                              <tr>
+
+                                                @* ActivityName *@
+                                                <td class="align-middle">
+                                                    <span>
+                                                      <span class="fw-bold">@countActivity.</span> @act_.ActivityName
+                                                    </span>
+                                                </td>
+
+                                                @* ActivityComments *@
+                                                <td class="align-middle">
+                                                    @act_.ActivityComments
+                                                </td>
+
+                                                @* Challenges *@
+                                                <td class="align-middle">
+                                                    @act_.ActivityChallenges
+                                                </td>
+
+                                                @* Activity Start Date *@
+                                                <td class="align-middle">@act_.ActivityStartDate.ToString("MMMM dd, yyyy")</td>
+
+                                                @* Activity Durarion *@
+                                                <td class="align-middle text-center">
+                                                  @*<small class="text-muted" >
+                                                    <span style="font-size:11px;"> Days </span></small><span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> | <small class="text-muted"><span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span><span style="font-size:11px;"> Weeks </span></small> *@
+
+                                                    @{
+                                                      var getTTCompletion_useract = act_.ActivityEndDate - act_.ActivityStartDate;
+
+                                                      // Option A: Using TimeSpan properties (most common and readable)
+                                                      int totalDays_useract = getTTCompletion_useract.Days;
+                                                      int totalWeeks_useract = getTTCompletion_useract.Days / 7;
+                                                      int totalMonths_useract = totalDays / 28;                                   
+                                                    }
+
+                                                    @if(totalDays_useract <= 0)
+                                                        {
+                                                          <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                              <i class="bi bi-clock-history fs-6"></i>
+                                                              <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
+                                                          </span>
+                                                        }else
+                                                            if(totalDays_useract > 0 && totalDays_useract <= 7)
+                                                            {
+                                                              <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                  <i class="bi bi-clock-history fs-6"></i>
+                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalDays_useract Days</span>
+                                                              </span>
+                                                            }else
+                                                                if(totalDays_useract > 7 && totalWeeks_useract <= 5 )
+                                                                {
+
+                                                                  <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_useract Wks</span>
+                                                                  </span>
+
+                                                                }
+                                                                else
+                                                                  if(totalWeeks_useract > 5 )
+                                                                  {
+                                                                      int months = 0;
+                                                                      DateTime endDate = act_.ActivityEndDate;
+                                                                      DateTime startDate = act_.ActivityStartDate;
+                                                                      while(startDate < endDate)
+                                                                      {
+                                                                        DateTime checkDate = startDate.AddMonths(1);
+                                                                        if(checkDate <= endDate)
+                                                                        {
+                                                                            months++;
+                                                                            startDate = checkDate;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            break;
+                                                                        }
+                                                                      }
+                                                                      <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                        <i class="bi bi-clock-history fs-6"></i>
+                                                                        <span style="margin-left: 0.30rem;font-weight:100">@months Mnts</span>
+                                                                      </span>
+                                                                  }
+
+                                                </td>
+
+                                                @* Activity Status *@
+                                                <td class="align-middle text-center">
+                                                  @if(act_.ActivityProgress == 2)
+                                                  {
+                                                      <span class="badge rounded-pill bg-primary">Started</span>
+                                                  }
+                                                  else
+                                                  @if(act_.ActivityProgress == 1)
+                                                  {
+                                                      <span class="badge rounded-pill bg-light text-muted">Upcoming</span>
+                                                  }
+                                                  else
+                                                  @if(act_.ActivityProgress == 3)
+                                                  {
+                                                      <span class="badge rounded-pill bg-info">Ongoing</span>
+                                                  }
+                                                  else
+                                                  @if(act_.ActivityProgress == 4)
+                                                  {
+                                                      <span class="badge rounded-pill bg-success">Completed</span>
+                                                  }
+                                                  else
+                                                  @if(act_.ActivityProgress == 5)
+                                                  {
+                                                      <span class="badge rounded-pill bg-danger">Incomplete</span>
+                                                  }
+                                                  else
+                                                  @if(act_.ActivityProgress == 6)
+                                                  {
+                                                      <span class="badge rounded-pill bg-secondary text-muted">On-Hold</span>
+                                                  }
+                                                  else
+                                                  @if(act_.ActivityProgress == 7)
+                                                  {
+                                                      <span class="badge rounded-pill bg-warning">Sent for Review</span>
+                                                  }
+
+                                                </td>
+
+                                                @* Attachments *@
+                                                <td class="text-center align-middle">
+                                                  <ul class="list-unstyled d-flex mb-4" style="margin: 0 !important; padding: 0 !important;">
+
+                                                    @* Attachments *@
+                                                    @if(!String.IsNullOrEmpty(act_.ProjectFiles) && act_.ProjectFiles.Contains('.'))
+                                                    {
+                                                      <li class="">
+                                                        <a href="~/Attachments/Activity/@act_.ProjectFiles" data-bs-toggle="tooltip" data-bs-placement="top" title="@act_.ProjectFiles" class="clip" download>
+                                                            <i class="bi bi-paperclip fs-5"></i>
+                                                        </a>
+                                                      </li>
+                                                    }
+                                                    else
+                                                    {
+                                                      <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project.">
+                                                        <a class="" aria-disabled="true" disabled>
+                                                            <i class="bi bi-paperclip fs-5"></i>
+                                                        </a>
+                                                      </li>
+                                                    }
+
+
+                                                  </ul>
+
+                                                </td>
+
+                                              </tr>
+
+                                          }
+
+                                        }
+
+                                    }
+
+                                </tbody>
+
+                            </table>
+                           
+
+                          </div>
+
+                        </div>
+
+                      </div>
+                    </div>
+                    @*End Recent Sales *@
+
+                  </div>
+                  
+                </section>
+
+              </div>
+              @* End #main *@
+
+    */}

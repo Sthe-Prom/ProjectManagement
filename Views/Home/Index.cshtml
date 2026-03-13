@@ -4,7 +4,7 @@
 @model ProjectViewModel
 
 @{
-    ViewData["Title"] = "MIR";
+    ViewData["Title"] = "Projects";
 
     var userId = userManager.GetUserId(User);
     User user = await userManager.FindByIdAsync(userId);
@@ -437,6 +437,22 @@
       color: lightgray;
     }
 
+    .drop-zone {
+    border: 2px dashed #A71930;
+    background-color: #fafafa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    }
+
+    .drop-zone:hover {
+        background-color: #f2f2f2;
+    }
+
+    .drop-zone.dragover {
+        background-color: #ffe9ec;
+        border-color: #A71930;
+    }
+
 
 </style>
 
@@ -457,6 +473,8 @@
                       s_user_ids += ',' + id;
                     }
 
+                    const file_input = document.getElementById('ProjectFiles');
+
                     formData.append("ProjectModel_ProjectName", $("#ProjectModel_ProjectName").val() );
                     formData.append("ProjectModel_ProjectDetails",  $("#ProjectModel_ProjectDetails").val() );
                     formData.append("ProjectModel_ProjectAreaOfWork",  $("#ProjectModel_ProjectAreaOfWork").val() );
@@ -466,8 +484,11 @@
                     formData.append("ProjectModel_ProjectEndDate",  $("#ProjectModel_ProjectEndDate").val() ) ;
                     formData.append("ProjectModel_ProjectStatusID", $("#ProjectModel_ProjectStatusID").val() );
                     formData.append("ProjectModel_AccountID",  $("#ProjectModel_AccountID").val() );
-                    formData.append("ProjectFiles",  $("#ProjectFiles").val() );
-
+                    
+                    if (file_input.files.length > 0) {
+                      formData.append('ProjectFiles', file_input.files[0]); // name must match server binding
+                    }
+              
                     var f = [];
                     var s = '<div style="text-align: center !important;">Please correct the following errors:</div>' + "<hr><br />";
 
@@ -496,10 +517,7 @@
                     }
 
                     if(f.length > 0){
-                        //validateAddRoadFactorsForm();
-                        //alert(s);
                         ProjectAddError('',s);
-                        //validatedNew();
                     }
                     else{
 
@@ -515,26 +533,26 @@
                       });
 
                     }
+                    
+                    function projectAddError(response) {
+                        //alert(response.responseMessage);
+                        ProjectAddError('',response.responseMessage);
+                    }
 
+                    function projectAddSuccess(response) {
+                        if (response.responseCode == 0) {
+
+                            ProjectAdd("Add Project", "Project Name: " + response.responseMessage
+                              + " was added successfully.");
+                            //alert("Project Added Successfully");
+                        }
+                        else {
+                            alert(response.responseMessage);
+                        }
+                    }
 
                 });
 
-                function projectAddError(response) {
-                    //alert(response.responseMessage);
-                    ProjectAddError('',response.responseMessage);
-                }
-
-                function projectAddSuccess(response) {
-                    if (response.responseCode == 0) {
-
-                        ProjectAdd("Add Project", "Project Name: " + response.responseMessage
-                          + " was added successfully.");
-                        //alert("Project Added Successfully");
-                    }
-                    else {
-                        alert(response.responseMessage);
-                    }
-                }
 
                 //Edit Project Forms
                 const editProjectForms = document.getElementsByClassName("frmEditProject");
@@ -550,6 +568,92 @@
                     if (num_extr) {
                         console.log('number found:' + num_extr[0]);
                     }
+
+
+                    //D and G
+                    const dropZone = document.getElementById("dropZoneEditProject_"+num_extr[0]);
+                    const fileInput = document.getElementById("ProjectFiles");
+
+                    // --- Utils ---
+                    function highlight() {
+                      dropZone.classList.add("border-primary", "bg-white");
+                    }
+                    function unhighlight() {
+                      dropZone.classList.remove("border-primary", "bg-white");
+                    }
+                    function renderFiles(files) {
+                      if (!files || files.length === 0) {
+                        dropZone.innerHTML = `<p class="mb-1 text-muted">Drop files here or click to browse</p>`;
+                        return;
+                      }
+
+                      // Show one or many
+                      if (files.length === 1) {
+                        dropZone.innerHTML = `
+                          <p class="mb-1 text-success fw-bold">File attached</p>
+                          <small>${files[0].name}</small>
+                        `;
+                      } else {
+                        const items = [...files].map(f => `<li>${f.name}</li>`).join("");
+                        dropZone.innerHTML = `
+                          <p class="mb-1 text-success fw-bold">Files attached (${files.length})</p>
+                          <ul class="mb-0 small">${items}</ul>
+                        `;
+                      }
+                    }
+
+                    // --- Open file picker on click (and keyboard) ---
+                    dropZone.addEventListener("click", () => {
+                      // Clear first so picking the same file triggers `change`
+                      fileInput.value = "";
+                      fileInput.click();
+                    });
+
+                    dropZone.setAttribute("tabindex", "0"); // focusable for keyboard
+                    dropZone.addEventListener("keydown", (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        fileInput.value = "";
+                        fileInput.click();
+                      }
+                    });
+
+                    // --- When user manually selects files ---
+                    fileInput.addEventListener("change", (e) => {
+                      const files = e.target.files;
+                      renderFiles(files);
+                    });
+
+                    // --- Drag events ---
+                    ["dragenter", "dragover"].forEach(evt =>
+                      dropZone.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        highlight();
+                      })
+                    );
+
+                    ["dragleave", "drop"].forEach(evt =>
+                      dropZone.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // For dragleave: avoid flicker by checking relatedTarget
+                        if (evt === "dragleave" && dropZone.contains(e.relatedTarget)) return;
+                        unhighlight();
+                      })
+                    );
+
+                    // --- Handle drop ---
+                    dropZone.addEventListener("drop", (e) => {
+                      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        // Assign dropped files to input for normal form submission / FormData
+                        fileInput.files = e.dataTransfer.files;
+                        renderFiles(e.dataTransfer.files);
+                        // Clear the DataTransfer to avoid duplicate events in some browsers
+                        e.dataTransfer.clearData();
+                      }
+                    });
+                    //*******************< End Drag and Drop >*********************//
 
                     //UPDATE Project
                     $("#btnUpdateProject_"+num_extr[0]).on("click", function() {
@@ -567,17 +671,23 @@
                           s_user_ids += ',' + id;
                         }
 
-                       // formData.append("ProjectModel_Id", $("#projectID").val() );
-                        formData.append("proj_AccountID",  values[1][1] );
-                        formData.append("proj_ProjectName", values[2][1] );
-                        formData.append("proj_ProjectDetails",  values[3][1] );
-                        formData.append("proj_ProjectAreaOfWork",  values[4][1] );
-                        formData.append("proj_ProjectWorkInConj",  values[5][1] );
+                        const file_input = document.getElementById('ProjectFiles');
+
+                        // formData.append("ProjectModel_Id", $("#projectID").val() );
+                        formData.append("proj_AccountID",  formData.get('proj.AccountID') );
+                        formData.append("proj_ProjectName", formData.get('proj.ProjectName') );
+                        formData.append("proj_ProjectDetails", formData.get('proj.ProjectDetails') );
+                        formData.append("proj_ProjectAreaOfWork",  formData.get('proj.ProjectAreaOfWork') );
+                        formData.append("proj_ProjectWorkInConj",  formData.get('proj.ProjectWorkInConj') );
                         formData.append("proj_SelectedAssignedUserIds", s_user_ids );
                         formData.append("proj_ProjectStartDate",  formData.get('proj.ProjectStartDate') ) ;
                         formData.append("proj_ProjectEndDate",  formData.get('proj.ProjectEndDate') ) ;
                         formData.append("proj_ProjectStatusID", formData.get('proj.ProjectStatusID') );
-                        formData.append("ProjectFiles",  formData.get('ProjectFiles') );
+                        //formData.append("ProjectFiles",  formData.get('ProjectFiles') );
+
+                        if (file_input.files.length > 0) {
+                          formData.append('ProjectFiles', file_input.files[0]); // name must match server binding
+                        }
 
                         var f = [];
                         //var s = 'Please correct the following: \n---------------------------------\n';
@@ -592,7 +702,7 @@
                         }
 
                         for(i = 0; i < values.length;i++){
-                          if(values[i][1] === "" || values[i][1] === 0)// || values[i][1].name == "")
+                          if((values[i][1] === "" || values[i][1] === 0) && (values[i][0] != "proj.SelectedAssignedUserIds" ))// || values[i][1].name == "")
                           {
                             if(values[i][0].includes('.')){
                                 s += values[i][0].split('.')[1] + ' is required. <br />';
@@ -625,23 +735,23 @@
 
                         }
 
+                        function projectUpdateError(response) {
+                            alert("error");
+                        }
+
+                        function projectUpdateSuccess(response) {
+                            if (response.responseCode == 0) {
+
+                                ProjectEdit("Update Project", "Project Name: " + response.responseMessage
+                                    + " was added successfully.");
+                                //alert("success");
+                            }
+                            else {
+                                alert('Error..');
+                            }
+                        }
+
                     });
-
-                    function projectUpdateError(response) {
-                        alert("error");
-                    }
-
-                    function projectUpdateSuccess(response) {
-                        if (response.responseCode == 0) {
-
-                            ProjectEdit("Update Project", "Project Name: " + response.responseMessage
-                                + " was added successfully.");
-                            //alert("success");
-                        }
-                        else {
-                            alert('Error..');
-                        }
-                    }
 
                 };
 
@@ -662,6 +772,92 @@
                         console.log('number found:' + num_extr[0]);
                     }
 
+                    //D and G
+                    const dropZone = document.getElementById("dropZoneAddActivity_"+num_extr[0]);
+                    const fileInput = document.getElementById("ProjectFiles");
+
+                    // --- Utils ---
+                    function highlight() {
+                      dropZone.classList.add("border-primary", "bg-white");
+                    }
+                    function unhighlight() {
+                      dropZone.classList.remove("border-primary", "bg-white");
+                    }
+                    function renderFiles(files) {
+                      if (!files || files.length === 0) {
+                        dropZone.innerHTML = `<p class="mb-1 text-muted">Drop files here or click to browse</p>`;
+                        return;
+                      }
+
+                      // Show one or many
+                      if (files.length === 1) {
+                        dropZone.innerHTML = `
+                          <p class="mb-1 text-success fw-bold">File attached</p>
+                          <small>${files[0].name}</small>
+                        `;
+                      } else {
+                        const items = [...files].map(f => `<li>${f.name}</li>`).join("");
+                        dropZone.innerHTML = `
+                          <p class="mb-1 text-success fw-bold">Files attached (${files.length})</p>
+                          <ul class="mb-0 small">${items}</ul>
+                        `;
+                      }
+                    }
+
+                    // --- Open file picker on click (and keyboard) ---
+                    dropZone.addEventListener("click", () => {
+                      // Clear first so picking the same file triggers `change`
+                      fileInput.value = "";
+                      fileInput.click();
+                    });
+
+                    dropZone.setAttribute("tabindex", "0"); // focusable for keyboard
+                    dropZone.addEventListener("keydown", (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        fileInput.value = "";
+                        fileInput.click();
+                      }
+                    });
+
+                    // --- When user manually selects files ---
+                    fileInput.addEventListener("change", (e) => {
+                      const files = e.target.files;
+                      renderFiles(files);
+                    });
+
+                    // --- Drag events ---
+                    ["dragenter", "dragover"].forEach(evt =>
+                      dropZone.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        highlight();
+                      })
+                    );
+
+                    ["dragleave", "drop"].forEach(evt =>
+                      dropZone.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // For dragleave: avoid flicker by checking relatedTarget
+                        if (evt === "dragleave" && dropZone.contains(e.relatedTarget)) return;
+                        unhighlight();
+                      })
+                    );
+
+                    // --- Handle drop ---
+                    dropZone.addEventListener("drop", (e) => {
+                      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        // Assign dropped files to input for normal form submission / FormData
+                        fileInput.files = e.dataTransfer.files;
+                        renderFiles(e.dataTransfer.files);
+                        // Clear the DataTransfer to avoid duplicate events in some browsers
+                        e.dataTransfer.clearData();
+                      }
+                    });
+                    //*******************< End Drag and Drop >*********************//
+
+
                     //SAVE Activity
                     $("#btnSaveActivity_"+num_extr[0]).on("click", function() {
 
@@ -669,17 +865,23 @@
 
                         var formData_act = new FormData(form);
                         const values = [...formData_act.entries()];
+                        const file_input = document.getElementById('ProjectFiles');
 
-                        formData_act.append("ActivityModel_ActivityName",  values[1][1] );
-                        formData_act.append("ActivityModel_ActivityComments", values[2][1] );
-                        formData_act.append("ActivityModel_ActivityChallenges", values[3][1] );
-                        formData_act.append("ActivityModel_ActivityHighlights", values[4][1] );
-                        formData_act.append("ActivityModel_ActivityStartDate", values[5][1] );
-                        formData_act.append("ActivityModel_ActivityEndDate", values[7][1] );
-                        formData_act.append("ActivityModel_ActivityProgress", values[9][1] );
-                        formData_act.append("ActivityModel_ProjectID", values[0][1] );
-                        formData_act.append("ProjectFiles",  values[10][1] );
-                        formData_act.append("ActivityModel_MemberProject",  values[11][1] );
+                        formData_act.append("ActivityModel_ActivityName",  $("#ActivityModel_ActivityName").val() );
+                        formData_act.append("ActivityModel_ActivityComments", $("#ActivityModel_ActivityComments").val() );
+                        formData_act.append("ActivityModel_ActivityChallenges", $("#ActivityModel_ActivityChallenges").val() );
+                        formData_act.append("ActivityModel_ActivityHighlights", $("#ActivityModel_ActivityHighlights").val() );
+                        formData_act.append("ActivityModel_ActivityStartDate", $("#ActivityModel_ActivityStartDate").val() );
+                        formData_act.append("ActivityModel_ActivityEndDate", $("#ActivityModel_ActivityEndDate").val() );
+                        formData_act.append("ActivityModel_ActivityProgress", $("#ActivityModel_ActivityProgress").val() );
+                        formData_act.append("ActivityModel_ProjectID", $("#ActivityModel_ProjectID").val() );
+                        
+                        if(file_input.files.length > 0) {
+                          formData_act.append('ProjectFiles', file_input.files[0]); // name must match server binding
+                        } 
+
+                        //formData_act.append("ProjectFiles",  $("#ProjectFiles").val() );
+                        formData_act.append("ActivityModel_MemberProject",  $("#ActivityModel_MemberProject").val() );
 
                         var f = [];
                         var s = '<div style="text-align: center !important;">Please correct the following errors:</div>' + "<hr><br />";
@@ -753,27 +955,27 @@
                             });
                         }
 
-
-                    });
-
-                    function activityError(response){
-                      if(response.responseCode == 1){
-                        alert("An error occured while updating your Activity. please try again." + '\n' + response.responseMessage)
-                        //ActivityAddError(response.responseMessage);
-                      }
-                    }
-
-                    function activitySuccess(response) {
-                        if (response.responseCode == 0) {
-
-                            ActivityAdd("Add Activity", "Activity Name: " + response.responseMessage
-                                + " was added successfully.");
-                            //alert("Activity Added Successfully.");
+                        function activityError(response){
+                          if(response.responseCode == 1){
+                            alert("An error occured while updating your Activity. please try again." + '\n' + response.responseMessage)
+                            //ActivityAddError(response.responseMessage);
+                          }
                         }
-                        else {
-                            alert(response.responseMessage);
+
+                        function activitySuccess(response) {
+                            if (response.responseCode == 0) {
+
+                                ActivityAdd("Add Activity", "Activity Name: " + response.responseMessage
+                                    + " was added successfully.");
+                                //alert("Activity Added Successfully.");
+                            }
+                            else {
+                                alert(response.responseMessage);
+                            }
                         }
-                    }
+
+
+                    });                 
 
                     //DELETE Project
                     $("#btnDeleteProject_"+num_extr[0]).on("click", function() {
@@ -831,21 +1033,114 @@
                     // Using match with regEx
                     let num_extr = id.match(/(\d+)/);
 
+                    //D and G
+                    const dropZone = document.getElementById("dropZoneUpdateActivity_"+num_extr[0]);
+                    const fileInput = document.getElementById("ProjectFiles");
+
+                    // --- Utils ---
+                    function highlight() {
+                      dropZone.classList.add("border-primary", "bg-white");
+                    }
+                    function unhighlight() {
+                      dropZone.classList.remove("border-primary", "bg-white");
+                    }
+                    function renderFiles(files) {
+                      if (!files || files.length === 0) {
+                        dropZone.innerHTML = `<p class="mb-1 text-muted">Drop files here or click to browse</p>`;
+                        return;
+                      }
+
+                      // Show one or many
+                      if (files.length === 1) {
+                        dropZone.innerHTML = `
+                          <p class="mb-1 text-success fw-bold">File attached</p>
+                          <small>${files[0].name}</small>
+                        `;
+                      } else {
+                        const items = [...files].map(f => `<li>${f.name}</li>`).join("");
+                        dropZone.innerHTML = `
+                          <p class="mb-1 text-success fw-bold">Files attached (${files.length})</p>
+                          <ul class="mb-0 small">${items}</ul>
+                        `;
+                      }
+                    }
+
+                    // --- Open file picker on click (and keyboard) ---
+                    dropZone.addEventListener("click", () => {
+                      // Clear first so picking the same file triggers `change`
+                      fileInput.value = "";
+                      fileInput.click();
+                    });
+
+                    dropZone.setAttribute("tabindex", "0"); // focusable for keyboard
+                    dropZone.addEventListener("keydown", (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        fileInput.value = "";
+                        fileInput.click();
+                      }
+                    });
+
+                    // --- When user manually selects files ---
+                    fileInput.addEventListener("change", (e) => {
+                      const files = e.target.files;
+                      renderFiles(files);
+                    });
+
+                    // --- Drag events ---
+                    ["dragenter", "dragover"].forEach(evt =>
+                      dropZone.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        highlight();
+                      })
+                    );
+
+                    ["dragleave", "drop"].forEach(evt =>
+                      dropZone.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // For dragleave: avoid flicker by checking relatedTarget
+                        if (evt === "dragleave" && dropZone.contains(e.relatedTarget)) return;
+                        unhighlight();
+                      })
+                    );
+
+                    // --- Handle drop ---
+                    dropZone.addEventListener("drop", (e) => {
+                      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        // Assign dropped files to input for normal form submission / FormData
+                        fileInput.files = e.dataTransfer.files;
+                        renderFiles(e.dataTransfer.files);
+                        // Clear the DataTransfer to avoid duplicate events in some browsers
+                        e.dataTransfer.clearData();
+                      }
+                    });
+                    //*******************< End Drag and Drop >*********************//
+
+
                      //UPDATE Activity
                     $("#btnUpdateActivity_"+num_extr[0]).on("click", function() {
 
                         var formData_act = new FormData(form);
                         const values = [...formData_act.entries()];
 
-                        formData_act.append("act_ActivityName",  values[1][1] );
-                        formData_act.append("act_ActivityComments", values[2][1] );
-                        formData_act.append("act_ActivityChallenges", values[3][1] );
-                        formData_act.append("act_ActivityHighlights", values[4][1] );
-                        formData_act.append("act_ActivityStartDate", values[5][1] );
-                        formData_act.append("act_ActivityEndDate", values[7][1] );
-                        formData_act.append("act_ActivityProgress", values[9][1] );
-                        formData_act.append("ActivityModel_Id", values[0][1] );
-                        formData_act.append("ProjectFiles",  values[10][1] );
+                        const file_input = document.getElementById('ProjectFiles');
+
+                        formData_act.append("act_ActivityName",  $("#act_ActivityName").val() );
+                        formData_act.append("act_ActivityComments", $("#act_ActivityComments").val() );
+                        formData_act.append("act_ActivityChallenges", $("#act_ActivityChallenges").val() );
+                        formData_act.append("act_ActivityHighlights", $("#act_ActivityHighlights").val() );
+                        formData_act.append("act_ActivityStartDate", $("#act_ActivityStartDate").val() );
+                        formData_act.append("act_ActivityEndDate", $("#act_ActivityEndDate").val() );
+                        formData_act.append("act_ActivityProgress", $("#act_ActivityProgress").val() );
+                        formData_act.append("ActivityModel_Id", $("#ActivityModel_Id").val() );
+                        
+                        if (file_input.files.length > 0) {
+                          formData_act.append('ProjectFiles', file_input.files[0]); // name must match server binding
+                        }
+
+                       // formData_act.append("ProjectFiles",  values[10][1] );
 
                         var f = [];                        
                         var s = '<div style="text-align: center !important;">Please correct the following errors:</div>' + "<hr><br />";
@@ -986,45 +1281,22 @@
 
         });
 
-        //Table Functions
-
-        //Search()
-        function searchProAct() {
-          // Declare variables
-          var input, filter, table, tr, td, i, txtValue;
-          input = document.getElementById("searchInput");
-          filter = input.value.toUpperCase();
-          table = document.getElementById("projectsTable");
-          tr = table.getElementsByTagName("tr");
-
-          // Loop through all table rows, and hide those who don't match the search query
-          for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];
-            if (td) {
-              txtValue = td.textContent || td.innerText;
-              if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-              } else {
-                tr[i].style.display = "none";
-              }
-            }
-          }
-        }
+        
 
     </script>
 
 }
 
 @* H E A D E R *@
-<div class="container-fluid min-height" style="margin-bottom:0 !important;">
-  <div class="container p-1">
+<div class="container min-height" style="margin-bottom:0 !important;">
+  
     @* <h3 class="text-center" style="color: #0F204B; margin: 10px;font-weight: 400;">MIR Projects</h3> *@
-  <h4 class="text-center pb-1" style="color: #A71930; font-weight: 400;">Manage Projects and Activities</h4>
+   <h4 class="text-center pb-1" style="color: #A71930; font-weight: 400;">Manage Projects and Activities</h4>
 
-    <div class="row d-flex flex-row justify-content-center align-content-center p-3" style="background-color: #fff; border: 1px lightgray solid; border-radius: 8px;">
+    <div class="col-sm-10 mx-auto d-flex flex-wrap flex-row justify-content-between align-content-center p-3 text-center" style="background-color: #fff; border: 1px lightgray solid; border-radius: 8px;">
       @* <h5 class="text-center" style="color: #0F204B;">​<strong style="position: relative;">Process workflow</strong></h5> *@
       @*<ul id="itgyf" class="list list-unstyled list-inline-item align-items-center text-center" style="align-content: center;"> *@
-      <div class="col-auto">
+      <div class="flex-grow-1 ">
         @if(await userManager.IsInRoleAsync(user,"Admin"))
         {
           <span>          
@@ -1056,7 +1328,7 @@
           </span>
         }
       </div>
-      <div class="col-auto">
+      <div class="flex-grow-1">
         <span >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-diagram-3" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
@@ -1067,7 +1339,7 @@
           </svg>
         </span>
       </div>
-      <div class="col-auto">
+      <div class="flex-grow-1">
         <span>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -1078,7 +1350,7 @@
           </svg>
         </span>
       </div>
-      <div class="col-auto">
+      <div class="flex-grow-1 ">
         <span >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bar-chart-fill" viewBox="0 0 16 16">
             <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
@@ -1088,7 +1360,7 @@
       </div>
       @*</ul> *@
     </div>
-  </div>
+  
 
 </div>
 
@@ -1105,7 +1377,6 @@
                       ProjectID = p.Id,
                       SelectedAssignedUserIds = p.SelectedAssignedUserIds
                     };
-
       
         var project_lists = new List<int>();
         var activity_lists = new List<int>();    
@@ -1226,24 +1497,25 @@
               @* Admin Main *@
               <div id="main" class="main" style="margin-top:0 !important;">
 
-                <div class="pagetitle" >
+           
+                <div class="col-sm-10 mx-auto d-flex flex-wrap flex-row justify-content-center mt-1 mb-3 gap-2 ">
+                  
+                  @* <div class="col-sm-2 col-md-2 d-none d-sm-block align-content-center mt-1 mb-4" >
+                      <h1>Dashboard</h1>
+                      <nav>
+                        <ol class="breadcrumb">
+                          <li class="breadcrumb-item active">Projects/Activities Summaries </li>
+                        </ol>
+                      </nav>
+                  </div> *@
 
-                    <div class="row gap-2 d-flex flex-row justify-content-center mt-1">
-                      
-                      <div class="col-sm-2 col-md-2 d-none d-sm-block align-content-center mt-1 mb-4" >
-                          <h1>Dashboard</h1>
-                          <nav>
-                            <ol class="breadcrumb">
-                              <li class="breadcrumb-item active">Projects/Activities Summaries </li>
-                            </ol>
-                          </nav>
-                      </div>
-
-                      <div class="col-sm rounded-2 align-content-center mt-1 mb-4" style="border:1px solid lightgrey;">
+                 
+                      @* Staff Filter *@
+                      <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
       
                             @if(!string.IsNullOrEmpty(Context.Request.Query["Staff"] ))
                             {
-                              <li class="list-inline-item filter-active m-2 " style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                              <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                                                                     
                                     <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
                                                                   
@@ -1259,7 +1531,7 @@
 
                           @{var AccountFilter = ViewBag.Staff;}
 
-                          <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                          <li class="list-inline-item filter-active " style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                             @if(AccountFilter != null)
                             {
                               <span style="vertical-align:middle;" >
@@ -1284,7 +1556,7 @@
                             
                             }
                         
-                          <select id="staff-filter"  class="form-select ms-2 mb-2 ">
+                          <select id="staff-filter"  class="form-select">
 
                             <option value="" selected>Filter by Staff</option>
                         
@@ -1315,7 +1587,7 @@
                       </div>
 
                       @* Status Filter *@
-                      <div class="col-sm rounded-2 align-content-center mt-1 mb-4" style="border:1px solid lightgrey;">
+                      <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
                                             
                         @if(!string.IsNullOrEmpty(Context.Request.Query["Status"] ))
                         {
@@ -1334,7 +1606,7 @@
 
                           @{var StatusFilter = ViewBag.Status;}
 
-                          <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                          <li class="list-inline-item filter-active " style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                             
                             @if(StatusFilter != null)
                             {
@@ -1353,7 +1625,7 @@
                           </li>
                           
                         
-                          <select id="status-filter"  class="form-select ms-2 mb-2 ">
+                          <select id="status-filter"  class="form-select ">
 
                             @{
                               var staffId = ViewBag.Staff;
@@ -1387,11 +1659,11 @@
                       </div>
 
                       @* Date Filter *@
-                      <div class="col-sm rounded-2 align-content-center mt-1 mb-4" style="border:1px solid lightgrey;">
+                      <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
 
                         @if((!string.IsNullOrEmpty(Context.Request.Query["StartDate"] )) && (!string.IsNullOrEmpty(Context.Request.Query["EndDate"] )) )
                         {
-                            <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                            <li class="list-inline-item filter-active " style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                               <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
 
                                   @if(ViewBag.Staff != null && ViewBag.Status != null)
@@ -1406,7 +1678,7 @@
                                   else
                                   if(ViewBag.Staff != null)
                                   {
-                                     @Html.ActionLink(
+                                    @Html.ActionLink(
                                         "Clear Filter", 
                                         "Index", 
                                         new {Staff = ViewBag.Staff }, 
@@ -1416,7 +1688,7 @@
                                   else
                                   if(ViewBag.Status != null)
                                   {
-                                     @Html.ActionLink(
+                                    @Html.ActionLink(
                                         "Clear Filter", 
                                         "Index", 
                                         new {Status = ViewBag.Status }, 
@@ -1432,7 +1704,7 @@
                               var EndDate = ViewBag.EndDate;
                             }
 
-                          <li class="list-inline-item filter-active mt-0 mb-2 ms-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                          <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                             
                               @if(StartDate != null || EndDate != null)
                               {
@@ -1451,12 +1723,12 @@
 
                           </li>            
 
-                           @{
+                          @{
                               var StatusDate = ViewBag.Status;
                               var StaffDate = ViewBag.Staff;
                             }      
-                         
-                          <form method="get" class="d-flex align-items-center ms-1 me-1 pe-1 ps-1">
+                        
+                          <form method="get" class="d-flex align-items-center">
 
                               @if (StatusDate != null && StaffDate != null)
                               {
@@ -1467,7 +1739,7 @@
                                   <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
                       
                                   <input type="hidden" name="Staff" class="form-control" value="@Context.Request.Query["Staff"]" />
-                                 
+                                
                               }
                               else
                               if(StatusDate != null)
@@ -1501,10 +1773,11 @@
                           </form>
 
                       </div>
-                   
-                    </div>
 
+                
                 </div>
+
+               
 
                 @* @*End Page Title *@
 
@@ -2514,18 +2787,20 @@
 
                                                         </div>
 
+                                                        @{string dateToolTip = proj.ProjectStartDate.ToString("dd MMM yy") + " -> " + proj.ProjectEndDate.ToString("dd MMM yy");}
+
                                                         @* Project Duration *@
                                                         <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
                                                           @if(totalDays <= 0)
                                                           {
-                                                            <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                            <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip">
                                                                 <i class="bi bi-clock-history fs-6"></i>
                                                                 <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
                                                             </span>
                                                           }else
                                                             if(totalDays > 0 && totalDays <= 7)
                                                             {
-                                                              <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                              <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip">
                                                                   <i class="bi bi-clock-history fs-6"></i>
                                                                   <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
                                                               </span>
@@ -2534,7 +2809,7 @@
                                                                 if(totalDays > 7 && totalWeeks <= 5 )
                                                                 {
 
-                                                                  <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                  <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip">
                                                                     <i class="bi bi-clock-history fs-6"></i>
                                                                     <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
                                                                   </span>
@@ -2560,7 +2835,7 @@
                                                                         }
                                                                       }
                                                                       
-                                                                      <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                      <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip">
                                                                         <i class="bi bi-clock-history fs-6"></i>
                                                                         <span style="margin-left: 0.30rem;font-weight:100">@months Month</span>
                                                                       </span>
@@ -2827,7 +3102,13 @@
                                                 </td>
 
                                                 @* Activity Start Date *@
-                                                <td class="align-middle">@act_.ActivityStartDate.ToString("MMMM dd, yyyy")</td>
+                                                <td class="align-middle text-center align-center">                                                                                                   
+                                                    <span>
+                                                      @act_.ActivityStartDate.ToString("dd MMM yy")
+                                                      <i class="bi bi-arrow-right-short"></i>
+                                                      @act_.ActivityEndDate.ToString("dd MMM yy")
+                                                    </span>                                           
+                                                </td>
 
                                                 @* Activity Durarion *@
                                                 <td class="align-middle text-center">
@@ -2954,8 +3235,11 @@
                                                     @* Attachments *@
                                                     @if(!String.IsNullOrEmpty(act_.ProjectFiles) && act_.ProjectFiles.Contains('.'))
                                                     {
-                                                      <li class="">
-                                                        <a href="~/Attachments/Activity/@act_.ProjectFiles" class="clip" download>
+                                                      
+                                                      string fileName = act_.ProjectFiles.Length >= 3 ? act_.ProjectFiles.Substring(4) : act_.ProjectFiles;
+                                                        
+                                                      <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName">
+                                                        <a href="~/Attachments/Activity/@act_.ProjectFiles"  class="clip" download>
                                                             <i class="bi bi-paperclip fs-5"></i>
                                                         </a>
                                                       </li>
@@ -3008,25 +3292,26 @@
               @* User Mini-Dashboard Main *@
               <div id="main" class="main" style="margin-top:0 !important;margin-bottom:-20px !important">
 
-                <div class="pagetitle" >  
 
-                    <div class="row d-flex flex-row justify-content-center mt-1">
-                      
-                      <div class="col-sm-2 col-md-2 d-none d-sm-block align-content-center mt-1 " >
+                <div class="d-flex flex-row justify-content-center mt-1">
+                                        
+                  <div class="col-sm-10 col-md-10 col-lg-10 mx-auto flex-wrap d-flex gap-2 justify-content-between">
+
+                      @* <div class="flex-grow-1 d-none d-sm-block align-content-center mt-2" >
                           <h1>Dashboard</h1>
                           <nav>
                             <ol class="breadcrumb">
                               <li class="breadcrumb-item active">Projects/Activities Summaries </li>
                             </ol>
                           </nav>
-                      </div> 
+                      </div>  *@
 
                       @* Status Filter *@
-                      <div class="col-md-4 rounded-2 align-content-center mt-1 me-2" style="border:1px solid lightgrey;">
+                      <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
 
                         @if(!string.IsNullOrEmpty(Context.Request.Query["Status"] ))
                         {
-                            <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 20px;border-radius:6px;border:1px solid #0f204b;">
+                            <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 20px;border-radius:6px;border:1px solid #0f204b;">
                               <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
                                                               
                                   @Html.ActionLink(
@@ -3045,7 +3330,7 @@
                             var EndDateStatus = ViewBag.EndDate;
                           }
 
-                          <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 20px;border-radius:6px;border:1px solid #0f204b;">
+                          <li class="list-inline-item filter-active mb-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 20px;border-radius:6px;border:1px solid #0f204b;">
                             
                               @if(StatusFilter != null)
                               {
@@ -3064,7 +3349,7 @@
 
                           </li>                  
 
-                          <select id="status-filter"  class="form-select ms-2 mb-2">
+                          <select id="status-filter"  class="form-select">
 
                             <option value="" selected>Filter by Status</option>
 
@@ -3092,7 +3377,7 @@
                       </div>
 
                       @* Date Filter *@
-                      <div class="col-md-4 rounded-2 align-content-center mt-1 me-2" style="border:1px solid lightgrey;">
+                      <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
 
                         @if((!string.IsNullOrEmpty(Context.Request.Query["StartDate"] )) && (!string.IsNullOrEmpty(Context.Request.Query["EndDate"] )) )
                         {
@@ -3133,7 +3418,7 @@
 
                           </li>            
 
-                           @{
+                          @{
                               var StatusDate = ViewBag.Status;
                             }      
 
@@ -3148,7 +3433,7 @@
                             </li>
 
                                                                                     
-                           
+                          
                                 @if(StatusDate != 0)
                                 {
                                     @Html.ActionLink(
@@ -3197,15 +3482,16 @@
 
                       </div>
 
-                    </div>  
+                  </div>
+
+                </div>  
                 
-                </div>
-                  
+         
                 <section class="dashboard mt-4" style="margin-bottom:0 !important;">
                   
                   <div class="row">
                     @*Mini User Dashboard *@
-                    <div class="col-lg-9 mx-auto" style="margin-bottom:0 !important;padding-bottom:0 !important;">
+                    <div class="col-lg-10 mx-auto" style="margin-bottom:0 !important;padding-bottom:0 !important;">
                       <div class="row">
 
                         @*Project Card *@
@@ -3545,9 +3831,9 @@
                                 <thead >
                                     <tr class="">
                                         <th rowspan="1" class="header text-center align-middle text-align:center" style="width:20%">Activity Name</th>
-                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:25%">Comments</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:20%">Comments</th>
                                         <th rowspan="1" class="header text-center align-middle text-align:center" style="width:15%">Challenges</th>
-                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:10%">Start Date</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:15%">Start-End Date</th>
                                         <th rowspan="1" class="header text-center align-middle text-align:center" style="width:10%">Duration</th>
                                         <th colspan="1" class="header text-center align-middle text-align:center" style="width:10%">Progress</th>
                                         <th rowspan="1" class="header text-center align-middle text-align:center" style="width:5%">Files</th>
@@ -3656,16 +3942,18 @@
                                                           @* Project Duration *@
                                                           <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
                                                             
+                                                             @{string dateToolTip2 = proj.ProjectStartDate.ToString("dd MMM yy") + " -> " + proj.ProjectEndDate.ToString("dd MMM yy");}
+
                                                             @if(totalDays <= 0)
                                                             {
-                                                              <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                              <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip2">
                                                                   <i class="bi bi-clock-history fs-6"></i>
                                                                   <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
                                                               </span>
                                                             }else
                                                               if(totalDays > 0 && totalDays <= 7)
                                                               {
-                                                                <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip2">
                                                                     <i class="bi bi-clock-history fs-6"></i>
                                                                     <span style="margin-left: 0.30rem;font-weight:100">@totalDays Days</span>
                                                                 </span>
@@ -3673,7 +3961,7 @@
                                                                   if(totalDays > 7 && totalWeeks <= 5 )
                                                                   {
 
-                                                                    <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                    <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip2">
                                                                       <i class="bi bi-clock-history fs-6"></i>
                                                                       <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks Weeks</span>
                                                                     </span>
@@ -3699,7 +3987,7 @@
                                                                             }
                                                                           }
 
-                                                                        <span class="ps-3" style="display: inline-flex; align-items: center;">
+                                                                        <span class="ps-3" style="display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="@dateToolTip2">
                                                                           <i class="bi bi-clock-history fs-6"></i>
                                                                           <span style="margin-left: 0.30rem;font-weight:100">@months Month</span>
                                                                         </span>
@@ -3796,7 +4084,7 @@
                                                                       }
                                                                       else
                                                                       {
-                                                                        <li class="align-middle ps-4 pe-4 pt-1" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Cannot delete. This project has activities.">
+                                                                        <li class="align-middle ps-4 pe-4 pt-1" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Cannot delete. This project has related activities.">
                                                                           <span class="">
                                                                               <i class="bi bi-trash3"></i>
                                                                           </span>
@@ -3916,7 +4204,22 @@
                                                     else
                                                     {
                                                         act_style = "border-left:2px solid #c59217;";
-                                                    }                                            
+                                                    }   
+
+                                                      var overdue = activities_data.Where(x => false).ToList();
+                                                      var due_soon = activities_data.Where(x => false).ToList();  
+                                                      var activities_ = activities_data.Where(x => x.ProjectID == proj.Id);
+                                                      //var project_ = Model.Projects.FirstOrDefault(x => x.Id == ViewBag.Project);
+
+                                                      if(activities_ != null)
+                                                      {                                                          
+                                                          var today_ = DateTime.UtcNow.Date;
+                                                          var seven_days = DateTime.UtcNow.AddDays(7);
+                                                          overdue = activities_data.Where(x => x.ActivityProgress != 4 && x.ActivityProgress != 5 && x.ActivityEndDate < today_).ToList(); //Activity not completed and past dueDate
+                                                          due_soon = activities_data.Where(x => x.ActivityProgress != 4 && x.ActivityEndDate > today_ && x.ActivityEndDate < seven_days).ToList();
+
+                                                      }
+
                                                   }
 
                                                   @* ActivityName *@
@@ -3927,7 +4230,7 @@
                                                   </td>
 
                                                   @* ActivityComments *@
-                                                  <td style="width:25%" class="align-middle">
+                                                  <td style="width:20%" class="align-middle">
                                                       @act.ActivityComments
                                                   </td>
 
@@ -3937,9 +4240,15 @@
                                                   </td>
 
                                                   @* Activity Start Date *@
-                                                  <td style="width:10%" class="align-middle">@act.ActivityStartDate.ToString("MMMM dd, yyyy")</td>
+                                                  <td style="width:15%" class="align-middle text-center align-center">                                                      
+                                                      <span>
+                                                        @act.ActivityStartDate.ToString("dd MMM yy")
+                                                        <i class="bi bi-arrow-right-short"></i>
+                                                        @act.ActivityEndDate.ToString("dd MMM yy")
+                                                      </span>                                                        
+                                                  </td>
 
-                                                  @* Activity Durarion *@
+                                                   @* Activity Durarion *@
                                                   <td style="width:10%" class="align-middle text-center">
                                                     @*<small class="text-muted" >
                                                       <span style="font-size:11px;"> Days </span></small><span class="badge bg-light fs-7" style="color:#0F204B;">@totalDays</span> | <small class="text-muted"><span class="badge bg-light fs-7" style="color:#0F204B;">@totalWeeks</span><span style="font-size:11px;"> Weeks </span></small> *@
@@ -3950,40 +4259,56 @@
                                                         // Option A: Using TimeSpan properties (most common and readable)
                                                         int totalDays_useract = getTTCompletion_useract.Days;
                                                         int totalWeeks_useract = getTTCompletion_useract.Days / 7;
-                                                        int totalMonths_useract = totalDays / 28;                                   
+                                                        var duration_style = "";
+                                                        var title_tag = "";
+                                                                              
+                                                      }
+
+                                                      @if(due_soon.Any(x => x.Id == act.Id))
+                                                      {
+                                                          duration_style = "text-warning";
+                                                          title_tag = "data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"This activity is due soon.\"";
+                                                      }
+
+                                                      @if(overdue.Any(x => x.Id == act.Id))
+                                                      {
+                                                          duration_style = "text-danger";
+                                                          title_tag = "data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"This activity is overdue.\"";
                                                       }
 
                                                       @if(totalDays_useract <= 0)
-                                                          {
-                                                            <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
-                                                                <i class="bi bi-clock-history fs-6"></i>
-                                                                <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
-                                                            </span>
-                                                          }else
+                                                        {
+                                                        <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                            <i class="bi bi-clock-history fs-6 @duration_style" @Html.Raw(title_tag)></i>
+                                                            <span style="margin-left: 0.30rem;font-weight:100">1 Day</span>
+                                                        </span>
+                                                        }else
                                                               if(totalDays_useract > 0 && totalDays_useract <= 7)
                                                               {
-                                                                <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
-                                                                    <i class="bi bi-clock-history fs-6"></i>
-                                                                    <span style="margin-left: 0.30rem;font-weight:100">@totalDays_useract Days</span>
-                                                                </span>
+                                                              <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                              
+                                                                  <i class="bi bi-clock-history fs-6 @duration_style" @Html.Raw(title_tag)></i>
+                                                            
+                                                                  <span style="margin-left: 0.30rem;font-weight:100">@totalDays_useract Days</span>
+                                                              </span>
                                                               }else
                                                                   if(totalDays_useract > 7 && totalWeeks_useract <= 5 )
                                                                   {
 
-                                                                    <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
-                                                                      <i class="bi bi-clock-history fs-6"></i>
+                                                                  <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                      <i class="bi bi-clock-history fs-6 @duration_style" @Html.Raw(title_tag)></i>
                                                                       <span style="margin-left: 0.30rem;font-weight:100">@totalWeeks_useract Wks</span>
-                                                                    </span>
+                                                                  </span>
 
                                                                   }
                                                                   else
-                                                                    if(totalWeeks_useract > 5 )
-                                                                    {
-                                                                        int months = 0;
-                                                                        DateTime endDate = act.ActivityEndDate;
-                                                                        DateTime startDate = act.ActivityStartDate;
-                                                                        while(startDate < endDate)
-                                                                        {
+                                                                  if(totalWeeks_useract > 5 )
+                                                                  {
+                                                                      int months = 0;
+                                                                      DateTime endDate = act.ActivityEndDate;
+                                                                      DateTime startDate = act.ActivityStartDate;
+                                                                      while(startDate < endDate)
+                                                                      {
                                                                           DateTime checkDate = startDate.AddMonths(1);
                                                                           if(checkDate <= endDate)
                                                                           {
@@ -3994,12 +4319,12 @@
                                                                           {
                                                                               break;
                                                                           }
-                                                                        }
-                                                                        <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
-                                                                          <i class="bi bi-clock-history fs-6"></i>
+                                                                      }
+                                                                      <span class="ps-3 justify-content-between" style="display: inline-flex; align-items: center;width:80px;">
+                                                                          <i class="bi bi-clock-history fs-6 @duration_style" @Html.Raw(title_tag)></i>
                                                                           <span style="margin-left: 0.30rem;font-weight:100">@months Mnts</span>
-                                                                        </span>
-                                                                    }
+                                                                      </span>
+                                                                  }
 
                                                   </td>
 
@@ -4064,7 +4389,8 @@
                                                       @* Attachments *@
                                                       @if(!String.IsNullOrEmpty(act.ProjectFiles) && act.ProjectFiles.Contains('.'))
                                                       {
-                                                        <li class="">
+                                                        string fileName = act.ProjectFiles.Length >= 3 ? act.ProjectFiles.Substring(4) : act.ProjectFiles;
+                                                        <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName">
                                                           <a href="~/Attachments/Activity/@act.ProjectFiles" class="clip" download>
                                                               <i class="bi bi-paperclip fs-5"></i>
                                                           </a>
@@ -4140,85 +4466,141 @@
                                                 </tr>
 
                                                 @* Update Activity *@
-                                                <div style="width:15%" class="modal modal-md fade" id="btnEditActivity_@act.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel1" aria-hidden="true">
+                                                <div class="modal modal-md fade" id="btnEditActivity_@act.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel1" aria-hidden="true">
 
-                                                    <div class="modal-dialog">
+                                                    <div class="modal-dialog modal-xl">
                                                       <form class="act_form" enctype="multipart/form-data" id="act_form_@act.Id" >
 
                                                             <div class="modal-content">
-                                                              <div class="modal-header">
-                                                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Update Activity</h1>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                              <div class="modal-header d-flex flex-row justify-content-between">
+                                                                  <h1 class="modal-title fs-5  flex-grow-1" id="staticBackdropLabel">Update Activity</h1>
+                                                                  <p class="text-small m-0 flex-grow-1">
+                                                                      Required Fields (<span class="text-danger">*</span>)
+                                                                  </p>
+                                                                  <div class="flex-grow-1 d-flex justify-content-end">
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                  </div>
                                                               </div>
                                                               <div class="modal-body">
 
-                                                                <input type="hidden" value="@act.Id" asp-for="@Model.ActivityModel.Id" class="form-control" />
+                                                                <div class="row">
 
-                                                                <div class="mb-3 form-group">
-                                                                    <label class="col-form-label fw-bold">Activity Name:</label>
-                                                                    <input class="form-control" placeholder="Project Name" asp-for="@act.ActivityName" />
-                                                                </div>
+                                                                  @* Left Col *@
+                                                                  <div class="col-md-6">
 
-                                                                <div class="mb-3 form-group">
-                                                                    <label class="col-form-label fw-bold">Activity Comments:</label>
-                                                                    <textarea class="form-control" placeholder="Comments" style="margin-top:0 !important;" asp-for="@act.ActivityComments">@act.ActivityComments</textarea>
-                                                                </div>
+                                                                      @* Activity_ID *@
+                                                                      <input type="hidden" value="@act.Id" asp-for="@Model.ActivityModel.Id" class="form-control" />
+                                                                      <input type="hidden" value="@act.ProjectID" asp-for="@act.ProjectID" class="form-control" />
 
-                                                                <div class="mb-3 form-group">
-                                                                    <label class="col-form-label fw-bold">Activity Challenges:</label>
-                                                                    <input type="text" placeholder="Challenges" asp-for="@act.ActivityChallenges" class="form-control"  />
-                                                                </div>
+                                                                      @* Activity Name *@
+                                                                      <div class="mb-1 form-group">
+                                                                          <label class="col-form-label fw-bold">Activity Name:</label>
+                                                                          <input class="form-control" placeholder="Project Name" asp-for="@act.ActivityName" />
+                                                                      </div>
 
-                                                                <div class="mb-3 form-group">
-                                                                    <label class="col-form-label fw-bold">Activity Highlights</label>
-                                                                    <input type="text" placeholder="Highlights" asp-for="@act.ActivityHighlights" class="form-control"  />
-                                                                </div>
+                                                                      @* Activity Comments *@
+                                                                      <div class="mb-1 form-group">
+                                                                          <label class="col-form-label fw-bold">Activity Comments:</label>
+                                                                          <textarea class="form-control" placeholder="Comments" style="margin-top:0 !important;" asp-for="@act.ActivityComments">@act.ActivityComments</textarea>
+                                                                      </div>
 
-                                                                <div class="row mb-3">
-                                                                    <div class="col-sm-6">
-                                                                        <label class="col-form-label fw-bold">Start Date</label>
-                                                                        <input type="date" asp-for="@act.ActivityStartDate" class="form-control"  />
-                                                                    </div>
+                                                                      @* Activity Challenges *@
+                                                                      <div class="mb-1 form-group">
+                                                                          <label class="col-form-label fw-bold">Activity Challenges:</label>
+                                                                          <input type="text" placeholder="Challenges" asp-for="@act.ActivityChallenges" class="form-control"  />
+                                                                      </div>
 
-                                                                    <div class="col-sm-6">
-                                                                        <label class="col-form-label fw-bold align-right">End Date</label>
-                                                                        <input type="date" asp-for="@act.ActivityEndDate" class="form-control"  />
-                                                                    </div>
-                                                                </div>
+                                                                      @* Activity Highlights *@
+                                                                      <div class="mb-1 form-group">
+                                                                          <label class="col-form-label fw-bold">Activity Highlights</label>
+                                                                          <input type="text" placeholder="Highlights" asp-for="@act.ActivityHighlights" class="form-control"  />
+                                                                      </div>
+                                                                  </div>
 
-                                                                <div class="form-group mb-3">
-                                                                    <label asp-for="@act.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>
-                                                                    <select class="form-select mb-3" asp-for="@act.ActivityProgress" asp-items="Model.ActivityStatuses" required>
-                                                                        <option value="" selected>@act.ActivityProgress</option>
-                                                                    </select>
+                                                                  @* Right Col *@
+                                                                  <div class="col-md-6">
 
-                                                                </div>
+                                                                      @* Activity Progress *@
+                                                                      <div class="form-group mb-3">
+                                                                          <label asp-for="@act.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>
+                                                                          <select class="form-select mb-3" asp-for="@act.ActivityProgress" asp-items="Model.ActivityStatuses" required>
+                                                                              <option value="" selected>@act.ActivityProgress</option>
+                                                                          </select>
 
-                                                                <div class="form-group mb-1">
+                                                                      </div>
 
-                                                                  <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Activity Attachments:</label>
-                                                                  <div class="custom-file">
-                                                                      <input type="file" class="form-control" asp-for="@Model.ProjectFiles" />
+                                                                      @* Activiyy Dates *@
+                                                                      <div class="row mb-3">
+                                                                          <div class="col-sm-6">
+                                                                              <label class="col-form-label fw-bold">Start Date</label>
+                                                                              <input type="date" asp-for="@act.ActivityStartDate" class="form-control"  />
+                                                                          </div>
 
-                                                                      @if(act.ProjectFiles.Count() > 5)
-                                                                      {
-                                                                        <div class="ps-1">
-                                                                              Current document: <a href="~/Attachments/Projects/@act.ProjectFiles" target="_blank">@act.ProjectFiles.Substring(4)</a>
-                                                                              <br />
-                                                                              <span style="vertical-align:center;color:#A71930;">
-                                                                                <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
-                                                                              </span>
+                                                                          <div class="col-sm-6">
+                                                                              <label class="col-form-label fw-bold align-right">End Date</label>
+                                                                              <input type="date" asp-for="@act.ActivityEndDate" class="form-control"  />
+                                                                          </div>
+                                                                      </div>
+                                                                      
+                                                                      @* Activity Attachments: 
+                                                                      <div class="form-group mb-1">
+
+                                                                        <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Activity Attachments:</label>
+                                                                        <div class="custom-file">
+                                                                            <input type="file" class="form-control" asp-for="@Model.ProjectFiles" />
+
+                                                                            @if(act.ProjectFiles.Count() > 5)
+                                                                            {
+                                                                              <div class="ps-1">
+                                                                                    Current document: <a href="~/Attachments/Projects/@act.ProjectFiles" target="_blank">@act.ProjectFiles.Substring(4)</a>
+                                                                                    <br />
+                                                                                    <span style="vertical-align:center;color:#A71930;">
+                                                                                      <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
+                                                                                    </span>
+                                                                              </div>
+                                                                            }
+
                                                                         </div>
-                                                                      }
+                                                                        <input type="hidden" asp-for="@act.ProjectID" value="@proj.Id" class="form-control" />
+
+                                                                      </div>*@                                                                      
+
+                                                                      @* <!-- Drag & Drop Upload --> *@
+                                                                      <div class="form-group mb-3">
+                                                                          <label class="col-form-label fw-bold">
+                                                                              Activity Attachments:
+                                                                          </label>
+
+                                                                          <div id="dropZoneUpdateActivity_@act.Id"
+                                                                              class="p-3 border border-secondary rounded text-center bg-light"
+                                                                              style="cursor:pointer;">
+                                                                              <p class="mb-1">Drag & Drop files here</p>
+                                                                              <small class="text-muted">or click to browse</small>
+                                                                          </div>
+
+                                                                          @if(act.ProjectFiles.Count() > 5)
+                                                                            {
+                                                                              <div class="ps-1">
+                                                                                    Current document: <a href="~/Attachments/Projects/@act.ProjectFiles" target="_blank">@act.ProjectFiles.Substring(4)</a>
+                                                                                    <br />
+                                                                                    <span style="vertical-align:center;color:#A71930;">
+                                                                                      <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
+                                                                                    </span>
+                                                                              </div>
+                                                                            }
+
+                                                                          <input type="file" class="form-control mt-2 d-none"
+                                                                                asp-for="@Model.ProjectFiles" required />
+                                                                      </div>
+
 
                                                                   </div>
-                                                                  <input type="hidden" asp-for="@act.ProjectID" value="@proj.Id" class="form-control" />
 
-                                                                </div>
+                                                                  <div class="card-footer text-center">
+                                                                        <a href="javascript:void(0)" id="btnUpdateActivity_@act.Id" class="btn btn-sm btn-primary" style="background-color:#A71930;color:white;">Update Activity</a>
+                                                                        <a href="javascript:void(0)" data-bs-dismiss="modal" class="btn btn-sm btn-secondary">Cancel</a>
+                                                                  </div>
 
-                                                                <div class="card-footer">
-                                                                      <a href="javascript:void(0)" id="btnUpdateActivity_@act.Id" class="btn btn-sm btn-primary" style="background-color:#A71930;color:white;">Update Activity</a>
-                                                                      <a href="javascript:void(0)" data-bs-dismiss="modal" class="btn btn-sm btn-secondary">Cancel</a>
                                                                 </div>
 
                                                               </div>
@@ -4233,85 +4615,130 @@
 
                                             // Modal Activity
                                             <div class="modal modal-md fade" id="modalActivity_@proj.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                              <div class="modal-dialog">
+                                              <div class="modal-dialog modal-xl">
                                                   <form enctype="multipart/form-data" class="frm_Activity" id="frm_Activity_@proj.Id" >
 
                                                       <div class="modal-content">
                                                         <div class="modal-header">
-                                                          <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Activity</h1>
-                                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                          <div class="flex-row d-flex justify-content-between col-sm-12"> 
+                                                              <h1 class="modal-title fs-5 flex-grow-1" id="staticBackdropLabel">Add Activity</h1>
+                                                              
+                                                              <p class="text-small text-center m-0 flex-grow-1">
+                                                                  Required Fields (<span class="text-danger">*</span>)
+                                                              </p>
+
+                                                              <div class="flex-grow-1  d-flex justify-content-end">
+                                                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                              </div>
+                                                          </div>
+                                                         
                                                         </div>
                                                         <div class="modal-body">
 
-                                                            <input type="hidden" asp-for="@Model.ActivityModel.ProjectID" value="@proj.Id" class="form-control" />
+                                                          <div class="row">
 
-                                                            <div class="mb-3 form-group">
-                                                                <label class="col-form-label fw-bold">Activity Name:</label>
-                                                                <input class="form-control" placeholder="Enter Name"  asp-for="@Model.ActivityModel.ActivityName" />
-                                                            </div>
+                                                              <div class="col-md-6">
 
-                                                            <div class="mb-3 form-group">
-                                                                <label class="col-form-label fw-bold">Activity Details:</label>
-                                                                <textarea class="form-control"placeholder="Enter Comments" style="margin-top:0 !important;" asp-for="@Model.ActivityModel.ActivityComments"></textarea>
-                                                            </div>
+                                                                <input type="hidden" asp-for="@Model.ActivityModel.ProjectID" value="@proj.Id" class="form-control" />
 
-                                                            <div class="mb-3 form-group">
-                                                                <label class="col-form-label fw-bold">Activity Highlights (Negative)</label>
-                                                                <input type="text" placeholder="Challenges..." asp-for="@Model.ActivityModel.ActivityChallenges" class="form-control"  />
-                                                            </div>
-
-                                                            <div class="mb-3 form-group">
-                                                                <label class="col-form-label fw-bold">Activity Highlights (Positive)</label>
-                                                                <input type="text" placeholder="Highlights..." asp-for="@Model.ActivityModel.ActivityHighlights" class="form-control"  />
-                                                            </div>
-
-                                                            <div class="row mb-3">
-                                                                <div class="col-sm-6">
-                                                                    <label class="col-form-label fw-bold">Start Date</label>
-                                                                    <input type="date" asp-for="@Model.ActivityModel.ActivityStartDate" class="form-control"  />
+                                                                @* Name *@
+                                                                <div class="mb-1 form-group">
+                                                                    <label class="col-form-label fw-bold">Activity Name: <span class="text-danger">*</span></label>
+                                                                    <input class="form-control" placeholder="Enter Name"  asp-for="@Model.ActivityModel.ActivityName" />
                                                                 </div>
 
-                                                                <div class="col-sm-6">
-                                                                    <label class="col-form-label fw-bold align-right">End Date</label>
-                                                                    <input type="date" asp-for="@Model.ActivityModel.ActivityEndDate" class="form-control"  />
+                                                                @* Details *@
+                                                                <div class="mb-1 form-group">
+                                                                    <label class="col-form-label fw-bold">Activity Details: <span class="text-danger">*</span></label>
+                                                                    <textarea class="form-control"placeholder="Enter Comments" style="margin-top:0 !important;" asp-for="@Model.ActivityModel.ActivityComments"></textarea>
                                                                 </div>
-                                                            </div>
 
-                                                            @* <div class="mb-3 form-group">
-                                                                <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress (%)</label>
-                                                                <input type="range" min="0" max="100" asp-for="@Model.ActivityModel.ActivityProgress" class="form-range"  />
-                                                            </div> *@
-
-                                                            <div class="form-group mb-3">
-                                                                <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress</label>
-                                                                <select class="form-select mb-3" asp-for="@Model.ActivityModel.ActivityProgress" asp-items="Model.ActivityStatuses" required>
-                                                                    <option value="" selected>Select Activity Status</option>
-                                                                </select>
-
-                                                            </div>
-
-                                                            <div class="form-group mb-3">
-
-                                                                <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Activity Attachments:</label>
-                                                                <div class="custom-file">
-                                                                    <input type="file" class="form-control" asp-for="@Model.ProjectFiles" />
+                                                                @* Activity Highlights (Negative) *@
+                                                                <div class="mb-1 form-group">
+                                                                    <label class="col-form-label fw-bold">Activity Highlights (Negative):</label>
+                                                                    <input type="text" placeholder="Challenges..." asp-for="@Model.ActivityModel.ActivityChallenges" class="form-control"  />
                                                                 </div>
-                                                            </div>
 
-                                                            @if(proj.AccountID != currentUser.AccountID)
-                                                            {
-                                                              <input type="hidden" asp-for="@Model.ActivityModel.MemberProject" value="@proj.Id" class="form-control" />
-                                                            }
-                                                            else
-                                                            {
-                                                              <input type="hidden" asp-for="@Model.ActivityModel.MemberProject" value="" class="form-control" />
-                                                            }
-                                                            
+                                                                @* Activity Highlights (Positive): *@
+                                                                <div class="mb-1 form-group">
+                                                                    <label class="col-form-label fw-bold">Activity Highlights (Positive):</label>
+                                                                    <input type="text" placeholder="Highlights..." asp-for="@Model.ActivityModel.ActivityHighlights" class="form-control"  />
+                                                                </div>
+                                                                
+                                                              </div>
+
+                                                              @* <div class="mb-3 form-group">
+                                                                  <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress (%)</label>
+                                                                  <input type="range" min="0" max="100" asp-for="@Model.ActivityModel.ActivityProgress" class="form-range"  />
+                                                              </div> *@
+
+                                                              <div class="col-md-6">
+
+                                                                  @* Status *@
+                                                                  <div class="form-group mb-3">
+                                                                      <label asp-for="@Model.ActivityModel.ActivityProgress" class="col-form-label fw-bold">Activity Progress<span class="text-danger">*</span></label>
+                                                                      <select class="form-select mb-3" asp-for="@Model.ActivityModel.ActivityProgress" asp-items="Model.ActivityStatuses" required>
+                                                                          <option value="" selected>Select Activity Status: </option>
+                                                                      </select>
+
+                                                                  </div>
+
+                                                                  @* Dates *@
+                                                                  <div class="col-sm-12 mb-1 d-flex justify-content-center">
+                                                                    <div class="flex-grow-1">
+                                                                        <label class="col-form-label fw-bold">Start Date: <span class="text-danger">*</span></label>
+                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityStartDate" class="form-control"  />
+                                                                    </div>
+
+                                                                    <div class="flex-grow-1">
+                                                                        <label class="col-form-label fw-bold align-right">End Date: <span class="text-danger">*</span></label>
+                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityEndDate" class="form-control"  />
+                                                                    </div>
+                                                                  </div>
+
+                                                                  @* Attachments 
+                                                                  <div class="form-group mb-3">
+                                                                      <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Activity Attachments:</label>
+                                                                      <div class="custom-file">
+                                                                          <input type="file" class="form-control" asp-for="@Model.ProjectFiles" />
+                                                                      </div>
+                                                                  </div>  *@
+                                                           
+                                                                  @* <!-- Drag & Drop Upload --> *@
+                                                                  <div class="form-group mb-3">
+                                                                      <label class="col-form-label fw-bold">
+                                                                          Activity Attachments:
+                                                                      </label>
+
+                                                                      <div id="dropZoneAddActivity_@proj.Id"
+                                                                          class="p-3 border border-secondary rounded text-center bg-light"
+                                                                          style="cursor:pointer;">
+                                                                          <p class="mb-1">Drag & Drop files here</p>
+                                                                          <small class="text-muted">or click to browse</small>
+                                                                      </div>
+
+                                                                      <input type="file" class="form-control mt-2 d-none"
+                                                                            asp-for="@Model.ProjectFiles" required />
+                                                                  </div>
+                                                                  
+
+                                                                  @* ActivityModel_MemberProject *@
+                                                                  @if(proj.AccountID != currentUser.AccountID)
+                                                                  {
+                                                                    <input type="hidden" asp-for="@Model.ActivityModel.MemberProject" value="@proj.Id" class="form-control" />
+                                                                  }
+                                                                  else
+                                                                  {
+                                                                    <input type="hidden" asp-for="@Model.ActivityModel.MemberProject" value="" class="form-control" />
+                                                                  }
+                                                              </div>
+                                                          
+                                                          </div>                                                           
 
                                                         </div>
-                                                        <div class="modal-footer">
+                                                        <div class="modal-footer text-center">
 
-                                                          <div class="mt-2 col-sm-12">
+                                                          <div class="mt-2 col-sm-12 text-center">
                                                               <a href="javascript:void(0)" id="btnSaveActivity_@proj.Id" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Save Activity</a>
                                                               <a href="javascript:void(0)" id="cancelButActivity_@proj.Id" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>
                                                           </div>
@@ -4321,96 +4748,185 @@
 
                                                   </form>
                                               </div>
-                                            </div>
-
+                                            </div> 
+                                                                                        
                                             //@*Update Modal Project*@
                                             <div class="modal modal-md fade" id="modalProjectEdit_@proj.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                              <div class="modal-dialog">
+                                                <div class="modal-dialog modal-xl">
                                                     <form enctype="multipart/form-data" class="frmEditProject" id="frmEditProject_@proj.Id">
 
                                                         <div class="modal-content">
-                                                          <div class="modal-header">
-                                                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Update Project</h1>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                          <div class="modal-header d-flex flex-row justify-content-between align-items-center">
+                                                            <h1 class="modal-title fs-5 flex-grow-1" id="staticBackdropLabel">Update Project</h1>
+
+                                                            <p class="text-small m-0 flex-grow-1">
+                                                                  Required Fields (<span class="text-danger">*</span>)
+                                                            </p>
+                                                            
+                                                            <div class="d-flex flex-row justify-content-end">
+                                                              <button type="button" class="btn-close flex-grow-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                              
                                                           </div>
+                                                        
                                                           <div class="modal-body">
+
+                                                            <div class="row g-4">
 
                                                               <input type="hidden" id="projectID" value="@proj.Id" asp-for="@Model.ProjectModel.Id" class="form-control" />
 
                                                               <input type="hidden" asp-for="@proj.AccountID" class="form-control" />
 
-                                                              <div class="mb-3 form-group">
-                                                                  <label class="col-form-label fw-bold">Project Name:</label>
-                                                                  <input class="form-control" placeholder="Project Name" asp-for="@proj.ProjectName" />
-                                                              </div>
+                                                                <div class="col-md-6">
+                                                                    
+                                                                    @* Name *@
+                                                                    <div class="mb-3 form-group">
+                                                                        <label class="col-form-label fw-bold">Project Name:<span class="text-danger">*</span></label>
+                                                                        <input class="form-control" maxlength="100" placeholder="Project Name" asp-for="@proj.ProjectName" />
+                                                                    </div>
 
-                                                              <div class="mb-3 form-group">
-                                                                  <label class="col-form-label fw-bold">Project Details:</label>
-                                                                  <textarea class="form-control" placeholder="Project Details" style="margin-top:0 !important;" asp-for="@proj.ProjectDetails">
-                                                                      @proj.ProjectDetails
-                                                                  </textarea>
-                                                              </div>
+                                                                     @* Project Details *@
+                                                                    <div class="mb-3 form-group">
+                                                                        <label class="col-form-label fw-bold">Project Details:<span class="text-danger">*</span></label>
+                                                                        <textarea class="form-control" placeholder="Project Details" style="margin-top:0 !important;"
+                                                                             asp-for="@proj.ProjectDetails" rows="3" maxlength="300" placeholder="Describe project details">
+                                                                            @proj.ProjectDetails
+                                                                        </textarea>
+                                                                    </div>
 
-                                                              <div class="mb-3 form-group">
-                                                                  <label class="col-form-label fw-bold">Area of Work:</label>
-                                                                  <input type="text" placeholder="SAS, DHET, HR, Faculties, Snr Director, Rector, ect." asp-for="@proj.ProjectAreaOfWork" class="form-control"  />
-                                                              </div>
+                                                                     @* Area of Work *@
+                                                                    <div class="mb-3 form-group" style="display:none;">
+                                                                        <label class="col-form-label fw-bold">Area of Work:</label>
+                                                                        <input type="text" placeholder="SAS, DHET, HR, Faculties, Snr Director, Rector, ect." asp-for="@proj.ProjectAreaOfWork" class="form-control"  />
+                                                                    </div>
 
-                                                              <input type="hidden" asp-for="@proj.ProjectWorkInConj" value="null" class="form-control"  />
+                                                                    @* Project Progress *@
+                                                                    <div class="form-group mb-3">
+                                                                        <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress:<span class="text-danger">*</span></label>
 
-                                                              <div class="mb-3 form-group">
-                                                                  <label asp-for="@proj.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>
-                                                                  <select class="form-select mb-3" size="3" asp-for="@proj.SelectedAssignedUserIds" asp-items="Model.UserAccounts" multiple required>
-                                                                      <option selected>Select Project Members</option>
-                                                                  </select>
-                                                              </div>
+                                                                        <select class="form-select mb-3" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
+                                                                            <option value="" selected> @proj.StatusName</option>
+                                                                        </select>
 
-                                                              <div class="row mb-3">
-                                                                  <div class="col-sm-6">
-                                                                      <label class="col-form-label fw-bold">Start Date</label>
-                                                                      <input type="date" asp-for="@proj.ProjectStartDate" class="form-control"  />
-                                                                  </div>
+                                                                    </div>
 
-                                                                  <div class="col-sm-6">
-                                                                      <label class="col-form-label fw-bold">End Date</label>
-                                                                      <input type="date" asp-for="@proj.ProjectEndDate" class="form-control"  />
-                                                                  </div>
-                                                              </div>
+                                                                    <input type="hidden" asp-for="@proj.ProjectWorkInConj" value="null" class="form-control"  />
 
-                                                              <div class="form-group mb-3">
-                                                                  <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress</label>
+                                                                </div>
 
-                                                                  <select class="form-select mb-3" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
-                                                                      <option value="" selected> @proj.StatusName</option>
-                                                                  </select>
+                                                                @* Right Column *@
+                                                                <div class="col-md-6">
 
-                                                              </div>
+                                                                    @* Members 
+                                                                    <div class="mb-3 form-group">
+                                                                        <label asp-for="@proj.SelectedAssignedUserIds" class="col-form-label fw-bold">Project Members</label>
+                                                                        <select class="form-select mb-3" size="3" asp-for="@proj.SelectedAssignedUserIds" asp-items="Model.UserAccounts" multiple required>
+                                                                            <option selected>Select Project Members</option>
+                                                                        </select>
+                                                                    </div>*@
 
-                                                              <div class="form-group mb-3">
+                                                                    @* Members *@                                                                 
+                                                                    <div class="mb-1 form-group">
+                                                                      <label asp-for="@proj.SelectedAssignedUserIds"
+                                                                            class="col-form-label fw-bold">
+                                                                          Project Members: <span class="text-danger">*</span>
+                                                                      </label>
 
-                                                                  <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Project Attachments:</label>
-                                                                  <div class="custom-file">
-                                                                      <input type="file" class="form-control" asp-for="@Model.ProjectFiles"/>
-                                                                      @if(proj.ProjectFiles.Count() > 5)
-                                                                      {
-                                                                        <div class="ps-1">
-                                                                          <p>
-                                                                            Current document: <a href="~/Attachments/Projects/@proj.ProjectFiles" target="_blank">@proj.ProjectFiles.Substring(4)</a>
-                                                                            <br />
-                                                                            <span style="vertical-align:center;color:#A71930;">
-                                                                              <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
-                                                                            </span>
-                                                                          </p>
+                                                                      <div id="memberSelectContainer" class="border rounded p-2">
+                                                                          @* <!-- Selected Pills Appear Here --> *@
+                                                                          <div id="selectedPills" class="mb-2 d-flex flex-wrap gap-2"></div>
+
+                                                                          @* <!-- Your original select unchanged --> *@
+                                                                          <select class="form-select"
+                                                                                  size="3"
+                                                                                  asp-for="@proj.SelectedAssignedUserIds"
+                                                                                  asp-items="Model.UserAccounts"
+                                                                                  multiple
+                                                                                  required
+                                                                                  id="memberSelect">
+                                                                              <option value="" selected>Select Project Members</option>
+                                                                          </select>
+                                                                      </div>
+                                                                    </div>
+
+                                                                    @* Project Dates *@
+                                                                    <div class="row mb-1">
+                                                                        <div class="col-sm-6">
+                                                                            <label class="col-form-label fw-bold">Start Date:<span class="text-danger">*</span></label>
+                                                                            <input type="date" asp-for="@proj.ProjectStartDate" class="form-control"  />
                                                                         </div>
-                                                                      }
 
-                                                                  </div>
+                                                                        <div class="col-sm-6">
+                                                                            <label class="col-form-label fw-bold">End Date:<span class="text-danger">*</span></label>
+                                                                            <input type="date" asp-for="@proj.ProjectEndDate" class="form-control"  />
+                                                                        </div>
+                                                                    </div>
 
-                                                              </div>
+                                                                    @* Project Attachments
+                                                                    <div class="form-group mb-3">
+
+                                                                        <label class="col-form-label fw-bold" style="margin-bottom:0 !important;" >Project Attachments:</label>
+                                                                        <div class="custom-file">
+                                                                            <input type="file" class="form-control" asp-for="@Model.ProjectFiles"/>
+                                                                            @if(proj.ProjectFiles.Count() > 5)
+                                                                            {
+                                                                              <div class="ps-1">
+                                                                                <p>
+                                                                                  Current document: <a href="~/Attachments/Projects/@proj.ProjectFiles" target="_blank">@proj.ProjectFiles.Substring(4)</a>
+                                                                                  <br />
+                                                                                  <span style="vertical-align:center;color:#A71930;">
+                                                                                    <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
+                                                                                  </span>
+                                                                                </p>
+                                                                              </div>
+                                                                            }
+
+                                                                        </div>
+
+                                                                    </div>*@
+                                                                    
+
+                                                                    @* <!-- Drag & Drop Upload -->   *@
+                                                                    <div class="form-group">
+                                                                        <label class="col-form-label fw-bold">
+                                                                            Project Attachments
+                                                                        </label>
+
+                                                                        <div id="dropZoneEditProject_@proj.Id"
+                                                                            class="p-3 border border-secondary rounded text-center bg-light"
+                                                                            style="cursor:pointer;">
+                                                                            <p class="mb-1">Drag & Drop files here</p>
+                                                                            <small class="text-muted">or click to browse</small>                                                            
+                                                                        </div>
+
+                                                                        <input type="file" class="form-control mt-2 d-none"
+                                                                              asp-for="@Model.ProjectFiles" required />
+
+                                                                        @if(proj.ProjectFiles.Count() > 5)
+                                                                        {
+                                                                          <div class="ps-1">
+                                                                            <p>
+                                                                              Current document: <a href="~/Attachments/Projects/@proj.ProjectFiles" target="_blank">@proj.ProjectFiles.Substring(4)</a>
+                                                                              <br />
+                                                                              <span style="vertical-align:center;color:#A71930;">
+                                                                                <i class="bi bi-info-circle fs-6" ></i> To change, select a new file above.
+                                                                              </span>
+                                                                            </p>
+                                                                          </div>
+                                                                        }
+                                                                    </div>     
+                                                                                                                                             
+
+                                                                </div>
+
+                                                            </div>
+
                                                           </div>
+
+                                                          @* Footer *@
                                                           <div class="modal-footer">
 
-                                                            <div class="mt-2 col-sm-12">
+                                                            <div class="mt-2 col-sm-12 text-center">
                                                                 <a href="javascript:void(0)" id="btnUpdateProject_@proj.Id" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Update Project</a>
                                                                 <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>
                                                             </div>
@@ -4419,8 +4935,10 @@
                                                         </div>
 
                                                     </form>
-                                              </div>
+                                                </div>
                                             </div>
+
+                                            
 
                                           }                                
 
@@ -4441,13 +4959,12 @@
 }
 
 
-
 @*Modal Project*@
 @if(Model.Accounts.Where(c => c.Id == userId).FirstOrDefault() != null)
 {
   var cc = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();
 
-  <div class="modal modal-md fade" id="modalProject" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  /*<div class="modal modal-md fade" id="modalProject" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
           <form enctype="multipart/form-data" id="frmAddProject">
 
@@ -4537,6 +5054,188 @@
 
           </form>
     </div>
+  </div>*/
+
+  <div class="modal modal-md fade" id="modalProject" data-bs-backdrop="static" data-bs-keyboard="false"
+      tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl"> 
+      @* <!-- Expanded width to use horizontal space --> *@
+          <form enctype="multipart/form-data" id="frmAddProject">
+
+              <div class="modal-content shadow-sm">
+
+                  @* <!-- HEADER --> *@
+                  <div class="modal-header d-flex flex-row justify-content-between align-items-center">
+                      <h1 class="modal-title fs-5 fw-bold col-sm-4" id="staticBackdropLabel">Add Project</h1>
+
+                      <p class="text-small text-center col-sm-4 m-0">
+                          Required Fields (<span class="text-danger">*</span>)
+                      </p>
+
+                      <button type="button" class="btn-close col-sm-4"
+                              style="text-align:right;" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+
+                  @* <!-- BODY --> *@
+                  <div class="modal-body">
+
+                      <input type="hidden" asp-for="@Model.ProjectModel.AccountID"
+                            value="@cc.AccountID" class="form-control" />
+
+                      @* <!-- 2-COLUMN RESPONSIVE LAYOUT --> *@
+                      <div class="row g-4">
+
+                          @* <!-- LEFT COLUMN --> *@
+                          <div class="col-md-6">
+
+                              @* <!-- Project Name --> *@
+                              <div class="mb-1 form-group">
+                                  <label class="col-form-label fw-bold">
+                                      Project Name <span class="text-danger">*</span>
+                                  </label>
+
+                                  <input class="form-control" maxlength="100"
+                                        placeholder="Enter project name"
+                                        asp-for="@Model.ProjectModel.ProjectName" required />
+
+                                  <small class="text-muted"><span id="charCountName">0</span>/100</small>
+                              </div>
+
+                              @* <!-- Project Details --> *@
+                              <div class="mb-1 form-group">
+                                  <label class="col-form-label fw-bold">
+                                      Project Details <span class="text-danger">*</span>
+                                  </label>
+
+                                  <textarea class="form-control" rows="3" maxlength="300"
+                                            placeholder="Describe project details"
+                                            style="margin-top:0 !important;"
+                                            asp-for="@Model.ProjectModel.ProjectDetails"
+                                            required></textarea>
+
+                                  <small class="text-muted"><span id="charCountDetails">0</span>/600</small>
+                              </div>
+
+                              @* <!-- Area of Work (hidden) --> *@
+                              <div class="mb-1 form-group" style="display:none;">
+                                  <label class="col-form-label fw-bold">
+                                      Area of Work <span class="text-danger">*</span>
+                                  </label>
+
+                                  <input type="text"
+                                        placeholder="Surveys, DHET, HR, Faculties, Snr Director, Rector, etc."
+                                        asp-for="@Model.ProjectModel.ProjectAreaOfWork"
+                                        class="form-control"
+                                        required value="N/A" />
+                              </div>
+
+                              @* <!-- Project Status --> *@
+                              <div class="form-group mb-1">
+                                  <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">
+                                      Project Progress <span class="text-danger">*</span>
+                                  </label>
+
+                                  <select class="form-select mb-2"
+                                          asp-for="@Model.ProjectModel.ProjectStatusID"
+                                          asp-items="Model.StatusList"
+                                          required>
+                                      <option value="" selected>Select Project Status</option>
+                                  </select>
+                              </div>
+
+                          </div> 
+                          @* <!-- LEFT END --> *@
+
+                          @* <!-- RIGHT COLUMN --> *@
+                          <div class="col-md-6">
+
+                              @* Project Members *@
+                              <div class="mb-1 form-group">
+                                <label asp-for="@Model.ProjectModel.SelectedAssignedUserIds"
+                                      class="col-form-label fw-bold">
+                                    Project Member:
+                                </label>
+
+                                <div id="memberSelectContainer" class="border rounded p-2">
+                                    @* <!-- Selected Pills Appear Here --> *@
+                                    <div id="selectedPills" class="mb-2 d-flex flex-wrap gap-2"></div>
+
+                                    @* <!-- Your original select unchanged --> *@
+                                    <select class="form-select"
+                                            size="3"
+                                            asp-for="@Model.ProjectModel.SelectedAssignedUserIds"
+                                            asp-items="Model.UserAccounts"
+                                            multiple
+                                            required
+                                            id="memberSelect">
+                                        <option value="" selected>Select Project Members</option>
+                                    </select>
+                                </div>
+                              </div>
+
+                              @* <!-- Dates --> *@
+                              <div class="row mb-1">
+                                  <div class="col-sm-6">
+                                      <label class="col-form-label fw-bold">
+                                          Start Date: <span class="text-danger">*</span>
+                                      </label>
+                                      <input type="date" asp-for="@Model.ProjectModel.ProjectStartDate"
+                                            class="form-control" required />
+                                  </div>
+
+                                  <div class="col-sm-6">
+                                      <label class="col-form-label fw-bold">
+                                          End Date: <span class="text-danger">*</span>
+                                      </label>
+                                      <input type="date" asp-for="@Model.ProjectModel.ProjectEndDate"
+                                            class="form-control" required />
+                                  </div>
+                              </div>
+
+                              @* <!-- Drag & Drop Upload --> *@
+                              <div class="form-group mb-1">
+                                  <label class="col-form-label fw-bold">
+                                      Project Attachments:
+                                  </label>
+
+                                  <div id="dropZone"
+                                      class="p-3 border border-secondary rounded text-center bg-light"
+                                      style="cursor:pointer;">
+                                      <p class="mb-1">Drag & Drop files here</p>
+                                      <small class="text-muted">or click to browse</small>
+                                  </div>
+
+                                  <input type="file" class="form-control mt-2 d-none"
+                                        asp-for="@Model.ProjectFiles" required />
+                              </div>
+                                                        
+
+                          </div> 
+                          @* <!-- RIGHT END --> *@
+
+                      </div> 
+                      @* <!-- ROW END --> *@
+
+                      <input type="hidden" asp-for="@Model.ProjectModel.ProjectWorkInConj"
+                            class="form-control" value="null" />
+
+                  </div>
+                  @* <!-- BODY END --> *@
+
+
+                  @* <!-- FOOTER --> *@
+
+                  <div class="modal-footer">
+                      <div class="mt-2 col-sm-12 text-center d-flex justify-content-center mx-auto">
+                        <a href="javascript:void(0)" id="btnSaveProject" class="btn btn-md btn-primary mb-1" style="background-color:#A71930;color:white;">Save Project</a>
+                        <a href="javascript:void(0)" id="cancelBut" data-bs-dismiss="modal" class="btn btn-md btn-secondary mb-1">Cancel</a>
+                      </div>
+                  </div>                
+
+              </div>
+
+          </form>
+      </div>
   </div>
 }
 else
@@ -4569,6 +5268,158 @@ else
 
 <script>
 
+      //Validations
+      //Character Counter Script
+      document.addEventListener("DOMContentLoaded", () => {
+
+          // Project Name
+          const nameField = document.getElementById("ProjectModel_ProjectName");
+          const nameCount = document.getElementById("charCountName");
+          nameField.addEventListener("input", () => {
+              nameCount.textContent = nameField.value.length;
+          });
+
+          // Project Details
+          const detailsField = document.getElementById("ProjectModel_ProjectDetails");
+          const detailsCount = document.getElementById("charCountDetails");
+          detailsField.addEventListener("input", () => {
+              detailsCount.textContent = detailsField.value.length;
+          });
+      });
+
+        //Client-Side Validation (Simple but Effective)
+        document.getElementById("btnSaveProject").addEventListener("click", function () {
+
+            let form = document.getElementById("frmAddProject");
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // proceed with your AJAX or submit logic here
+        });
+
+
+        //D and G
+        const dropZone = document.getElementById("dropZone");
+        const fileInput = document.getElementById("ProjectFiles");
+
+        // --- Utils ---
+        function highlight() {
+          dropZone.classList.add("border-primary", "bg-white");
+        }
+        function unhighlight() {
+          dropZone.classList.remove("border-primary", "bg-white");
+        }
+        function renderFiles(files) {
+          if (!files || files.length === 0) {
+            dropZone.innerHTML = `<p class="mb-1 text-muted">Drop files here or click to browse</p>`;
+            return;
+          }
+
+          // Show one or many
+          if (files.length === 1) {
+            dropZone.innerHTML = `
+              <p class="mb-1 text-success fw-bold">File attached</p>
+              <small>${files[0].name}</small>
+            `;
+          } else {
+            const items = [...files].map(f => `<li>${f.name}</li>`).join("");
+            dropZone.innerHTML = `
+              <p class="mb-1 text-success fw-bold">Files attached (${files.length})</p>
+              <ul class="mb-0 small">${items}</ul>
+            `;
+          }
+        }
+
+        // --- Open file picker on click (and keyboard) ---
+        dropZone.addEventListener("click", () => {
+          // Clear first so picking the same file triggers `change`
+          fileInput.value = "";
+          fileInput.click();
+        });
+
+        dropZone.setAttribute("tabindex", "0"); // focusable for keyboard
+        dropZone.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            fileInput.value = "";
+            fileInput.click();
+          }
+        });
+
+        // --- When user manually selects files ---
+        fileInput.addEventListener("change", (e) => {
+          const files = e.target.files;
+          renderFiles(files);
+        });
+
+        // --- Drag events ---
+        ["dragenter", "dragover"].forEach(evt =>
+          dropZone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            highlight();
+          })
+        );
+
+        ["dragleave", "drop"].forEach(evt =>
+          dropZone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // For dragleave: avoid flicker by checking relatedTarget
+            if (evt === "dragleave" && dropZone.contains(e.relatedTarget)) return;
+            unhighlight();
+          })
+        );
+
+        // --- Handle drop ---
+        dropZone.addEventListener("drop", (e) => {
+          if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            // Assign dropped files to input for normal form submission / FormData
+            fileInput.files = e.dataTransfer.files;
+            renderFiles(e.dataTransfer.files);
+            // Clear the DataTransfer to avoid duplicate events in some browsers
+            e.dataTransfer.clearData();
+          }
+        });
+        //*******************< End Drag and Drop >*********************//
+
+      //Multi-Select - User Members
+      document.addEventListener("DOMContentLoaded", function () {
+
+          const select = document.getElementById("memberSelect");
+          const pillContainer = document.getElementById("selectedPills");
+
+          function renderPills() {
+              pillContainer.innerHTML = "";
+
+              Array.from(select.selectedOptions).forEach(opt => {
+                  if (opt.value === "") return; // ignore placeholder
+
+                  let pill = document.createElement("span");
+                  pill.className = "badge bg-primary d-flex align-items-center px-2 py-1";
+
+                  pill.innerHTML = `
+                      ${opt.text}
+                      <button type="button" class="btn-close btn-close-white ms-2" style="font-size: .6rem;"></button>
+                  `;
+
+                  pill.querySelector("button").addEventListener("click", () => {
+                      opt.selected = false;
+                      renderPills();
+                  });
+
+                  pillContainer.appendChild(pill);
+              });
+          }
+
+          select.addEventListener("change", renderPills);
+      });
+      
+
+      //Filters and Sorts
       window.addEventListener('DOMContentLoaded', function () {
 
         //Search button style

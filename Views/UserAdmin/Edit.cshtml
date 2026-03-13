@@ -5,60 +5,121 @@
     Layout = "_Layout";
 }
 
-<div class="text-center"> 
-    <div class="midde_cont">
-        <div class="container-fluid">
-            <div class="row column_title">
-                <div class="col-md-12">
-                    <div class="page_title">
-                        <h1>Edit User</h1>
-                        <hr />
-                    </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            <!-- Page Title -->
+            <div class="text-center mb-4">
+                <h1 class="fw-bold">Edit User</h1>
+                <p class="text-muted">Update/Reset user password</p>
+                <hr />
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+
+                    @* Validation Summary *@
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <form asp-action="Edit" method="post">
+
+                        <input asp-for="@Model.User.Id" type="hidden" />
+
+                        <!-- Email -->
+                        <div class="mb-3 text-start">
+                            <label asp-for="@Model.User.Email" class="form-label fw-semibold">Email Address</label>
+                            <input asp-for="@Model.User.Email" class="form-control" placeholder="Enter email" />
+                            <span asp-validation-for="@Model.User.Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3 text-start">
+                            <label for="password" class="form-label fw-semibold">New Password</label>
+                            <input name="password" class="form-control" type="password"
+                                   placeholder="New Password" />
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-sm px-2 me-2">
+                                <i class="fa fa-save me-1"></i> Update Password
+                            </button>
+
+                            <a href="~/UserAdmin/Index" class="btn btn-secondary btn-sm p2-4 me-2" >
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
-            <!-- row -->
-            <div class="row column1">
-                <div class="col-md-12">
-                    <div class="white_shd full margin_bottom_30">
-                       
-                        @* <div asp-validation-summary="All" class="text-danger"></div> *@
 
-                        <form asp-action="Edit" method="post">
-
-                            <div class="col-sm-12 col-md-8 col-lg-6 text-center" style="float:none; margin: 0 auto;">
-
-                                <div class="form-group">
-                                    @* <label asp-for="@Model.User.Id"></label> *@
-                                    <input asp-for="@Model.User.Id" type="hidden" class="form-control" disabled />
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="@Model.User.Email"></label>
-                                    <input asp-for="@Model.User.Email" class="form-control" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="password">Password</label>
-                                    <input name="password" class="form-control" />
-                                </div>
-                            </div> 
-
-                            <div class="col-sm-12 col-md-12 col-lg-12 text-center">
-                                <br />
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <a asp-action="Index" class="btn btn-secondary">                                   
-                                    <i class="fa fa-chevron-left" aria-hidden="true"></i>&nbsp;Back to Users
-                                </a>
-                                <hr /><br />
-                            </div>
-
-
-                            
-                        </form>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
+
+
+@* <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="userMsg" class="toast text-bg-success" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["UserMsg"]
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+            
+        </div>
+    </div>
+</div> *@
+
+<script>
+    /* function ChangePasswordToast(msg) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: msg,
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+    } */
+
+    
+    function ChangePasswordToast(title, msg) {
+        Swal.fire({
+            title: title,
+            //html: "<h3>Password Successfully Changed</h3><br/>" + msg,
+            icon: "success",
+            showCancelButton: false,
+            confirmButtonText: "Log out",
+            reverseButtons: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to logout
+                window.location.href = "/UserAccount/Login";
+                // If your route is different, adjust the URL accordingly.
+            }
+        });
+    }
+
+
+</script>
+
+@if(TempData["UserMsg"] != null)
+{        
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+                ChangePasswordToast("@TempData["UserMsg"]", "Change Password");
+       });
+    </script>
+}
 
 
                     

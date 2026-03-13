@@ -1,5 +1,7 @@
 @inject SignInManager<User> signInManager;
 @inject UserManager<User> userManager;
+@inject IProject Project;
+@inject IActivity Activity;
 
 @{
     var userId = userManager.GetUserId(User);
@@ -26,6 +28,7 @@
 
     <!-- Sweet Alert -->
     <link rel="stylesheet" type="text/css" href="https://common.olemiss.edu/_js/sweet-alert/sweet-alert.css">
+    
 
     @* Admin Template *@
     @* <link href="~/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet"/> *@
@@ -104,6 +107,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Projects</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Activities">Activities</a>
+                                </li>
                             </ul>
                         }
                         else
@@ -111,10 +117,24 @@
                             <ul class="navbar-nav flex-grow-1">
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Project</a>
-                                </li>                                    
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Activities</a>
-                                </li>
+                                </li>           
+
+                                @{
+                                    var acc = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();   
+                                    var project = Project.Projects.FirstOrDefault(x => x.AccountID == acc.AccountID) ;                                   
+                                                                                
+                                }
+
+                                @if(Project.Projects.Where(x => x.AccountID == acc.AccountID) != null) 
+                                {            
+                                    if(Activity.Activities.Count(x => x.ProjectID == project.Id ) > 0)
+                                    {
+                                        <li class="nav-item">                                    
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Activities">Activities</a>
+                                        </li>
+                                    }
+                                 
+                                }
                             </ul>
                         }
                     </div>

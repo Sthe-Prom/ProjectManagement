@@ -17,6 +17,7 @@ namespace ProjectManagement.Controllers
 {
     public class UserAdminController: Controller
     {
+        private SignInManager<User> signInManager;
         private UserManager<User> userManager;
         private RoleManager<IdentityRole> roleManager;
         private IUserValidator<User> userValidator;
@@ -25,9 +26,10 @@ namespace ProjectManagement.Controllers
         private IAccount acc_context;
         private IServiceProvider serviceProvider;
 
+
         public UserAdminController(UserManager<User> _userMgr, RoleManager<IdentityRole> _roleManager, IUserValidator<User> _userValidator,
                                IPasswordValidator<User> _passwordValidator, IPasswordHasher<User> _passwordHasher,
-                                IAccount acc_context_, IServiceProvider serviceProvider_)
+                                IAccount acc_context_, IServiceProvider serviceProvider_,SignInManager<User> signInManager_)
         {
             roleManager = _roleManager;
             userManager = _userMgr;
@@ -36,6 +38,7 @@ namespace ProjectManagement.Controllers
             passwordHasher = _passwordHasher;
             acc_context = acc_context_;
             serviceProvider = serviceProvider_;
+            signInManager = signInManager_;
         }
 
         //READ
@@ -205,12 +208,29 @@ namespace ProjectManagement.Controllers
 
                     if (result.Succeeded)
                     {
-                        RedirectToAction("Index");
+                        
+                        var isAdmin = userManager.IsInRoleAsync(user, "Admin");
+                        var isDirap = userManager.IsInRoleAsync(user, "DIRAP");
+
+                        TempData["UserMsg"] = "Password Successfully Changed.";
+
+                        if(await isAdmin ||  await isDirap )
+                        {
+                            return RedirectToAction("Index", "UserAdmin");
+                        }
+                        else
+                        {
+                            await signInManager.SignOutAsync();
+                            // return RedirectToAction("Login", "UserAccount");                           
+                            return RedirectToAction("Edit", "UserAdmin");
+                        }
                     }
                     else
                     {
+                        TempData["UserMsg"] = "Error Occured While Changing Your Password.";
                         AddErrorsFromResult(result);
                     }
+
                 }
             }
             else

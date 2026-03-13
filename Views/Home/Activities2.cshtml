@@ -1,0 +1,130 @@
+@inject SignInManager<User> signInManager;
+@inject UserManager<User> userManager;
+
+@model ProjectViewModel
+
+@{
+    ViewData["Title"] = "Activities";
+
+    var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
+}
+
+<style>
+
+  
+.kpi-card .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi-card .sub { font-size: .875rem; color: #6c757d; }
+  .avg-progress-bar { height: .6rem; }
+  .small-muted { font-size: .9rem; color: #6c757d; }
+  #projectSelect { min-width: 260px; }
+
+
+  
+
+</style>
+
+<!-- Header with title and project filter -->
+<div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="h3 mb-1">Activities Dashboard</h2>
+    <div class="small-muted">Overview based on activities in the selected project</div>
+  </div>
+
+  <!-- Server renders options. Use your own form/action/route. -->
+  <form action="/Home/Index" method="getect" class="form-label mb-0 me-2">Project</label>
+    <select id="projectSelect" name="projectId" class="form-select">
+      <!-- Example. Replace with your server-rendered options -->
+      <!-- <option value="__all__">All projects</option> -->
+      @*<!-- foreach (var p in ViewBag.Projects) { <option value="@p.Value" selected="@(p.Selected ? "selected" : null)">@p.Text</option> } -->*@
+    </select>
+  </form>
+</div>
+
+<!-- Original KPI cards -->
+<div class="row g-3">
+  <div class="col-6 col-md-3 col-xl-2">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body">
+        <div class="sub">Total activities</div>
+        <div id="kpiTotal" class="value">0</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3 col-xl-2">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body">
+        <div class="sub">Avg progress</div>
+        <div class="d-flex align-items-center gap-2">
+          <div id="kpiAvgProgress" class="value">0%</div>
+        </div>
+        <div class="progress avg-progress-bar mt-2">
+          <div id="kpiAvgProgressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3 col-xl-2">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body">
+        <div class="sub">Completed</div>
+        <div id="kpiCompleted" class="value">0</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3 col-xl-2">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body">
+        <div class="sub">In progress</div>
+        <div id="kpiInProgress" class="value">0</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3 col-xl-2">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body">
+        <div class="sub">Overdue</div>
+        <div id="kpiOverdue" class="value text-danger">0</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3 col-xl-2">
+    <div class="card kpi-card shadow-sm">
+      <div class="card-body">
+        <div class="sub">Due in 7 days</div>
+        <div id="kpiDueSoon" class="value">0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <!-- Challenges & Comments Highlights -->
+  <div class="col-12 col-xl-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Highlights: Comments & Challenges</span>
+        <span class="small-muted">Top keywords</span>
+      </div>
+      <div class="card-body">
+        <div id="topKeywords" class="d-flex flex-wrap"></div>
+        <hr>
+        <div class="small-muted">Recent notes (latest 3)</div>
+        <ul id="recentNotes" class="list-group list-group-flush"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Updates -->
+  <div class="col-12 col-xl-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Recent updates</span>
+        <span class="small-muted">From ActivityUpdateTime</span>
+      </div>
+      <div class="card-body">
+        <ul id="recentUpdates" class="list-group list-group-flush"></ul>
+      </div>
+    </div>
+  </div>
+</div>

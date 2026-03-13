@@ -17,7 +17,8 @@ namespace ProjectManagement.Models
             context = ctx;
         }
 
-        public IEnumerable<Activity> Activities => context.Activity;
+        public IEnumerable<Activity> Activities => context.Activity
+                                                .ToList();
 
         public async Task<IEnumerable<Activity>> GetAllActivities()
         {

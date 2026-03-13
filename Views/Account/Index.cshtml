@@ -50,7 +50,7 @@
                                     
                                         <div class="col-lg-12 col-md-12 text-center p-4">
                                             <a asp-action="Manage" asp-route-AccountID="@item.AccountID" class="text-center btn btn-sm btn-primary">Manage Profile</a>    
-                                            <a href="~/Home/Index" class="text-center btn btn-sm btn-danger" style="#a71930;">Manage Projects</a>    
+                                            <a href="~/Home/Index" class="text-center btn btn-sm btn-danger" style="#a71930;">Manage Projects</a>                                                
                                             <hr />                                
                                             
                                         </div>
@@ -81,6 +81,14 @@
                                         <div class="row mb-3">
                                             <div class="col-lg-4 col-md-4 label fw-bold">Designation</div>
                                             <div class="col-lg-8 col-md-8">@item.Name</div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-lg-4 col-md-4 label fw-bold">Password</div>
+                                            <div class="col-lg-8 col-md-8 de-flex flex-row">
+                                                <span class="col-auto">*******</span>
+                                                <a asp-action="Edit" asp-controller="UserAdmin" asp-route-Id="@userId" class="text-center btn btn-sm btn-success col-auto" style="#a71930;">Change Password</a>    
+                                            </div>
                                         </div>
                                         
                                     </div>

@@ -151,7 +151,6 @@ public class HomeController : Controller
                 break;
         }
 
-
         //Filter
         if (!string.IsNullOrWhiteSpace(staff) && int.TryParse(staff, out int _staff))
         {
@@ -382,6 +381,149 @@ public class HomeController : Controller
         return View(vm);
     }
 
+    public async Task<IActionResult> Activities2(ProjectViewModel vm, string searchString, int? Status, 
+                                    int? Project, int? Staff, DateTime? StartDate, DateTime? EndDate, string sortOrder)
+    {
+        vm.ProjectModel = new Project();
+        vm.fileModel = new FileViewModel();
+        vm.ActivityModel = new ProjectManagement.Models.Activity();
+        vm.Projects = project_context.Projects;       
+        vm.Activities = activity_context.Activities;
+        vm.Accounts = account_context.Accounts;
+        vm.Statuses = status_context.Statuses;
+        vm.UserAccounts = GetAccountsAsync();
+        vm.StatusList = getStatuses();
+        vm.ActivityStatuses = getActivityStatus();    
+
+        return View(vm);
+    }
+
+    // Activities
+    public async Task<IActionResult> Activities(ProjectViewModel vm, string searchString, int? Project, int? Staff, 
+                                    DateTime? StartDate, DateTime? EndDate, string sortOrder)
+    {
+        vm.ProjectModel = new Project();
+        vm.fileModel = new FileViewModel();
+        vm.ActivityModel = new ProjectManagement.Models.Activity();
+        vm.Projects = project_context.Projects;       
+        vm.Activities = activity_context.Activities;
+        vm.Accounts = account_context.Accounts;
+        vm.Statuses = status_context.Statuses;
+        vm.UserAccounts = GetAccountsAsync();
+        vm.StatusList = getStatuses();
+        vm.ActivityStatuses = getActivityStatus();    
+
+        // Prepare base query
+        var projectQuery = project_context.Projects.AsQueryable();
+        var activityQuery = activity_context.Activities.AsQueryable();
+        var staffQuery = account_context.Accounts.AsQueryable();
+        
+        //Filter Parameters
+        string project = Request.Query["Project"];
+        string staff = Request.Query["Staff"];
+        string startDate = Request.Query["StartDate"];
+        string endDate = Request.Query["EndDate"];
+
+        //Add Current User
+        var currentUser = await UserManager.GetUserAsync(User);
+        var project_owner = account_context.Accounts.Where(c => c.Id == currentUser.Id).FirstOrDefault();
+
+        var first_project = projectQuery.OrderBy(x => x.Id).FirstOrDefault(); 
+        var first_staff = staffQuery.OrderBy(x => x.AccountID).Where(x => x.AccountID != 1).FirstOrDefault();
+        int ProjectID = first_project.Id;
+        int StaffID = first_staff.AccountID;
+        var currentYear = DateTime.Today.Year;
+
+        if(await UserManager.IsInRoleAsync(currentUser,"Admin"))
+        {
+            //first_project = projectQuery.Where(x => x.ProjectStartDate.Year == currentYear).OrderBy(x => x.Id).FirstOrDefault(); 
+            first_project = projectQuery.Where(x => x.AccountID == first_staff.AccountID).OrderBy(x => x.Id).FirstOrDefault(); 
+            ProjectID = first_project.Id;
+            StaffID = first_staff.AccountID;
+
+            // Filter Projects
+            if (!string.IsNullOrWhiteSpace(project) && int.TryParse(project, out int _project))//Use Query to Filter
+            {
+                Project = _project;                
+                ProjectID = _project;
+            }
+            
+            // Filter Staff
+            if (!string.IsNullOrWhiteSpace(staff) && int.TryParse(staff, out int _staff))//Use Query to Filter
+            {
+                Staff = _staff;                
+                StaffID = _staff;
+
+                // Get the selected user's first (Default) project
+                //first_project = projectQuery.FirstOrDefault(x => x.AccountID == _staff);
+                //activityQuery = activityQuery.Where(p => p.ProjectID == first_project.Id); 
+            }
+            else
+            {
+                //activityQuery = activityQuery.Where(p => p.ProjectID == ProjectID);  
+            }
+        }
+        else
+        {        
+            first_project = projectQuery.Where(x => x.AccountID == project_owner.AccountID).OrderBy(x => x.Id).FirstOrDefault(); 
+            ProjectID = first_project.Id;
+            StaffID = project_owner.AccountID;
+
+            // Filter Projects
+            if (!string.IsNullOrWhiteSpace(project) && int.TryParse(project, out int _project))//Use Query to Filter
+            {
+                Project = _project;                
+                ProjectID = _project;
+            }
+
+            // Filter Staff
+            if (!string.IsNullOrWhiteSpace(staff) && int.TryParse(staff, out int _staff)) //Use Query to Filter
+            {
+                Staff = _staff;                
+                StaffID = _staff;
+
+                // Get the selected user's first (Default) project
+                //first_project = projectQuery.FirstOrDefault(x => x.AccountID == StaffID);
+                //activityQuery = activityQuery.Where(p => p.ProjectID == first_project.Id); 
+            }
+            else
+            {
+                //activityQuery = activityQuery.Where(p => p.ProjectID == ProjectID);  
+            }
+
+        }
+              
+        //Statuses
+        var project_ = project_context.Projects.FirstOrDefault(x => x.Id == ProjectID);
+        project_.CalculatedDisplayStatusId = await project_service.GetProjectDisplayStatus(project_);
+        project_.CalculatedDisplayStatusName = GetStatusNameById(project_.CalculatedDisplayStatusId);
+
+        // Filter Activity
+        if(!string.IsNullOrWhiteSpace(startDate) && DateTime.TryParse(startDate, out DateTime _startDate) && !string.IsNullOrWhiteSpace(endDate) && DateTime.TryParse(endDate, out DateTime _endDate))
+        {
+            activityQuery = activityQuery.Where(a => a.ActivityStartDate >= _startDate && a.ActivityEndDate <= _endDate);
+        }       
+
+        //projectQuery = projectQuery.Where(x => x.AccountID == StaffID);
+        activityQuery = activityQuery.Where(p => p.ProjectID == ProjectID);     
+
+        var filteredProjects = projectQuery.ToList();
+        var filteredActivities = activityQuery.ToList();
+        
+        // Assign filtered activities to the ViewModel
+        vm.Projects = filteredProjects;
+        vm.Activities = filteredActivities;
+                
+        // View Data Variables
+        ViewBag.Project = ProjectID;
+        ViewBag.Staff = StaffID;
+        ViewBag.StartDate = StartDate;
+        ViewBag.EndDate = EndDate; 
+
+        return View(vm);
+
+    }
+
     // Helper method to get status name (can also be in ProjectService or a separate utility)
     private string GetStatusNameById(int statusId)
     {
@@ -414,15 +556,7 @@ public class HomeController : Controller
         }
         else
         {
-            //vm.fileModel = new FileViewModel();
-            //vm_.fileModel.ProjectFiles = formCollection["ProjectModel_ProjectName"].ToString();
-
-            // Get file information
-            //var fileName = Path.GetFileName(file.FileName);
-            //var fileSize = file.Length;
-            //var contentType = file.ContentType;
-            uniqueFileName = Guid.NewGuid().ToString().Substring(0, 3) + "_" + vm.ProjectFiles.FileName;
-        
+            uniqueFileName = Guid.NewGuid().ToString().Substring(0, 3) + "_" + vm.ProjectFiles.FileName;        
 
             string uploadsFolder = Path.Combine(HostEnvironment.WebRootPath, "Attachments/Projects");
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
@@ -666,45 +800,48 @@ public class HomeController : Controller
             } 
         }
        
-        List<int> selectedUserIds = Project.SelectedAssignedUserIds;//new List<int>();
+        List<int> currentUserIds = Project.SelectedAssignedUserIds;//new List<int>();// 
+        List<int> updatedUserIds = new List<int>();
+        updatedUserIds.Add(currentUserIds[0]);
+        
         string selectedIdsString = formCollection["proj_SelectedAssignedUserIds"].ToString();
 
-        if (!string.IsNullOrEmpty(selectedIdsString))
+        if (!string.IsNullOrEmpty(selectedIdsString) || selectedIdsString.Length < 0)
         {
             // 2. Split the string by comma
-            if(selectedIdsString.Contains(','))
-            {
-                string[] idStrings = selectedIdsString.Split(',');
-
-                 // 3. Parse each string part into an integer and add to the list
-                foreach (string idStr in idStrings)
+           
+                if(selectedIdsString.Contains(','))
                 {
-                    if (int.TryParse(idStr.Trim(), out int userId))
+                    string[] idStrings = selectedIdsString.Split(',');
+
+                    // 3. Parse each string part into an integer and add to the list
+                    foreach (string idStr in idStrings)
                     {
-                        if(!selectedUserIds.Contains(userId))
+                        if (int.TryParse(idStr.Trim(), out int userId))
                         {
-                            selectedUserIds.Add(userId);
+                            //if(!currentUserIds.Contains(userId))
+                            //    {
+                            //    currentUserIds.Add(userId);
+                            //}                           
+                            updatedUserIds.Add(userId);
+                        }
+                        else
+                        {
+                            // Handle parsing error if necessary (e.g., log it, return error)
+                            model.ResponseMessage = $"Warning: Could not parse '{idStr}' into an integer.";
                         }
                     }
-                    else
-                    {
-                        // Handle parsing error if necessary (e.g., log it, return error)
-                        model.ResponseMessage = $"Warning: Could not parse '{idStr}' into an integer.";
-                    }
                 }
-            }
-            else
-            {
-                selectedUserIds.Add(Convert.ToInt32(selectedIdsString));
-            }
-
-           
+       
         }
         else
         {
             // No users were selected or the input was empty
             model.ResponseMessage = "No user IDs selected.";
+            //updatedUserIds = currentUserIds.ToList();//updatedUserIds.Union(currentUserIds).ToList();
         }    
+
+        //var allMembers = currentUserIds.Union(updatedUserIds).ToList();
 
         if (Project != default(Project))
         {                   
@@ -728,7 +865,7 @@ public class HomeController : Controller
             Project.ProjectEndDate =  Convert.ToDateTime(formCollection["proj_ProjectEndDate"]);
             Project.ProjectStatusID = Convert.ToInt32(formCollection["proj_ProjectStatusID"]);
             Project.AccountID = Convert.ToInt32(formCollection["proj_AccountID"]);
-            Project.SelectedAssignedUserIds = selectedUserIds;
+            Project.SelectedAssignedUserIds = updatedUserIds;
         
             try
             {
@@ -894,7 +1031,7 @@ public class HomeController : Controller
         
         return userSelect;
     }
-
+   
     public SelectList getStatuses()
     {
         List<Status> models = new List<Status>();

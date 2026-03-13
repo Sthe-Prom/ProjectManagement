@@ -10,6 +10,8 @@ namespace ProjectManagement.Interfaces
     {
         IEnumerable<Project> Projects { get; }
 
+        Task<Project?> GetProjectById(int Id);
+
         Task SaveProject(Project Project);
 
         Project DeleteProject(int ProjectID);

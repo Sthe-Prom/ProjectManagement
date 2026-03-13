@@ -13,8 +13,7 @@ namespace ProjectManagement.Models
         public AppDbContext context;
 
         public IEnumerable<Project> Projects => context.Project
-                                                       .Include(p => p.Activities)
-                                                       .ToList();
+                                                       .Include(p => p.Activities);
 
         public EFProject(AppDbContext ctx)
         {
