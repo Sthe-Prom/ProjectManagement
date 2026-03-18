@@ -30,6 +30,8 @@ namespace ProjectManagement.Models
 
         [Required(ErrorMessage = "No Project Status ID")]
         public int AccountID { get; set; }
+        
+        public int? ProjectTypeID { get; set; }
 
         /* Ref Nav Properties */
         [ForeignKey("ProjectStatusID")]
@@ -37,6 +39,9 @@ namespace ProjectManagement.Models
 
         [ForeignKey("AccountID")]
         public virtual Account Account { get; set; }
+
+        // [ForeignKey("ProjectTypeID")]
+        public virtual ProjectType ProjectType { get; set; }
 
         public ICollection<Activity> Activities {get; set;} = new List<Activity>();
 

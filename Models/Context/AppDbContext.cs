@@ -22,7 +22,7 @@ namespace ProjectManagement.Models
         public DbSet<Status> Status { get; set; }
         public DbSet<Subdept> Subdept { get; set; }
         public DbSet<Account> Account { get; set; }
-
+        public DbSet<ProjectType> ProjectType { get; set; }
        
     }
 }

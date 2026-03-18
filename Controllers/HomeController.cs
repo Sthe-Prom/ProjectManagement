@@ -30,6 +30,7 @@ public class HomeController : Controller
     private readonly IProject project_context;
     private readonly IActivity activity_context;
     private readonly IStatus status_context;
+    private readonly IProjectType p_type_context;
     private readonly IWebHostEnvironment HostEnvironment;
     public BaseViewModel BaseViewModel { get; set; }
     private readonly ILogger<HomeController> _logger;
@@ -59,7 +60,7 @@ public class HomeController : Controller
     public HomeController(ILogger<HomeController> logger, IAccount account_context_, ISubdept subdept_context_,
                           IProject project_context_, IActivity activity_context_, IStatus status_context_,
                           UserManager<User> userManager_, SignInManager<User> signInManager_, IWebHostEnvironment he,
-                          IProjectAction project_service_)
+                          IProjectAction project_service_, IProjectType p_type_context_)
     {
         _logger = logger;
 
@@ -68,6 +69,7 @@ public class HomeController : Controller
         activity_context = activity_context_;
         subdept_context = subdept_context_;
         status_context = status_context_;
+        p_type_context = p_type_context_;
         
         //User Management
         UserManager = userManager_;
@@ -86,7 +88,8 @@ public class HomeController : Controller
     }
 
     public async Task<IActionResult> Index(ProjectViewModel vm, string searchString, int? Status, 
-                                    int? Staff, DateTime? StartDate, DateTime? EndDate, string sortOrder)
+                                    int? Staff, DateTime? StartDate, DateTime? EndDate, string sortOrder,
+                                    int? ProjectType)
     {
         //IEnumerable<Project> projects = project_context.Projects;
         //var projects_ = projects;
@@ -98,9 +101,11 @@ public class HomeController : Controller
         vm.Activities = activity_context.Activities;
         vm.Accounts = account_context.Accounts;
         vm.Statuses = status_context.Statuses;
+        vm.ProjectTypes = p_type_context.ProjectTypes;
         vm.UserAccounts = GetAccountsAsync();
         vm.StatusList = getStatuses();
         vm.ActivityStatuses = getActivityStatus();
+        vm.ProjectTypeList = getProjectTypeList();
         
         var Project_ = project_context.Projects;
 
@@ -108,6 +113,7 @@ public class HomeController : Controller
         // Get filters from query string
         string staff = Request.Query["Staff"];
         string status = Request.Query["Status"];
+        string projectType = Request.Query["ProjectType"];
         string startDate = Request.Query["StartDate"];
         string endDate = Request.Query["EndDate"];
                 
@@ -160,6 +166,11 @@ public class HomeController : Controller
         if (!string.IsNullOrWhiteSpace(status) && int.TryParse(status, out int _status))
         {
             projectQuery = projectQuery.Where(p => p.ProjectStatusID == _status);
+        }
+
+        if (!string.IsNullOrWhiteSpace(projectType) && int.TryParse(projectType, out int _projectType))
+        {
+            projectQuery = projectQuery.Where(p => p.ProjectTypeID == _projectType);
         }
 
         if (!string.IsNullOrWhiteSpace(startDate) && DateTime.TryParse(startDate, out DateTime _startDate) && !string.IsNullOrWhiteSpace(endDate) && DateTime.TryParse(endDate, out DateTime _endDate))
@@ -374,6 +385,7 @@ public class HomeController : Controller
         // View Data Variables
         ViewBag.Staff = Staff;
         ViewBag.Status = Status;
+        ViewBag.ProjectType = ProjectType;
         ViewBag.StartDate = StartDate;
         ViewBag.EndDate = EndDate;
         ViewBag.Statuses = new SelectList(ActivityStatusList, "Id", "Name");
@@ -409,10 +421,12 @@ public class HomeController : Controller
         vm.Activities = activity_context.Activities;
         vm.Accounts = account_context.Accounts;
         vm.Statuses = status_context.Statuses;
+        vm.ProjectTypes = p_type_context.ProjectTypes;
         vm.UserAccounts = GetAccountsAsync();
         vm.StatusList = getStatuses();
         vm.ActivityStatuses = getActivityStatus();    
-
+        vm.ProjectTypeList = getProjectTypeList();
+        
         // Prepare base query
         var projectQuery = project_context.Projects.AsQueryable();
         var activityQuery = activity_context.Activities.AsQueryable();
@@ -625,6 +639,7 @@ public class HomeController : Controller
             ProjectStartDate =  Convert.ToDateTime(formCollection["ProjectModel_ProjectStartDate"]),
             ProjectEndDate =  Convert.ToDateTime(formCollection["ProjectModel_ProjectEndDate"]),
             ProjectStatusID = Convert.ToInt32(formCollection["ProjectModel_ProjectStatusID"]),
+            ProjectTypeID = Convert.ToInt32(formCollection["ProjectModel_ProjectTypeID"]),
             AccountID = Convert.ToInt32(formCollection["ProjectModel_AccountID"]),
             SelectedAssignedUserIds = selectedUserIds
             
@@ -864,6 +879,7 @@ public class HomeController : Controller
             Project.ProjectStartDate = Convert.ToDateTime(formCollection["proj_ProjectStartDate"]);
             Project.ProjectEndDate =  Convert.ToDateTime(formCollection["proj_ProjectEndDate"]);
             Project.ProjectStatusID = Convert.ToInt32(formCollection["proj_ProjectStatusID"]);
+            Project.ProjectTypeID = Convert.ToInt32(formCollection["proj_ProjectTypeID"]);
             Project.AccountID = Convert.ToInt32(formCollection["proj_AccountID"]);
             Project.SelectedAssignedUserIds = updatedUserIds;
         
@@ -902,10 +918,11 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> UpdateActivity(IFormCollection formCollection, ProjectViewModel vm)
+    public async Task<JsonResult> UpdateActivity(IFormCollection formCollection, ProjectViewModel vm, int Id)
     {
-        var act_Id = Convert.ToInt32(formCollection["ActivityModel_Id"]);
-        var Activity = activity_context.Activities.FirstOrDefault(c => c.Id == act_Id);
+        //var act_Id = Convert.ToInt32(formCollection["ActivityModel_Id"]);
+        var Activity = activity_context.Activities.FirstOrDefault(c => c.Id == Id);
+        //var Project = project_context.Projects.Where(c => c.Id == Id).FirstOrDefault();  
       
         //Prepare Json Response
         JsonViewModel model = new JsonViewModel();
@@ -1054,6 +1071,31 @@ public class HomeController : Controller
         
         
        SelectList userSelect = new SelectList(models, "Id", "StatusName");
+       return userSelect;
+    }
+
+    public SelectList getProjectTypeList()
+    {
+        List<ProjectType> models = new List<ProjectType>();
+
+        var AllTypes = from type in p_type_context.ProjectTypes
+                select new
+                {
+                    Id = type.Id,
+                    TypeName = type.TypeName
+                };
+
+        foreach (var item in AllTypes)
+        {
+            var m = new ProjectType();
+            
+            m.Id = item.Id;
+            m.TypeName = item.TypeName;
+            models.Add(m);
+        }
+        
+        
+       SelectList userSelect = new SelectList(models, "Id", "TypeName");
        return userSelect;
     }
 

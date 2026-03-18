@@ -588,6 +588,7 @@
                   formData.append("proj_ProjectStartDate",  formData.get('proj.ProjectStartDate') ) ;
                   formData.append("proj_ProjectEndDate",  formData.get('proj.ProjectEndDate') ) ;
                   formData.append("proj_ProjectStatusID", formData.get('proj.ProjectStatusID') );
+                  formData.append("proj_ProjectTypeID", formData.get('proj.ProjectTypeID') );
                   //formData.append("ProjectFiles",  formData.get('ProjectFiles') );
 
                   if (file_input.files.length > 0) {
@@ -607,7 +608,9 @@
                   }
 
                   for(i = 0; i < values.length;i++){
-                    if((values[i][1] === "" || values[i][1] === 0) && (values[i][0] != "proj.SelectedAssignedUserIds" ))// || values[i][1].name == "")
+                    if((values[i][1] === "" || values[i][1] === 0) && 
+                        (values[i][0] != "proj.SelectedAssignedUserIds" ) &&
+                        (values[i][0] != "proj.ProjectTypeID" ))// || values[i][1].name == "")
                     {
                       if(values[i][0].includes('.')){
                           s += values[i][0].split('.')[1] + ' is required. <br />';
@@ -936,6 +939,7 @@
 
               // Using match with regEx
               let num_extr = id.match(/(\d+)/);
+              console.log("Key for Edit: " + num_extr[0]);
 
               //D and G
               const dropZone = document.getElementById("dropZoneUpdateActivity_"+num_extr[0]);
@@ -1031,14 +1035,14 @@
 
                   const file_input = document.getElementById('ProjectFiles');
 
-                  formData_act.append("act_ActivityName",  $("#act_ActivityName").val() );
-                  formData_act.append("act_ActivityComments", $("#act_ActivityComments").val() );
-                  formData_act.append("act_ActivityChallenges", $("#act_ActivityChallenges").val() );
-                  formData_act.append("act_ActivityHighlights", $("#act_ActivityHighlights").val() );
-                  formData_act.append("act_ActivityStartDate", $("#act_ActivityStartDate").val() );
-                  formData_act.append("act_ActivityEndDate", $("#act_ActivityEndDate").val() );
-                  formData_act.append("act_ActivityProgress", $("#act_ActivityProgress").val() );
-                  formData_act.append("ActivityModel_Id", $("#ActivityModel_Id").val() );
+                  formData_act.append("act_ActivityName",  formData_act.get('act.ActivityName')  );
+                  formData_act.append("act_ActivityComments", formData_act.get('act.ActivityComments') );
+                  formData_act.append("act_ActivityChallenges", formData_act.get('act.ActivityChallenges') );
+                  formData_act.append("act_ActivityHighlights", formData_act.get('act.ActivityHighlights') );
+                  formData_act.append("act_ActivityStartDate", formData_act.get('act.ActivityStartDate') );
+                  formData_act.append("act_ActivityEndDate", formData_act.get('act.ActivityEndDate') );
+                  formData_act.append("act_ActivityProgress", formData_act.get('act.ActivityProgress') );
+                  formData_act.append("ActivityModel_Id", formData_act.get('ActivityModel.Id') );
                   
                   if (file_input.files.length > 0) {
                     formData_act.append('ProjectFiles', file_input.files[0]); // name must match server binding
@@ -1106,7 +1110,7 @@
 
                       $.ajax({
                           type: 'POST',
-                          url: '@Url.Action("UpdateActivity", "Home")',
+                          url: '@Url.Action("UpdateActivity", "Home")' + '/'+ num_extr[0],
                           contentType: false,
                           processData: false,
                           cache: false,
@@ -1222,6 +1226,8 @@
                       on acc.AccountID equals proj.AccountID
                       join stat in Model.Statuses
                       on proj.ProjectStatusID equals stat.Id
+                      join p_type in Model.ProjectTypes 
+                      on proj.ProjectTypeID equals p_type.Id
                       //where acc.Id == userId ||
                                         //acc.AccountID == proj.SelectedAssignedUserIds[0]
                       //where project_lists.Contains(proj.Id)
@@ -1241,32 +1247,12 @@
                       StatusName = stat.StatusName,
                       SelectedAssignedUserIds = proj.SelectedAssignedUserIds,
                       CalculatedDisplayStatusId = proj.CalculatedDisplayStatusId,
-                      FirstName = acc.FirstName
+                      FirstName = acc.FirstName,
+                      ProjectTypeID = p_type.Id,
+                      TypeName = p_type.TypeName
 
-                    };
+                    };         
 
-         var projects_data_admin = from acc in Model.Accounts
-                      join proj in Model.Projects
-                      on acc.AccountID equals proj.AccountID
-                      join stat in Model.Statuses
-                      on proj.ProjectStatusID equals stat.Id           
-
-                    select new {
-                      proj.AccountID,
-                      proj.Id,
-                      proj.ProjectName,
-                      proj.ProjectDetails,
-                      proj.ProjectAreaOfWork,
-                      proj.ProjectStartDate,
-                      proj.ProjectUpdateTime,
-                      proj.ProjectEndDate,
-                      proj.ProjectWorkInConj,
-                      proj.ProjectStatusID,
-                      proj.ProjectFiles,
-                      stat.StatusName,
-                      proj.SelectedAssignedUserIds,
-                      proj.CalculatedDisplayStatusId
-                    };
 
         var activities_data = from proj in Model.Projects
                         join act in Model.Activities
@@ -1303,28 +1289,20 @@
          @if(await userManager.IsInRoleAsync(user,"Admin") || await userManager.IsInRoleAsync(user,"MIR") || await userManager.IsInRoleAsync(user,"IIS") || await userManager.IsInRoleAsync(user,"AP"))
             {        
                 @* User Mini-Dashboard Main *@
-                <div id="main" class="main" style="margin-top:0 !important;margin-bottom:20px !important">
+                <div id="" class="container" style="margin-top:0 !important;margin-bottom:10px !important">
 
-                    <div class="pagetitle" >  
+                    <div class="" >  
+
+                        <h4 class="text-center pb-2" style="color: #A71930; font-weight: 400;">Projects Activities</h4>
 
                         @* DASH 1 *@
                         <div class="row d-flex flex-row justify-content-center mt-1">
                         
-                            @* Dashboard *@
-                            <div class="col-sm-2 col-md-2 d-none d-sm-block align-content-center mt-1 " >
-                                <h1>Dashboard</h1>
-                                <nav>
-                                    <ol class="breadcrumb">
-                                      <li class="breadcrumb-item active">Activities Summaries </li>
-                                    </ol>
-                                </nav>
-                            </div> 
-
-                            <div class="col-md-10 d-flex justify-content-between gap-2">
+                            <div class="col-md-10 mx-auto d-flex justify-content-between gap-2">
 
                                 @if(await userManager.IsInRoleAsync(user,"Admin"))
                                 {
-                                    @* Staff *@
+                                    @* Staff Filter*@
                                     <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
                     
                                           @if(!string.IsNullOrEmpty(Context.Request.Query["Staff"] ))
@@ -1955,6 +1933,7 @@
                                                   project_owner_style = "background-color:#c59217;opacity:1;color:#fff;";
                                                 }                                          
 
+                                              @* PROJECT *@
                                               <td colspan="100%" style="@project_owner_style" >
 
                                                     <div class="align-middle accordion accordion-flush" id="accordionFlush" style="background-color: transparent !important;background: none !important;">
@@ -1972,7 +1951,7 @@
                                                         </div>
 
                                                         @* Project Members *@
-                                                        <div class="col-sm-2 d-none d-lg-block" 
+                                                        <div class="col-sm-2 d-none d-lg-block align-content-center" 
                                                               style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;"
                                                               data-bs-toggle="tooltip" data-bs-placement="top" 
                                                               title="@getProjectMembers.Substring(1)"
@@ -1986,7 +1965,7 @@
                                                         </div>
 
                                                         @* Project Duration *@
-                                                        <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
+                                                        <div class="col-sm-2 d-none d-lg-block align-content-center" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
                                                           
                                                           @if(totalDays <= 0)
                                                           {
@@ -2184,8 +2163,8 @@
                                                                   </div>
                                                                 </div>
                                                                 <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
-                                                                  <h6 class="fw-semibold mb-1" style="color:#a71930;">Area of Work</h6>
-                                                                  <p class="fw-light">@proj.ProjectAreaOfWork</p>
+                                                                  <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Type</h6>
+                                                                  <p class="fw-light">@proj.TypeName</p>
                                                                 </div>
                                                                 <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
                                                                   <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
@@ -2241,7 +2220,6 @@
                                                               </div>
                                                                 
                                                             </div>
-
                                                           
                                                             <div class="modal-body">
 
@@ -2251,19 +2229,58 @@
 
                                                                 <input type="hidden" asp-for="@proj.AccountID" class="form-control" />
 
+                                                                   <div class="col-sm-12">
+                                                                                                                                      
+                                                                      @* Project Type (with left accent bar) *@
+                                                                      <div class="d-flex align-items-stretch shadow-sm rounded-3">
+
+                                                                          @* <!-- Left accent bar --> *@
+                                                                          <div class="bg-success rounded-start" style="width: 6px;"></div>
+
+                                                                          @* <!-- Content pane --> *@
+                                                                          <div class="border border-1 border-success-subtle rounded-end ps-4 pe-4 w-100">
+                                                                            <div class="form-group">
+                                                                              <label asp-for="@Model.ProjectType.Id" class="col-form-label fw-bold d-flex align-items-center gap-2">
+                                                                                <i class="bi bi-check2-circle text-success"></i>
+                                                                                Ad hoc / Long-term Project 
+                                                                              </label>
+
+                                                                              <select class="form-select mb-2"
+                                                                                      asp-for="@proj.ProjectTypeID"
+                                                                                      asp-items="Model.ProjectTypeList"
+                                                                                      required>
+
+                                                                                @if(proj.ProjectTypeID != null)
+                                                                                {
+                                                                                  <option value="" selected>@proj.TypeName</option>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                  <option value="" selected>Select Project Type</option>
+                                                                                }
+
+                                                                              </select>
+
+                                                                            </div>
+                                                                          </div>
+
+                                                                      </div>
+
+                                                                    </div>
+
                                                                   @* LEFT Column *@
                                                                   <div class="col-md-6">
                                                                       
                                                                       @* Name *@
-                                                                      <div class="mb-3 form-group">
+                                                                      <div class="mb-1 form-group">
                                                                           <label class="col-form-label fw-bold">Project Name:<span class="text-danger">*</span></label>
-                                                                          <input class="form-control" maxlength="100" placeholder="Project Name" asp-for="@proj.ProjectName" />
+                                                                          <input class="form-control border-success-subtle" maxlength="100" placeholder="Project Name" asp-for="@proj.ProjectName" />
                                                                       </div>
 
                                                                         @* Project Details *@
                                                                       <div class="mb-3 form-group">
                                                                           <label class="col-form-label fw-bold">Project Details:<span class="text-danger">*</span></label>
-                                                                          <textarea class="form-control" placeholder="Project Details" style="margin-top:0 !important;"
+                                                                          <textarea class="form-control border-success-subtle" placeholder="Project Details" style="margin-top:0 !important;"
                                                                                 asp-for="@proj.ProjectDetails" rows="3" maxlength="300" placeholder="Describe project details">
                                                                               @proj.ProjectDetails
                                                                           </textarea>
@@ -2279,7 +2296,7 @@
                                                                       <div class="form-group mb-3">
                                                                           <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress:<span class="text-danger">*</span></label>
 
-                                                                          <select class="form-select mb-3" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
+                                                                          <select class="form-select mb-3 border-success-subtle" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
                                                                               <option value="" selected> @proj.StatusName</option>
                                                                           </select>
 
@@ -2305,7 +2322,7 @@
                                                                             <div id="selectedPills" class="mb-2 d-flex flex-wrap gap-2"></div>
 
                                                                             @* <!-- Your original select unchanged --> *@
-                                                                            <select class="form-select"
+                                                                            <select class="form-select border-success-subtle"
                                                                                     size="3"
                                                                                     asp-for="@proj.SelectedAssignedUserIds"
                                                                                     asp-items="Model.UserAccounts"
@@ -2321,12 +2338,12 @@
                                                                       <div class="row mb-1">
                                                                           <div class="col-sm-6">
                                                                               <label class="col-form-label fw-bold">Start Date:<span class="text-danger">*</span></label>
-                                                                              <input type="date" asp-for="@proj.ProjectStartDate" class="form-control"  />
+                                                                              <input type="date" asp-for="@proj.ProjectStartDate" class="form-control border-success-subtle"  />
                                                                           </div>
 
                                                                           <div class="col-sm-6">
                                                                               <label class="col-form-label fw-bold">End Date:<span class="text-danger">*</span></label>
-                                                                              <input type="date" asp-for="@proj.ProjectEndDate" class="form-control"  />
+                                                                              <input type="date" asp-for="@proj.ProjectEndDate" class="form-control border-success-subtle"  />
                                                                           </div>
                                                                       </div>
 
@@ -2409,7 +2426,7 @@
                                         @* Activity Section *@
                                         var countActivity = 0;
                                         foreach(var act in activities_data
-                                                //.Where(a => a.ProjectID == ViewBag.Project)
+                                                .Where(a => a.ProjectID == ViewBag.Project)
                                                 .OrderBy(a => a.ActivityStartDate))
                                         {
                                             countActivity++;
@@ -2687,7 +2704,7 @@
                                                               @* Left Col *@
                                                               <div class="col-md-6">
 
-                                                                  @* Activity_ID *@
+                                                                  @* Activity_ID *@ActivityModel_Id
                                                                   <input type="hidden" value="@act.Id" asp-for="@Model.ActivityModel.Id" class="form-control" />
                                                                   <input type="hidden" value="@act.ProjectID" asp-for="@act.ProjectID" class="form-control" />
 
@@ -2791,7 +2808,7 @@
                                                                                                     
                                         //var proj = Model.Projects.FirstOrDefault(x => x.Id == ViewBag.Project);  
 
-                                        // Modal Activity
+                                        // Modal Activity (ADD)
                                         <div class="modal modal-md fade" id="modalActivity_@ViewBag.Project" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                           <div class="modal-dialog modal-xl">
                                               <form enctype="multipart/form-data" class="frm_Activity" id="frm_Activity_@ViewBag.Project" >
@@ -3029,6 +3046,39 @@
 
 
         });
+
+
+      //Multi-Select - User Members
+      document.addEventListener("DOMContentLoaded", function () {
+
+          const select = document.getElementById("memberSelect");
+          const pillContainer = document.getElementById("selectedPills");
+
+          function renderPills() {
+              pillContainer.innerHTML = "";
+
+              Array.from(select.selectedOptions).forEach(opt => {
+                  if (opt.value === "") return; // ignore placeholder
+
+                  let pill = document.createElement("span");
+                  pill.className = "badge bg-primary d-flex align-items-center px-2 py-1";
+
+                  pill.innerHTML = `
+                      ${opt.text}
+                      <button type="button" class="btn-close btn-close-white ms-2" style="font-size: .6rem;"></button>
+                  `;
+
+                  pill.querySelector("button").addEventListener("click", () => {
+                      opt.selected = false;
+                      renderPills();
+                  });
+
+                  pillContainer.appendChild(pill);
+              });
+          }
+
+          select.addEventListener("change", renderPills);
+      });
 
 </script>
 

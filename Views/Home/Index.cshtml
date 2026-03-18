@@ -180,12 +180,17 @@
         background-color: transparent;
         color: #e7f1ff;
       }
+
+      .icon-hourglass    { background-image: url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/hourglass-split.svg"); }
+      .icon-layers       { background-image: url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/layers.svg"); }
+
       .accordion-button::after {
         width: 12px;
         height: 12px;
         border-radius: 100%;
         background-color: var(--bs-danger);
-        background-image: none !important;
+        /* background-image: url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/hourglass-split.svg'); */
+        background-image: none !important; 
 
       }
       .accordion-button.collapsed::after {
@@ -484,6 +489,7 @@
                     formData.append("ProjectModel_ProjectEndDate",  $("#ProjectModel_ProjectEndDate").val() ) ;
                     formData.append("ProjectModel_ProjectStatusID", $("#ProjectModel_ProjectStatusID").val() );
                     formData.append("ProjectModel_AccountID",  $("#ProjectModel_AccountID").val() );
+                    formData.append("ProjectModel_ProjectTypeID",  $("#ProjectModel_ProjectTypeID").val() );
                     
                     if (file_input.files.length > 0) {
                       formData.append('ProjectFiles', file_input.files[0]); // name must match server binding
@@ -568,7 +574,6 @@
                     if (num_extr) {
                         console.log('number found:' + num_extr[0]);
                     }
-
 
                     //D and G
                     const dropZone = document.getElementById("dropZoneEditProject_"+num_extr[0]);
@@ -683,6 +688,7 @@
                         formData.append("proj_ProjectStartDate",  formData.get('proj.ProjectStartDate') ) ;
                         formData.append("proj_ProjectEndDate",  formData.get('proj.ProjectEndDate') ) ;
                         formData.append("proj_ProjectStatusID", formData.get('proj.ProjectStatusID') );
+                        formData.append("proj_ProjectTypeID", formData.get('proj.ProjectTypeID') );
                         //formData.append("ProjectFiles",  formData.get('ProjectFiles') );
 
                         if (file_input.files.length > 0) {
@@ -702,7 +708,9 @@
                         }
 
                         for(i = 0; i < values.length;i++){
-                          if((values[i][1] === "" || values[i][1] === 0) && (values[i][0] != "proj.SelectedAssignedUserIds" ))// || values[i][1].name == "")
+                          if((values[i][1] === "" || values[i][1] === 0) && 
+                              (values[i][0] != "proj.SelectedAssignedUserIds" ) &&
+                              (values[i][0] != "proj.ProjectTypeID" ))// || values[i][1].name == "")
                           {
                             if(values[i][0].includes('.')){
                                 s += values[i][0].split('.')[1] + ' is required. <br />';
@@ -1127,15 +1135,15 @@
 
                         const file_input = document.getElementById('ProjectFiles');
 
-                        formData_act.append("act_ActivityName",  $("#act_ActivityName").val() );
-                        formData_act.append("act_ActivityComments", $("#act_ActivityComments").val() );
-                        formData_act.append("act_ActivityChallenges", $("#act_ActivityChallenges").val() );
-                        formData_act.append("act_ActivityHighlights", $("#act_ActivityHighlights").val() );
-                        formData_act.append("act_ActivityStartDate", $("#act_ActivityStartDate").val() );
-                        formData_act.append("act_ActivityEndDate", $("#act_ActivityEndDate").val() );
-                        formData_act.append("act_ActivityProgress", $("#act_ActivityProgress").val() );
-                        formData_act.append("ActivityModel_Id", $("#ActivityModel_Id").val() );
-                        
+                        formData_act.append("act_ActivityName",  formData_act.get('act.ActivityName')  );
+                        formData_act.append("act_ActivityComments", formData_act.get('act.ActivityComments') );
+                        formData_act.append("act_ActivityChallenges", formData_act.get('act.ActivityChallenges') );
+                        formData_act.append("act_ActivityHighlights", formData_act.get('act.ActivityHighlights') );
+                        formData_act.append("act_ActivityStartDate", formData_act.get('act.ActivityStartDate') );
+                        formData_act.append("act_ActivityEndDate", formData_act.get('act.ActivityEndDate') );
+                        formData_act.append("act_ActivityProgress", formData_act.get('act.ActivityProgress') );
+                        formData_act.append("ActivityModel_Id", formData_act.get('ActivityModel.Id') );
+                
                         if (file_input.files.length > 0) {
                           formData_act.append('ProjectFiles', file_input.files[0]); // name must match server binding
                         }
@@ -1202,7 +1210,7 @@
 
                             $.ajax({
                                 type: 'POST',
-                                url: '@Url.Action("UpdateActivity", "Home")',
+                                url: '@Url.Action("UpdateActivity", "Home")' + '/'+ num_extr[0],
                                 contentType: false,
                                 processData: false,
                                 cache: false,
@@ -1300,62 +1308,111 @@
         @if(await userManager.IsInRoleAsync(user,"Admin"))
         {
           <span>          
-            <button class="btn btn-sm" >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-              </svg>
-              <span style="display: inline-flex; align-items: center;margin-right:2px;">Add a project</span>
-            </button>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-            </svg>
+             <div class="dropdown align-middle">   
+              
+              <button class="btn btn-success dropdown-toggle" type="button" id="dropdown_" data-bs-toggle="dropdown" aria-expanded="false">
+              
+                <span style="display: inline-flex; align-items: center;">
+                  <i class="bi bi-plus-circle fs-4 me-1"></i> Add a project
+                </span>
+
+              </button>
+              
+          
+          
+            </div>
+          
           </span>
         }
         else
         {
-          <span>          
-            <button class="btn btn-sm" id="btnAddProject" data-bs-toggle="modal" data-bs-target="#modalProject">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-              </svg>
-              <span style="display: inline-flex; align-items: center;margin-right:2px;">Add a project</span>
-            </button>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-            </svg>
+          <span class="">  
+            <div class="dropdown align-middle">   
+              
+              <button class="btn btn-success dropdown-toggle" type="button" id="dropdown_" data-bs-toggle="dropdown" aria-expanded="false">
+              
+                <span style="display: inline-flex; align-items: center;">
+                  <i class="bi bi-plus-circle fs-4 me-1"></i> Add a project
+                </span>
+
+              </button>
+              
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">    
+                
+                @foreach(var p in Model.ProjectTypes)
+                {
+                  <li>
+                    <a data-bs-toggle="modal" 
+                                          data-bs-target="#modalProject" 
+                                          data-project-type="@p.Id" 
+                                          class="dropdown-item" href="#">
+                      @p.TypeName
+                    </a>
+                  </li>
+                  
+                }
+
+              </ul>
+
+              <script>
+                  document.addEventListener('DOMContentLoaded', function () {
+                    // Grab all dropdown items that carry the predefined numeric value
+                    const items = document.querySelectorAll('.dropdown-menu .dropdown-item[data-project-type]');
+
+                    // Select the hidden field generated by asp-for
+                    const hiddenInput = document.querySelector('input[type="hidden"][name="ProjectModel.ProjectTypeID"]');
+
+                    if (!hiddenInput) return;
+
+                    items.forEach(function (item) {
+                      item.addEventListener('click', function (e) {
+                        e.preventDefault(); // prevent navigating to '#'
+
+                        // Read the predefined numeric value (as a string), e.g., "1" or "2"
+                        const value = item.getAttribute('data-project-type');
+
+                        // Set the value to be posted with the form
+                        hiddenInput.value = value;
+
+                        // OPTIONAL: if you want to distinguish choices by ID for any reason:
+                        // hiddenInput.id = 'projectType_' + value;
+
+                        // If this item opens a modal via data attributes, Bootstrap will handle it.
+                        // Do extra UI updates here if needed (e.g., change the dropdown button label).
+                      });
+                    });
+                  });
+
+              </script>      
+          
+            </div>
+            
           </span>
         }
       </div>
-      <div class="flex-grow-1">
-        <span >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-diagram-3" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
-          </svg>&nbsp;
-            <span style="display: inline-flex; align-items: center;margin-right:2px;">Log a project activity</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-          </svg>
+      <div class="flex-grow-1 d-flex justify-content-center">
+        
+        <span class="d-flex align-items-center">
+          <i class="bi bi-arrow-right fs-3 flex-grow-1 me-4" style="color:#A71930; "></i>  
+        </span>
+        
+        <span class="d-flex align-items-center gap-1">  
+          <i class="bi bi-diagram-3 fs-3 flex-grow-1"></i>
+          <span class="flex-grow-1" style="display: inline-flex; align-items: center;margin-right:2px;">Log a project activity</span>
+          <i class="bi bi-arrow-right fs-3 flex-grow-1 ms-4" style="color:#A71930; "></i>
         </span>
       </div>
-      <div class="flex-grow-1">
-        <span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-          </svg>&nbsp; <span style="display: inline-flex; align-items: center;margin-right:2px;">Update project status</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#A71930" class="bi bi-arrow-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-          </svg>
+      <div class="flex-grow-1 d-flex justify-content-center">
+        <span class="d-flex align-items-center gap-1">
+          <i class="bi bi-pencil-square fs-3 flex-grow-1"></i>
+          <span style="display: inline-flex; align-items: center;margin-right:2px;">Update project status</span>
+          <i class="bi bi-arrow-right fs-3 flex-grow-1 ms-4" style="color:#A71930; "></i>
         </span>
       </div>
-      <div class="flex-grow-1 ">
-        <span >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bar-chart-fill" viewBox="0 0 16 16">
-            <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
-          </svg>
-          &nbsp;<span style="display: inline-flex; align-items: center;margin-right:2px;">Complete a project </span>
+      <div class="flex-grow-1 d-flex justify-content-center">
+        <span class="d-flex align-items-center gap-1">
+          <i class="bi bi-check-circle fs-3 flex-grow-1"></i>
+          <span style="display: inline-flex; align-items: center;margin-right:2px;">Complete a project </span>
         </span>
       </div>
       @*</ul> *@
@@ -1398,6 +1455,8 @@
                       on acc.AccountID equals proj.AccountID
                       join stat in Model.Statuses
                       on proj.ProjectStatusID equals stat.Id
+                      join p_type in Model.ProjectTypes 
+                      on proj.ProjectTypeID equals p_type.Id
                       where acc.Id == userId ||
                                         //acc.AccountID == proj.SelectedAssignedUserIds[0]
                       (project_lists.Contains(proj.Id))
@@ -1416,7 +1475,9 @@
                       proj.ProjectFiles,
                       stat.StatusName,
                       proj.SelectedAssignedUserIds,
-                      proj.CalculatedDisplayStatusId
+                      proj.CalculatedDisplayStatusId,
+                      proj.ProjectTypeID,
+                      p_type.TypeName
 
                     };
 
@@ -1499,17 +1560,7 @@
 
            
                 <div class="col-sm-10 mx-auto d-flex flex-wrap flex-row justify-content-center mt-1 mb-3 gap-2 ">
-                  
-                  @* <div class="col-sm-2 col-md-2 d-none d-sm-block align-content-center mt-1 mb-4" >
-                      <h1>Dashboard</h1>
-                      <nav>
-                        <ol class="breadcrumb">
-                          <li class="breadcrumb-item active">Projects/Activities Summaries </li>
-                        </ol>
-                      </nav>
-                  </div> *@
-
-                 
+                              
                       @* Staff Filter *@
                       <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
       
@@ -1522,7 +1573,7 @@
                                       @Html.ActionLink(
                                           "Clear Filter", 
                                           "Index", 
-                                          new {Status = ViewBag.Status  }, 
+                                          new {Status = ViewBag.Status, ProjectType = ViewBag.ProjectType  }, 
                                           new { @class="clear_filter" }
                                       )                               
                                   
@@ -1531,7 +1582,7 @@
 
                           @{var AccountFilter = ViewBag.Staff;}
 
-                          <li class="list-inline-item filter-active " style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                          <li class="list-inline-item filter-active mb-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                             @if(AccountFilter != null)
                             {
                               <span style="vertical-align:middle;" >
@@ -1550,7 +1601,7 @@
 
                           @{
                               var statusId = ViewBag.Status;
-
+                              var projectTypeId = ViewBag.ProjectType;
                               var StartDateStaff = ViewBag.StartDate;
                               var EndDateStaff = ViewBag.EndDate;
                             
@@ -1565,13 +1616,29 @@
                                 var selected = account.AccountID == (ViewBag.Staff) ? "selected" : "";   
                                 var url = "";                                             
                                 
-                                @if(statusId != 0 || (StartDateStaff != null && EndDateStaff != null) )
+                                @if(statusId != 0 || projectTypeId != 0 || (StartDateStaff != null && EndDateStaff != null) )
                                 {
                                   url = Url.Action( "Index", 
-                                          new {Status = statusId, Staff = account.AccountID, StartDate = StartDateStaff, EndDateStaff = EndDateStaff })   ;  
+                                          new {Status = statusId, Staff = account.AccountID, ProjectType = projectTypeId, StartDate = StartDateStaff, EndDateStaff = EndDateStaff })   ;  
                                   
                                   @:  <option value="@url" @selected>@account.FirstName   </option>                                  
                                 
+                                }
+                                else
+                                if(projectTypeId != 0 || (StartDateStaff != null && EndDateStaff != null) )
+                                {
+                                    url = Url.Action( "Index", 
+                                          new { ProjectType = projectTypeId, StartDate = StartDateStaff, EndDateStaff = EndDateStaff })   ;  
+                                  
+                                  @:  <option value="@url" @selected>@account.FirstName   </option>    
+                                }
+                                else
+                                if(statusId != 0 || (StartDateStaff != null && EndDateStaff != null) )
+                                {
+                                    url = Url.Action( "Index", 
+                                          new {Status = statusId, StartDate = StartDateStaff, EndDateStaff = EndDateStaff })   ;  
+                                  
+                                  @:  <option value="@url" @selected>@account.FirstName   </option>    
                                 }
                                 else
                                 {
@@ -1584,7 +1651,7 @@
 
                           </select>                          
 
-                      </div>
+                      </div>                   
 
                       @* Status Filter *@
                       <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
@@ -1597,7 +1664,7 @@
                                 @Html.ActionLink(
                                     "Clear Filter", 
                                     "Index", 
-                                    new {Staff = ViewBag.Staff }, 
+                                    new {Staff = ViewBag.Staff, ProjectType = ViewBag.ProjectType }, 
                                     new { @class="clear_filter" }
                                 )                                    
                               
@@ -1606,7 +1673,7 @@
 
                           @{var StatusFilter = ViewBag.Status;}
 
-                          <li class="list-inline-item filter-active " style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                          <li class="list-inline-item filter-active mb-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                             
                             @if(StatusFilter != null)
                             {
@@ -1629,7 +1696,6 @@
 
                             @{
                               var staffId = ViewBag.Staff;
-                              
                               var StartDateStatus = ViewBag.StartDate;
                               var EndDateStatus = ViewBag.EndDate;
                             }
@@ -1641,11 +1707,23 @@
                               var selected = status.Id == (ViewBag.Status) ? "selected" : ""; 
                               var url = "";                                                               
 
-                                  @if(staffId != 0 || (StartDateStatus != null && EndDateStatus != null) )
+                                  @if(staffId != 0 || projectTypeId != 0 || (StartDateStatus != null && EndDateStatus != null) )
+                                  {
+                                    url = Url.Action("Index", new {Staff = staffId, ProjectType = projectTypeId, Status = status.Id, StartDate = StartDateStatus, EndDate = EndDateStatus }); 
+                                    @: <option value="@url" @selected>@status.StatusName </option>
+                                  }
+                                  else
+                                  if(staffId != 0 || (StartDateStatus != null && EndDateStatus != null))
                                   {
                                     url = Url.Action("Index", new {Staff = staffId, Status = status.Id, StartDate = StartDateStatus, EndDate = EndDateStatus }); 
                                     @: <option value="@url" @selected>@status.StatusName </option>
                                   }
+                                  else                                  
+                                  if(projectTypeId != 0 || (StartDateStatus != null && EndDateStatus != null))
+                                  {
+                                    url = Url.Action("Index", new {Project = projectTypeId, Status = status.Id, StartDate = StartDateStatus, EndDate = EndDateStatus }); 
+                                    @: <option value="@url" @selected>@status.StatusName </option>
+                                  }                                  
                                   else
                                   {
                                     url = Url.Action("Index", new { Status = status.Id });
@@ -1656,6 +1734,76 @@
                           </select>
 
                         
+                      </div>
+
+                      @* Project-Type Filter *@
+                      <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
+      
+                            @if(!string.IsNullOrEmpty(Context.Request.Query["ProjectType"] ))
+                            {
+                              <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                                                                    
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
+                                                                  
+                                      @Html.ActionLink(
+                                          "Clear Filter", 
+                                          "Index", 
+                                          new {Staff = ViewBag.Staff, Status = ViewBag.Status  }, 
+                                          new { @class="clear_filter" }
+                                      )                               
+                                  
+                              </li>
+                            }
+
+                          @{var ProjectTypeFilter = ViewBag.ProjectType;}
+
+                            <li class="list-inline-item filter-active mb-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                              @if(ProjectTypeFilter != null)
+                              {
+                                <span style="vertical-align:middle;" >
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#00D100"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                                </span>  
+                                <span class="apply_filter">Filters Applied</span>
+                              }
+                              else
+                              {
+                                <span style="vertical-align:middle;">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#969696"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                                </span> 
+                                <span class="no_apply_filter">No Filters</span>
+                              }
+                            </li>      
+
+                                             
+                          <select id="p_type-filter"  class="form-select">
+
+                            <option value="" selected>Filter by Project Type</option>
+                        
+                            @foreach(var p_type in Model.ProjectTypes )
+                            {                        
+                                var selected = p_type.Id == (ViewBag.ProjectType) ? "selected" : "";   
+                                var url = "";                                             
+                                
+                                @if(statusId != 0 || staffId != 0 || (StartDateStaff != null && EndDateStaff != null) )
+                                {
+                                    url = Url.Action( "Index", 
+                                          new {Status = statusId, Staff = staffId, ProjectType = p_type.Id, StartDate = StartDateStaff, EndDateStaff = EndDateStaff })   ;  
+                                  
+                                  @:  <option value="@url" @selected>@p_type.TypeName   </option>                                  
+                                
+                                }                               
+                                else
+                                if(statusId != 0 || staffId != 0)
+                                {
+                                  url = Url.Action("Index", new { Status = statusId, Staff = staffId, ProjectType = p_type.Id, });                                    
+                                  @: <option value="@url" @selected >@p_type.TypeName  </option>
+                                  
+                                }
+
+                            }   
+
+                          </select>                          
+
                       </div>
 
                       @* Date Filter *@
@@ -1704,7 +1852,7 @@
                               var EndDate = ViewBag.EndDate;
                             }
 
-                          <li class="list-inline-item filter-active" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                          <li class="list-inline-item filter-active mb-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
                             
                               @if(StartDate != null || EndDate != null)
                               {
@@ -3292,19 +3440,86 @@
               @* User Mini-Dashboard Main *@
               <div id="main" class="main" style="margin-top:0 !important;margin-bottom:-20px !important">
 
-
+                @* Filters *@
                 <div class="d-flex flex-row justify-content-center mt-1">
                                         
                   <div class="col-sm-10 col-md-10 col-lg-10 mx-auto flex-wrap d-flex gap-2 justify-content-between">
+                      
+                      @* Project-Type Filter *@
+                      <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
+      
+                            @if(!string.IsNullOrEmpty(Context.Request.Query["ProjectType"] ))
+                            {
+                              <li class="list-inline-item filter-active m-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                                                                    
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="pe-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.6512 14.0654L11.6047 20H9.57389L10.9247 12.339L3.51465 4.92892L4.92886 3.51471L20.4852 19.0711L19.071 20.4853L12.6512 14.0654ZM11.7727 7.53009L12.0425 5.99999H10.2426L8.24257 3.99999H19.9999V5.99999H14.0733L13.4991 9.25652L11.7727 7.53009Z"></path></svg>
+                                                                
+                                    @Html.ActionLink(
+                                        "Clear Filter", 
+                                        "Index", 
+                                        new { Status = ViewBag.Status  },  
+                                        new { @class="clear_filter" }
+                                    )                               
+                                  
+                              </li>
+                            }
+                          
 
-                      @* <div class="flex-grow-1 d-none d-sm-block align-content-center mt-2" >
-                          <h1>Dashboard</h1>
-                          <nav>
-                            <ol class="breadcrumb">
-                              <li class="breadcrumb-item active">Projects/Activities Summaries </li>
-                            </ol>
-                          </nav>
-                      </div>  *@
+                          @{var ProjectTypeFilter = ViewBag.ProjectType;}
+
+                            <li class="list-inline-item filter-active mb-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 5px;border-radius:6px;border:1px solid #0f204b;">
+                              @if(ProjectTypeFilter != null)
+                              {
+                                <span style="vertical-align:middle;" >
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#00D100"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                                </span>  
+                                <span class="apply_filter">Filters Applied</span>
+                              }
+                              else
+                              {
+                                <span style="vertical-align:middle;">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#969696"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
+                                </span> 
+                                <span class="no_apply_filter">No Filters</span>
+                              }
+                            </li>      
+
+                                             
+                          <select id="p_type-filter"  class="form-select">
+
+                            <option value="" selected>Project Type</option>
+                            @{
+                              var statusId = ViewBag.Status;
+                              var StartDateStatus = ViewBag.StartDate;
+                              var EndDateStatus = ViewBag.EndDate;
+                            }
+                        
+                            @foreach(var p_type in Model.ProjectTypes )
+                            {                        
+                                var selected = p_type.Id == (ViewBag.ProjectType) ? "selected" : "";   
+                                var url = "";                                             
+                                
+                                @if(statusId != 0 || (StartDateStatus != null && EndDateStatus != null) )
+                                {
+                                    url = Url.Action( "Index", 
+                                          new {Status = statusId, ProjectType = p_type.Id, StartDate = StartDateStatus, EndDateStaff = EndDateStatus })   ;  
+                                  
+                                  @:  <option value="@url" @selected>@p_type.TypeName   </option>                                  
+                                
+                                }                               
+                                else
+                                if(statusId != 0)
+                                {
+                                  url = Url.Action("Index", new { Status = statusId, ProjectType = p_type.Id, });                                    
+                                  @: <option value="@url" @selected >@p_type.TypeName  </option>
+                                  
+                                }
+
+                            }   
+
+                          </select>                          
+
+                      </div>
 
                       @* Status Filter *@
                       <div class="flex-grow-1 rounded-2 align-content-center p-2" style="border:1px solid lightgrey;">
@@ -3317,7 +3532,7 @@
                                   @Html.ActionLink(
                                       "Clear Filter", 
                                       "Index", 
-                                      new {Staff = ViewBag.Staff }, 
+                                      new { ProjectType = ViewBag.ProjectType }, 
                                       new { @class="clear_filter" }
                                   )                                    
                                 
@@ -3325,9 +3540,7 @@
                         }    
 
                           @{
-                            var StatusFilter = ViewBag.Status;
-                            var StartDateStatus = ViewBag.StartDate;
-                            var EndDateStatus = ViewBag.EndDate;
+                            var StatusFilter = ViewBag.Status;                          
                           }
 
                           <li class="list-inline-item filter-active mb-2" style="font-size: 12px;color:white;background-color: #ececec;color:#0f204b !important;padding:4px 20px;border-radius:6px;border:1px solid #0f204b;">
@@ -3351,7 +3564,7 @@
 
                           <select id="status-filter"  class="form-select">
 
-                            <option value="" selected>Filter by Status</option>
+                            <option value="" selected>Status</option>
 
                             @foreach(var status in Model.Statuses)
                             {                   
@@ -3363,6 +3576,12 @@
                                   url = Url.Action("Index", new { Status = status.Id, StartDate = StartDateStatus, EndDate = EndDateStatus });
                                   @: <option value="@url" @selected_ > @status.StatusName</option>                   
 
+                                }
+                                else
+                                if(ProjectTypeFilter != 0)
+                                {
+                                  url = Url.Action("Index", new {ProjectType = ProjectTypeFilter, Status = status.Id});
+                                  @: <option value="@url" @selected_ > @status.StatusName</option>  
                                 }
                                 else
                                 {
@@ -3490,12 +3709,13 @@
                 <section class="dashboard mt-4" style="margin-bottom:0 !important;">
                   
                   <div class="row">
+
                     @*Mini User Dashboard *@
-                    <div class="col-lg-10 mx-auto" style="margin-bottom:0 !important;padding-bottom:0 !important;">
-                      <div class="row">
+                    <div class="col-lg-10 mx-auto d-flex flex-row flex-wrap justify-content-center gap-2" style="margin-bottom:0 !important;padding-bottom:0 !important;">
+               
 
                         @*Project Card *@
-                        <div class="col-xxl-4 col-md-4" >
+                        <div class="flex-grow-1" >
                           <div class="card info-card sales-card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown">
@@ -3518,21 +3738,32 @@
                               <h5 class="card-title">Projects <span>| All</span></h5>
 
                               <div class="d-flex align-items-center">
-                                <div
-                                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
-                                >
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                   <i class="bi bi-folder2"></i>
                                 </div>
                                 <div class="ps-3">
-                                  <h6>
-                                    @{
+                                   @{
                                       var p = from p_ in projects_data
                                             select new {
                                               p_.Id
                                             };
                                     }
-                                    @p.Count()
-                                  </h6>
+                         
+
+                                  <div class="mb-0">
+                                      <span class="d-inline-flex align-items-center pe-3 me-3 border-end">
+                                         <small class="text-secondary me-1">Total:</small><h6 class="fs-5"> @p.Count()</h6>
+                                      </span>
+
+                                      <span class="d-inline-flex align-items-center pe-3 me-3 border-end">
+                                        <small class="text-secondary me-1">Long‑term:</small> <h6 class="fs-5">@projects_data.Count(x => x.ProjectTypeID == 1)</h6>
+                                      </span>
+
+                                      <span class="d-inline-flex align-items-center">
+                                        <small class="text-secondary me-1">Ad hoc:</small> <h6 class="fs-5">@projects_data.Count(x => x.ProjectTypeID == 2)</h6>
+                                      </span>
+                                  </div>
+
                                   <span class="text-primary small pt-1 fw-bold">
                                     @{
                                       var completed_proj = projects_data.Where(p => p.ProjectStatusID == 4).ToList();
@@ -3553,7 +3784,7 @@
                         @*End Project Card *@
 
                         @*Activities Card *@
-                        <div class="col-xxl-4 col-md-4">
+                        <div class="flex-grow-1">
                           <div class="card info-card revenue-card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown"
@@ -3619,7 +3850,7 @@
                         @*End Activities Card *@
 
                         @*Staff Card *@
-                        <div class="col-xxl-4 col-md-4">
+                        <div class="flex-grow-1">
                           <div class="card info-card customers-card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown"
@@ -3681,7 +3912,6 @@
                         </div>
                         @*End Staff Card *@
 
-                      </div>
                     </div>
 
                   </div>     
@@ -3922,11 +4152,21 @@
                                                           <div class="col-sm-6" >
                                                               <span class="accordion-button collapsed fw-semibold" data-bs-toggle="collapse" data-bs-target="#flush-collapse_@proj.Id" aria-expanded="false" aria-controls="flush-collapse_@proj.Id">
                                                                 <span class="fw-bold">@countProject. &nbsp;</span>@proj.ProjectName @getProjectOwner
+                                                                @* <span class="">
+                                                                  @if(proj.ProjectTypeID == 1)
+                                                                  {
+                                                                    <i class="bi bi-hourglass-split fs-5 text-success"></i>
+                                                                  }
+                                                                  else
+                                                                  {
+                                                                    <i class="bi bi-layers fs-5 text-primary"></i>
+                                                                  }
+                                                                </span> *@
                                                               </span>
                                                           </div>
 
                                                           @* Project Members *@
-                                                          <div class="col-sm-2 d-none d-lg-block" 
+                                                          <div class="col-sm-2 d-none d-lg-block align-content-center" 
                                                                 style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;"
                                                                 data-bs-toggle="tooltip" data-bs-placement="top" 
                                                                 title="@getProjectMembers.Substring(1)"
@@ -3940,7 +4180,7 @@
                                                           </div>
 
                                                           @* Project Duration *@
-                                                          <div class="col-sm-2 d-none d-lg-block" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
+                                                          <div class="col-sm-2 d-none d-lg-block align-content-center" style="background-color:#3D4A6B;border:1px solid grey;border-radius:4px;vertical-align:middle;width:110px;">
                                                             
                                                              @{string dateToolTip2 = proj.ProjectStartDate.ToString("dd MMM yy") + " -> " + proj.ProjectEndDate.ToString("dd MMM yy");}
 
@@ -4140,8 +4380,8 @@
                                                                     </div>
                                                                   </div>
                                                                   <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
-                                                                    <h6 class="fw-semibold mb-1" style="color:#a71930;">Area of Work</h6>
-                                                                    <p class="fw-light">@proj.ProjectAreaOfWork</p>
+                                                                    <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Type</h6>
+                                                                    <p class="fw-light">@proj.TypeName</p>
                                                                   </div>
                                                                   <div class="col-sm-2 ps-3 pe-3" style="border-right:1px solid grey;">
                                                                     <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
@@ -4777,34 +5017,73 @@
 
                                                               <input type="hidden" asp-for="@proj.AccountID" class="form-control" />
 
+                                                                <div class="col-sm-12">
+                                                                                                                                      
+                                                                    @* Project Type (with left accent bar) *@
+                                                                    <div class="d-flex align-items-stretch shadow-sm rounded-3">
+
+                                                                      @* <!-- Left accent bar --> *@
+                                                                      <div class="bg-success rounded-start" style="width: 6px;"></div>
+
+                                                                      @* <!-- Content pane --> *@
+                                                                      <div class="border border-1 border-success-subtle rounded-end ps-4 pe-4 w-100">
+                                                                        <div class="form-group">
+                                                                          <label asp-for="@Model.ProjectModel.ProjectTypeID" class="col-form-label fw-bold d-flex align-items-center gap-2">
+                                                                            <i class="bi bi-check2-circle text-success"></i>
+                                                                            Ad hoc / Long-term Project 
+                                                                          </label>
+
+                                                                          <select class="form-select mb-2"
+                                                                                  asp-for="@proj.ProjectTypeID"
+                                                                                  asp-items="Model.ProjectTypeList"
+                                                                                  required>
+
+                                                                            @if(proj.ProjectTypeID != null)
+                                                                            {
+                                                                              <option value="" selected>@proj.TypeName</option>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                               <option value="" selected>Select Project Type</option>
+                                                                            }
+                                                                          </select>
+
+                                                                        </div>
+                                                                      </div>
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                                @* Left Column *@
                                                                 <div class="col-md-6">
                                                                     
                                                                     @* Name *@
-                                                                    <div class="mb-3 form-group">
+                                                                    <div class="mb-1 form-group">
                                                                         <label class="col-form-label fw-bold">Project Name:<span class="text-danger">*</span></label>
-                                                                        <input class="form-control" maxlength="100" placeholder="Project Name" asp-for="@proj.ProjectName" />
+                                                                        <input class="form-control border-success-subtle" maxlength="100" placeholder="Project Name" asp-for="@proj.ProjectName" />
                                                                     </div>
 
                                                                      @* Project Details *@
-                                                                    <div class="mb-3 form-group">
+                                                                    <div class="mb-1 form-group">
                                                                         <label class="col-form-label fw-bold">Project Details:<span class="text-danger">*</span></label>
-                                                                        <textarea class="form-control" placeholder="Project Details" style="margin-top:0 !important;"
+                                                                        <textarea class="form-control border-success-subtle" placeholder="Project Details" style="margin-top:0 !important;"
                                                                              asp-for="@proj.ProjectDetails" rows="3" maxlength="300" placeholder="Describe project details">
                                                                             @proj.ProjectDetails
                                                                         </textarea>
                                                                     </div>
 
                                                                      @* Area of Work *@
-                                                                    <div class="mb-3 form-group" style="display:none;">
+                                                                    <div class="mb-1 form-group" style="display:none;">
                                                                         <label class="col-form-label fw-bold">Area of Work:</label>
                                                                         <input type="text" placeholder="SAS, DHET, HR, Faculties, Snr Director, Rector, ect." asp-for="@proj.ProjectAreaOfWork" class="form-control"  />
                                                                     </div>
 
                                                                     @* Project Progress *@
-                                                                    <div class="form-group mb-3">
+                                                                    <div class="form-group mb-1">
                                                                         <label asp-for="@Model.ProjectModel.ProjectStatusID" class="col-form-label fw-bold">Project Progress:<span class="text-danger">*</span></label>
 
-                                                                        <select class="form-select mb-3" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
+                                                                        <select class="form-select mb-1 border-success-subtle" asp-for="@proj.ProjectStatusID" asp-items="Model.StatusList" required>
                                                                             <option value="" selected> @proj.StatusName</option>
                                                                         </select>
 
@@ -4832,7 +5111,7 @@
                                                                           Project Members: <span class="text-danger">*</span>
                                                                       </label>
 
-                                                                      <div id="memberSelectContainer" class="border rounded p-2">
+                                                                      <div id="memberSelectContainer" class="border border-success-subtle rounded p-2">
                                                                           @* <!-- Selected Pills Appear Here --> *@
                                                                           <div id="selectedPills" class="mb-2 d-flex flex-wrap gap-2"></div>
 
@@ -4853,12 +5132,12 @@
                                                                     <div class="row mb-1">
                                                                         <div class="col-sm-6">
                                                                             <label class="col-form-label fw-bold">Start Date:<span class="text-danger">*</span></label>
-                                                                            <input type="date" asp-for="@proj.ProjectStartDate" class="form-control"  />
+                                                                            <input type="date" asp-for="@proj.ProjectStartDate" class="form-control border-success-subtle"  />
                                                                         </div>
 
                                                                         <div class="col-sm-6">
                                                                             <label class="col-form-label fw-bold">End Date:<span class="text-danger">*</span></label>
-                                                                            <input type="date" asp-for="@proj.ProjectEndDate" class="form-control"  />
+                                                                            <input type="date" asp-for="@proj.ProjectEndDate" class="form-control border-success-subtle"  />
                                                                         </div>
                                                                     </div>
 
@@ -4937,7 +5216,6 @@
                                                     </form>
                                                 </div>
                                             </div>
-
                                             
 
                                           }                                
@@ -5066,7 +5344,13 @@
 
                   @* <!-- HEADER --> *@
                   <div class="modal-header d-flex flex-row justify-content-between align-items-center">
-                      <h1 class="modal-title fs-5 fw-bold col-sm-4" id="staticBackdropLabel">Add Project</h1>
+                      <h1 class="modal-title fs-5 fw-bold col-sm-4" id="staticBackdropLabel">
+                         @{
+                            @* var typeId = Model?.ProjectModel?.Id ?? 0;
+                            var p_type = Model.ProjectTypes.FirstOrDefault(x => x.Id == typeId); *@
+                          } 
+                        Add Project @*<!--(<span class="text-danger">@p_type.TypeName</span>)-->*@
+                      </h1>
 
                       <p class="text-small text-center col-sm-4 m-0">
                           Required Fields (<span class="text-danger">*</span>)
@@ -5081,6 +5365,9 @@
 
                       <input type="hidden" asp-for="@Model.ProjectModel.AccountID"
                             value="@cc.AccountID" class="form-control" />
+
+                      <input type="hidden" asp-for="@Model.ProjectModel.ProjectTypeID"
+                          value="" class="form-control" />
 
                       @* <!-- 2-COLUMN RESPONSIVE LAYOUT --> *@
                       <div class="row g-4">
@@ -5464,6 +5751,15 @@ else
             }      
 
             var statusFilter = document.getElementById("status-filter");
+            if (statusFilter) {
+                statusFilter.addEventListener("change", function () {
+                    if (this.value) {
+                        window.location.href = this.value;
+                    }
+                });
+            }
+
+            var statusFilter = document.getElementById("p_type-filter");
             if (statusFilter) {
                 statusFilter.addEventListener("change", function () {
                     if (this.value) {
