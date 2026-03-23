@@ -66,7 +66,6 @@ public class AccountController : Controller
         vm.Users = getUsers();
         vm.Subdepts = getSubdepts();
         vm.Designation = getDesignation();
-        vm.Accounts = context.Accounts;
         vm.SubdeptsList = subdept_context.Subdepts;
         vm.Account = new Account();
                

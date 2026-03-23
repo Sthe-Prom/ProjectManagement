@@ -28,11 +28,13 @@ namespace ProjectManagement.Models
         public IEnumerable<Status> Statuses { get; set; }
         public IEnumerable<Subdept> Subdepts { get; set; }
         public IEnumerable<ProjectType> ProjectTypes { get; set; }
+        public IEnumerable<KPI> KPIs { get; set; }
         public List<int> SelectedAssignedUserIds { get; set; }
         public SelectList UserAccounts { get; set; }
         public SelectList StatusList { get; set; }        
         public SelectList ActivityStatuses { get; set; }
         public SelectList ProjectTypeList { get; set; }
+        public SelectList KPIsList { get; set; }
         
        
     }

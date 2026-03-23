@@ -117,24 +117,34 @@
                             <ul class="navbar-nav flex-grow-1">
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Project</a>
-                                </li>           
+                                </li>  
 
-                                @{
-                                    var acc = Model.Accounts.Where(c => c.Id == userId).FirstOrDefault();   
-                                    var project = Project.Projects.FirstOrDefault(x => x.AccountID == acc.AccountID) ;                                   
-                                                                                
-                                }
-
-                                @if(Project.Projects.Where(x => x.AccountID == acc.AccountID) != null) 
-                                {            
-                                    if(Activity.Activities.Count(x => x.ProjectID == project.Id ) > 0)
+                                @if(Model.Accounts != null && Model.Accounts.Count() != 0) //If there are no (0) accounts in the database
+                                {  
+                                    bool accExists = Model.Accounts.Any(c => c.Id == userId); //The logged in user has an account:
+                                                                        
+                                    if(accExists)
                                     {
-                                        <li class="nav-item">                                    
-                                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Activities">Activities</a>
-                                        </li>
+                                        var acc = Model.Accounts.FirstOrDefault(c => c.Id == userId); //find the user object:
+                                        bool projExist = Project.Projects.Any(c => c.AccountID == acc.AccountID); //The logged in user has an account:
+
+                                        if(projExist)         
+                                        {                                
+                                            var project  = Project.Projects.FirstOrDefault(x => x.AccountID == acc.AccountID);
+                                            bool hasActivity = Activity.Activities.Any(x => x.ProjectID == project.Id) ;  //The logged in user projects(s) has activities
+
+                                            if( hasActivity)
+                                            {   
+                                                <li class="nav-item">                                    
+                                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Activities">Activities</a>
+                                                </li>
+                                            }                         
+                                        }
                                     }
+                                    
                                  
                                 }
+
                             </ul>
                         }
                     </div>

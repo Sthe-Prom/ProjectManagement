@@ -31,6 +31,7 @@ public class HomeController : Controller
     private readonly IActivity activity_context;
     private readonly IStatus status_context;
     private readonly IProjectType p_type_context;
+    private readonly IKPI kpi_context;
     private readonly IWebHostEnvironment HostEnvironment;
     public BaseViewModel BaseViewModel { get; set; }
     private readonly ILogger<HomeController> _logger;
@@ -60,7 +61,7 @@ public class HomeController : Controller
     public HomeController(ILogger<HomeController> logger, IAccount account_context_, ISubdept subdept_context_,
                           IProject project_context_, IActivity activity_context_, IStatus status_context_,
                           UserManager<User> userManager_, SignInManager<User> signInManager_, IWebHostEnvironment he,
-                          IProjectAction project_service_, IProjectType p_type_context_)
+                          IProjectAction project_service_, IProjectType p_type_context_, IKPI kpi_context_)
     {
         _logger = logger;
 
@@ -70,6 +71,7 @@ public class HomeController : Controller
         subdept_context = subdept_context_;
         status_context = status_context_;
         p_type_context = p_type_context_;
+        kpi_context = kpi_context_;
         
         //User Management
         UserManager = userManager_;
@@ -102,10 +104,12 @@ public class HomeController : Controller
         vm.Accounts = account_context.Accounts;
         vm.Statuses = status_context.Statuses;
         vm.ProjectTypes = p_type_context.ProjectTypes;
+        vm.KPIs = kpi_context.KPIs;
         vm.UserAccounts = GetAccountsAsync();
         vm.StatusList = getStatuses();
         vm.ActivityStatuses = getActivityStatus();
         vm.ProjectTypeList = getProjectTypeList();
+        vm.KPIsList = getKPIs();
         
         var Project_ = project_context.Projects;
 
@@ -176,6 +180,18 @@ public class HomeController : Controller
         if (!string.IsNullOrWhiteSpace(startDate) && DateTime.TryParse(startDate, out DateTime _startDate) && !string.IsNullOrWhiteSpace(endDate) && DateTime.TryParse(endDate, out DateTime _endDate))
         {
             projectQuery = projectQuery.Where(p => p.ProjectStartDate >= _startDate && p.ProjectEndDate <= _endDate);
+        }
+        else
+        {
+            var year = DateTime.UtcNow.Year;            
+            var startOfYearUtc = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var startOfNextYearUtc = startOfYearUtc.AddYears(1);
+
+            projectQuery = projectQuery.Where(p => p.ProjectStartDate >= startOfYearUtc
+                                        && p.ProjectEndDate < startOfNextYearUtc );
+                                    
+            StartDate = startOfYearUtc;
+            EndDate = startOfNextYearUtc;
         }
 
         var filteredProjects = projectQuery.ToList();
@@ -391,6 +407,7 @@ public class HomeController : Controller
         ViewBag.Statuses = new SelectList(ActivityStatusList, "Id", "Name");
 
         return View(vm);
+
     }
 
     public async Task<IActionResult> Activities2(ProjectViewModel vm, string searchString, int? Status, 
@@ -422,10 +439,12 @@ public class HomeController : Controller
         vm.Accounts = account_context.Accounts;
         vm.Statuses = status_context.Statuses;
         vm.ProjectTypes = p_type_context.ProjectTypes;
+        vm.KPIs = kpi_context.KPIs;
         vm.UserAccounts = GetAccountsAsync();
         vm.StatusList = getStatuses();
         vm.ActivityStatuses = getActivityStatus();    
         vm.ProjectTypeList = getProjectTypeList();
+       
         
         // Prepare base query
         var projectQuery = project_context.Projects.AsQueryable();
@@ -515,10 +534,30 @@ public class HomeController : Controller
         // Filter Activity
         if(!string.IsNullOrWhiteSpace(startDate) && DateTime.TryParse(startDate, out DateTime _startDate) && !string.IsNullOrWhiteSpace(endDate) && DateTime.TryParse(endDate, out DateTime _endDate))
         {
-            activityQuery = activityQuery.Where(a => a.ActivityStartDate >= _startDate && a.ActivityEndDate <= _endDate);
+            //activityQuery = activityQuery.Where(a => a.ActivityStartDate >= _startDate && a.ActivityEndDate <= _endDate);
+            projectQuery = projectQuery.Where(p => p.ProjectStartDate >= _startDate
+                                    && p.ProjectEndDate < _endDate );
+                                    
+            StartDate = _startDate;
+            EndDate = _endDate;
         }       
+        else
+        {
+            var year = DateTime.UtcNow.Year;            
+            var startOfYearUtc = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var startOfNextYearUtc = startOfYearUtc.AddYears(1);
+
+            projectQuery = projectQuery.Where(p => p.ProjectUpdateTime >= startOfYearUtc
+                                         && p.ProjectUpdateTime < startOfNextYearUtc );
+                                    
+            StartDate = startOfYearUtc;
+            EndDate = startOfNextYearUtc;
+        }
 
         //projectQuery = projectQuery.Where(x => x.AccountID == StaffID);
+        //projectQuery = projectQuery.Where(p => p.ProjectStartDate >= StartDate
+        //                               && p.ProjectEndDate < EndDate );
+
         activityQuery = activityQuery.Where(p => p.ProjectID == ProjectID);     
 
         var filteredProjects = projectQuery.ToList();
@@ -628,6 +667,7 @@ public class HomeController : Controller
             model.ResponseMessage = "No user IDs selected.";
         }
 
+        var rawKpi = formCollection["ProjectModel_ProjectKPI"];
         var Project = new Project()
         {            
             ProjectName = formCollection["ProjectModel_ProjectName"].ToString(),
@@ -640,6 +680,8 @@ public class HomeController : Controller
             ProjectEndDate =  Convert.ToDateTime(formCollection["ProjectModel_ProjectEndDate"]),
             ProjectStatusID = Convert.ToInt32(formCollection["ProjectModel_ProjectStatusID"]),
             ProjectTypeID = Convert.ToInt32(formCollection["ProjectModel_ProjectTypeID"]),
+          
+            ProjectKPI = int.TryParse(rawKpi, out var kpiValue) ? kpiValue: 26,
             AccountID = Convert.ToInt32(formCollection["ProjectModel_AccountID"]),
             SelectedAssignedUserIds = selectedUserIds
             
@@ -1099,7 +1141,32 @@ public class HomeController : Controller
        return userSelect;
     }
 
-    [HttpDelete]
+    public SelectList getKPIs()
+    {
+        List<KPI> models = new List<KPI>();
+
+        var AllKPIs = from kpi in kpi_context.KPIs
+                select new
+                {
+                    Id = kpi.Id,
+                    KPIName = kpi.KPIName
+                };
+
+        foreach (var item in AllKPIs)
+        {
+            var m = new KPI();
+            
+            m.Id = item.Id;
+            m.KPIName = item.KPIName;
+            models.Add(m);
+        }
+        
+        
+       SelectList userSelect = new SelectList(models, "Id", "KPIName");
+       return userSelect;
+    }
+
+    [HttpPost]
     public ActionResult DeleteProject(int Id)
     {        
         //Prepare Json Response
@@ -1141,7 +1208,7 @@ public class HomeController : Controller
         return Json(model);
     }
 
-    [HttpDelete]
+    [HttpPost]
     public ActionResult DeleteActivity(int Id)
     {        
         //Prepare Json Response

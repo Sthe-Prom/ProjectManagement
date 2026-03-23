@@ -23,6 +23,7 @@ namespace ProjectManagement.Models
         public DbSet<Subdept> Subdept { get; set; }
         public DbSet<Account> Account { get; set; }
         public DbSet<ProjectType> ProjectType { get; set; }
+        public DbSet<KPI> KPI { get; set; }
        
     }
 }

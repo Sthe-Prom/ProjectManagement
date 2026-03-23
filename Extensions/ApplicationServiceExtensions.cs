@@ -78,6 +78,7 @@ namespace ProjectManagement.Extensions
             services.AddTransient<ISubdept, EFSubdept>();
             services.AddTransient<IAccount, EFAccount>();
             services.AddTransient<IProjectType, EFProjectType>();
+            services.AddTransient<IKPI, EFKPI>();
            
             return services;
         }

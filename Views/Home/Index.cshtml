@@ -185,9 +185,13 @@
       .icon-layers       { background-image: url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/layers.svg"); }
 
       .accordion-button::after {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 12px;
         height: 12px;
         border-radius: 100%;
+        align-content:middle;
         background-color: var(--bs-danger);
         /* background-image: url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/hourglass-split.svg'); */
         background-image: none !important; 
@@ -490,6 +494,7 @@
                     formData.append("ProjectModel_ProjectStatusID", $("#ProjectModel_ProjectStatusID").val() );
                     formData.append("ProjectModel_AccountID",  $("#ProjectModel_AccountID").val() );
                     formData.append("ProjectModel_ProjectTypeID",  $("#ProjectModel_ProjectTypeID").val() );
+                    formData.append("ProjectModel_ProjectKPI",  $("#ProjectModel_ProjectKPI").val() );
                     
                     if (file_input.files.length > 0) {
                       formData.append('ProjectFiles', file_input.files[0]); // name must match server binding
@@ -507,7 +512,9 @@
                     }
 
                     for(i = 0; i < values.length;i++){
-                      if(values[i][1] === "" && values[i][0] !== 'ProjectModel.SelectedAssignedUserIds' )// || values[i][1].name == "")
+                      if(values[i][1] === "" 
+                        && values[i][0] !== 'ProjectModel.SelectedAssignedUserIds' 
+                        && values[i][0] !== 'ProjectModel.ProjectKPI' )// || values[i][1].name == "")
                       {
                                      
                         if(values[i][0].includes('.')){
@@ -875,21 +882,21 @@
                         const values = [...formData_act.entries()];
                         const file_input = document.getElementById('ProjectFiles');
 
-                        formData_act.append("ActivityModel_ActivityName",  $("#ActivityModel_ActivityName").val() );
-                        formData_act.append("ActivityModel_ActivityComments", $("#ActivityModel_ActivityComments").val() );
-                        formData_act.append("ActivityModel_ActivityChallenges", $("#ActivityModel_ActivityChallenges").val() );
-                        formData_act.append("ActivityModel_ActivityHighlights", $("#ActivityModel_ActivityHighlights").val() );
-                        formData_act.append("ActivityModel_ActivityStartDate", $("#ActivityModel_ActivityStartDate").val() );
-                        formData_act.append("ActivityModel_ActivityEndDate", $("#ActivityModel_ActivityEndDate").val() );
-                        formData_act.append("ActivityModel_ActivityProgress", $("#ActivityModel_ActivityProgress").val() );
-                        formData_act.append("ActivityModel_ProjectID", $("#ActivityModel_ProjectID").val() );
+                        formData_act.append("ActivityModel_ActivityName",  formData_act.get('ActivityModel.ActivityName')  );
+                        formData_act.append("ActivityModel_ActivityComments", formData_act.get('ActivityModel.ActivityComments') );
+                        formData_act.append("ActivityModel_ActivityChallenges", formData_act.get('ActivityModel.ActivityChallenges') );
+                        formData_act.append("ActivityModel_ActivityHighlights", formData_act.get('ActivityModel.ActivityHighlights') );
+                        formData_act.append("ActivityModel_ActivityStartDate", formData_act.get('ActivityModel.ActivityStartDate') );
+                        formData_act.append("ActivityModel_ActivityEndDate", formData_act.get('ActivityModel.ActivityEndDate') );
+                        formData_act.append("ActivityModel_ActivityProgress", formData_act.get('ActivityModel.ActivityProgress') );
+                        formData_act.append("ActivityModel_ProjectID", formData_act.get('ActivityModel.ProjectID') );
                         
                         if(file_input.files.length > 0) {
                           formData_act.append('ProjectFiles', file_input.files[0]); // name must match server binding
                         } 
 
                         //formData_act.append("ProjectFiles",  $("#ProjectFiles").val() );
-                        formData_act.append("ActivityModel_MemberProject",  $("#ActivityModel_MemberProject").val() );
+                        formData_act.append("ActivityModel_MemberProject",  formData_act.get('ActivityModel.MemberProject') );
 
                         var f = [];
                         var s = '<div style="text-align: center !important;">Please correct the following errors:</div>' + "<hr><br />";
@@ -1002,7 +1009,7 @@
                                 function (isConfirm) {
                                     if (isConfirm) {
                                            $.ajax({
-                                                type: 'DELETE',
+                                                type: 'POST',
                                                 url: '@Url.Action("DeleteProject", "Home")' +'/' + num_extr[0],
                                                 cache: false
 
@@ -1258,7 +1265,7 @@
                                 function (isConfirm) {
                                     if (isConfirm) {
                                            $.ajax({
-                                                type: 'DELETE',
+                                                type: 'POST',
                                                 url: '@Url.Action("DeleteActivity", "Home")' +'/' + num_extr[0],
                                                 cache: false
 
@@ -1286,13 +1293,13 @@
                     });
 
                 };
+                
 
         });
 
         
 
     </script>
-
 }
 
 @* H E A D E R *@
@@ -1316,8 +1323,7 @@
                   <i class="bi bi-plus-circle fs-4 me-1"></i> Add a project
                 </span>
 
-              </button>
-              
+              </button>             
           
           
             </div>
@@ -1456,7 +1462,10 @@
                       join stat in Model.Statuses
                       on proj.ProjectStatusID equals stat.Id
                       join p_type in Model.ProjectTypes 
-                      on proj.ProjectTypeID equals p_type.Id
+                      on proj.ProjectTypeID equals p_type.Id 
+                      join kpi in Model.KPIs
+                      on proj.ProjectKPI equals kpi.Id into gj
+                      from kpi in gj.DefaultIfEmpty()
                       where acc.Id == userId ||
                                         //acc.AccountID == proj.SelectedAssignedUserIds[0]
                       (project_lists.Contains(proj.Id))
@@ -1477,7 +1486,9 @@
                       proj.SelectedAssignedUserIds,
                       proj.CalculatedDisplayStatusId,
                       proj.ProjectTypeID,
-                      p_type.TypeName
+                      p_type.TypeName,
+                      proj.ProjectKPI,
+                      kpi.KPIName
 
                     };
 
@@ -1485,8 +1496,12 @@
                       join proj in Model.Projects
                       on acc.AccountID equals proj.AccountID
                       join stat in Model.Statuses
-                      on proj.ProjectStatusID equals stat.Id           
-
+                      on proj.ProjectStatusID equals stat.Id  
+                      join p_type in Model.ProjectTypes 
+                      on proj.ProjectTypeID equals p_type.Id   
+                      join kpi in Model.KPIs
+                      on proj.ProjectKPI equals kpi.Id  
+           
                     select new {
                       proj.AccountID,
                       proj.Id,
@@ -1501,7 +1516,11 @@
                       proj.ProjectFiles,
                       stat.StatusName,
                       proj.SelectedAssignedUserIds,
-                      proj.CalculatedDisplayStatusId
+                      proj.CalculatedDisplayStatusId,
+                      proj.ProjectTypeID,
+                      p_type.TypeName,
+                      proj.ProjectKPI,
+                      kpi.KPIName
                     };
 
         var activities_data = from proj in Model.Projects
@@ -1558,7 +1577,7 @@
               @* Admin Main *@
               <div id="main" class="main" style="margin-top:0 !important;">
 
-           
+                @* FILTERS *@
                 <div class="col-sm-10 mx-auto d-flex flex-wrap flex-row justify-content-center mt-1 mb-3 gap-2 ">
                               
                       @* Staff Filter *@
@@ -1882,9 +1901,9 @@
                               {
                                   <input type="hidden" name="Status" class="form-control" value="@Context.Request.Query["Status"]" />
 
-                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
 
-                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
                       
                                   <input type="hidden" name="Staff" class="form-control" value="@Context.Request.Query["Staff"]" />
                                 
@@ -1894,24 +1913,24 @@
                               {
                                   <input type="hidden" name="Status" class="form-control" value="@Context.Request.Query["Status"]" />
 
-                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
 
-                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />                      
+                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />                      
                               }
                               else
                               if(StaffDate != null)
                               {
                                   <input type="hidden" name="Staff" class="form-control" value="@Context.Request.Query["Staff"]" />
 
-                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
 
-                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
                               }
                               else
                               {
-                                  <input type="date" id="start_date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                                  <input type="date" id="start_date" name="StartDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
 
-                                  <input type="date" id="end_date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                                  <input type="date" id="end_date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
                               }
 
                               <button type="submit" class="btn btn-outline-secondary">
@@ -1921,11 +1940,8 @@
                           </form>
 
                       </div>
-
                 
-                </div>
-
-               
+                </div>               
 
                 @* @*End Page Title *@
 
@@ -1935,18 +1951,16 @@
 
                     @*Left side columns *@
                     <div class="col-lg-8">
-                      <div class="row">
+                      <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
 
                         @*Project Card *@
-                        <div class="col-xxl-4 col-md-4">
+                        <div class="flex-grow-1">
                           <div class="card info-card sales-card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown">
                                 <i class="bi bi-three-dots"></i>
                               </a>
-                              <ul
-                                class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
-                              >
+                              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                 <li class="dropdown-header text-start">
                                   <h6>Filter</h6>
                                 </li>
@@ -1961,34 +1975,99 @@
                               <h5 class="card-title">Projects <span>| All</span></h5>
 
                               <div class="d-flex align-items-center">
-                                <div
-                                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
-                                >
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                   <i class="bi bi-folder2"></i>
-                                </div>
-                                <div class="ps-3">
-                                  <h6>
-                                    @{
-                                      var p = from p_ in Model.Projects
-                                            select new {
-                                              p_.Id
-                                            };
-                                    }
-                                    @p.Count()
-                                  </h6>
-                                  <span class="text-primary small pt-1 fw-bold">
-                                    @{
-                                        var completed_proj = Model.Projects.Where(p => p.ProjectStatusID == 4).ToList();
-                                        double getPerc_proj = 0;
-                                        if(p.Count() > 0)
-                                        {
-                                          getPerc_proj = ((double)completed_proj.Count / p.Count()) *100;
+                                </div>    
+
+                                  <span class="d-inline-flex align-items-center px-2 border-end">                                            
+                                    @* Total *@
+                                     @{
+                                          var p = from p_ in Model.Projects
+                                                select new {
+                                                  p_.Id
+                                                };
                                         }
-                                      }
-                                      @getPerc_proj.ToString("F2")%
-                                  </span>
-                                  <span class="text-muted small pt-2 ps-1">Completed</span>
-                                </div>
+                                    <div class="flex-column mb-0">
+
+                                      <h6 class=""> @p.Count()</h6>
+                                      <span class="text-primary small fw-bold">
+                                        @{
+                                            var completed_proj = Model.Projects.Where(p => p.ProjectStatusID == 4).ToList();
+                                            double getPerc_proj = 0;
+                                            if(p.Count() > 0)
+                                            {
+                                              getPerc_proj = ((double)completed_proj.Count / p.Count()) *100;
+                                            }
+                                          }
+                                          @getPerc_proj.ToString("F2")%
+                                      </span>
+                                      <span class="text-muted small px-2">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                      </span>
+                                      
+                                    </div>
+                                      
+                                  </span>                         
+                              
+                                  <div class="mb-0">
+
+                                      @* Long‑term: *@
+                                      <span class="d-inline-flex align-items-center px-2 border-end">
+                                        <small class="text-secondary me-1">Long‑term:</small> <h6 class="">@projects_data_admin.Count(x => x.ProjectTypeID == 1)</h6>
+                                      </span>
+
+                                      @* Ad hoc: *@
+                                      <span class="d-inline-flex align-items-center">
+                                        <small class="text-secondary me-1">Ad hoc:</small> <h6 class="">@projects_data_admin.Count(x => x.ProjectTypeID == 2)</h6>
+                                      </span>
+
+                                      @* KPI Related *@
+                                      <span class="d-inline-flex align-items-center px-2 mx-2 border-start" title="KPI Related Projects" data-bs-toggle="tooltip" data-bs-placement="top" >                                          
+                                          
+                                          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center" style="background-color: rgba(255, 193, 7, 0.1);" >
+                                            <i class="bi bi-stars" style="color: #FFD700;"></i>
+                                          </div>
+
+                                          <div class="ps-3">
+                                            <h6>
+        
+                                              @{
+                                                var kpi_related = from proj in Model.Projects
+                                                        join kpi in Model.KPIs
+                                                        on proj.ProjectKPI equals kpi.Id                                                      
+                                                        where kpi.Id != 26
+                                                        select new {
+                                                          kpi.Id,
+                                                          kpi.KPIName,
+                                                          ProjectID = proj.Id,
+                                                          ProjectStatusID = proj.ProjectStatusID
+                                                        };
+
+                                              }                                   
+                                              @kpi_related.Count()
+                                            </h6>
+                                            <span class="text-success small pt-1 fw-bold">
+                                              @{
+                                                var completed_kpi_proj = kpi_related.Where(p => p.ProjectStatusID == 4).ToList();
+                                                double getPerc_ = 0;
+                                              
+                                                if(kpi_related.Count() > 0)
+                                                {
+                                                  getPerc_ = ((double)completed_kpi_proj.Count / kpi_related.Count()) * 100;
+                                                }
+                                              }
+                                              @getPerc_.ToString("F2")%
+                                              
+                                            </span>
+                                            <span class="text-muted small pt-2 ps-1">
+                                              <i class="bi bi-check-circle-fill text-success"></i>
+                                            </span>
+                                          </div>
+
+                                      </span>     
+                                     
+                                  </div>
+
                               </div>
                             </div>
                           </div>
@@ -1996,7 +2075,7 @@
                         @*End Project Card *@
 
                         @*Activities Card *@
-                        <div class="col-xxl-4 col-md-4">
+                        <div class="flex-grow-1">
                           <div class="card info-card revenue-card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown"
@@ -2058,7 +2137,7 @@
                         @*End Activities Card *@
 
                         @*Staff Card *@
-                        <div class="col-xxl-4 col-md-4">
+                        <div class="flex-grow-1">
                           <div class="card info-card customers-card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown"
@@ -2130,9 +2209,11 @@
                           </div>
                         </div>
                         @*End Staff Card *@
+                      </div>
+                      <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
 
                         @*Projects *@
-                        <div class="col-sm-6">
+                        <div class="flex-grow-1">
                           <div class="card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown"
@@ -2253,7 +2334,7 @@
                         @*End Projects *@
 
                         @*Activities Progress Traffic *@
-                        <div class="col-sm-6">
+                        <div class="flex-grow-1">
                           <div class="card">
                             <div class="filter">
                               <a class="icon" href="#" data-bs-toggle="dropdown"
@@ -2684,11 +2765,8 @@
                       <div class="card">
                         
                         <div class="filter">
-                          <a class="icon" href="#" data-bs-toggle="dropdown"
-                            ><i class="bi bi-three-dots"></i></a>
-                          <ul
-                            class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
-                          >
+                          <a class="icon" href="#" data-bs-toggle="dropdown" ><i class="bi bi-three-dots"></i></a>
+                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                             <li class="dropdown-header text-start">
                               <h6>Filter</h6>
                             </li>
@@ -2701,8 +2779,7 @@
 
                         <div class="card-body" style="margin:0;padding:0;">
                           <h5 class="card-title p-3 m-0">
-                            Projects & Activities <span>| All</span>
-                           
+                            Projects & Activities <span>| All</span>                           
                           </h5>
                           
                           @using (Html.BeginForm())
@@ -2851,10 +2928,10 @@
 
                                 <thead >
                                     <tr class="">
-                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:15%">Activity Name</th>
-                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:30%">Comments</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:20%">Activity Name</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:20%">Comments</th>
                                         <th rowspan="1" class="header text-center align-middle text-align:center" style="width:20%">Challenges</th>
-                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:10%">Start Date</th>
+                                        <th rowspan="1" class="header text-center align-middle text-align:center" style="width:15%">Start/End Date</th>
                                         <th rowspan="1" class="header text-center align-middle text-align:center" style="width:10%">Duration</th>
                                         <th colspan="1" class="header text-center align-middle text-align:center" style="width:10%">Progress</th>
                                         <th rowspan="1" class="header text-center align-middle text-align:center" style="width:5%">Files</th>
@@ -2918,7 +2995,18 @@
                                                         @* Project Name *@
                                                         <div class="col-sm-6" >
                                                             <span class="accordion-button collapsed fw-semibold" data-bs-toggle="collapse" data-bs-target="#flush-collapse_@proj.Id" aria-expanded="false" aria-controls="flush-collapse_@proj.Id">
-                                                              <span class="fw-bold">@countProject. &nbsp;</span>@proj.ProjectName
+                                                              <span class="fw-bold">@countProject. &nbsp;</span>
+                                                                <span class="d-inline-flex align-items-center" style="gap:.375rem;">
+                                                                                                                         
+                                                                  @if(proj?.ProjectKPI != null && proj.ProjectKPI != 26)
+                                                                  {
+                                                                    var kpi = Model.KPIs.FirstOrDefault(x => x.Id == proj.ProjectKPI);
+                                                                    <i class="bi bi-stars fs-5" style="color: #FFD700;" data-bs-toggle="tooltip" data-bs-placement="top" title="@kpi.KPIName" aria-label="KPI-linked project"></i>
+                                                                  }
+                                                               
+                                                                  @proj.ProjectName | @proj.ProjectKPI
+
+                                                                </span>
                                                             </span>
                                                         </div>
 
@@ -3386,23 +3474,62 @@
                                                       
                                                       string fileName = act_.ProjectFiles.Length >= 3 ? act_.ProjectFiles.Substring(4) : act_.ProjectFiles;
                                                         
-                                                      <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName">
+                                                      <li class="file-item" data-filename="@act_.ProjectFiles" data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName">
                                                         <a href="~/Attachments/Activity/@act_.ProjectFiles"  class="clip" download>
-                                                            <i class="bi bi-paperclip fs-5"></i>
+                                                            <i class="bi fs-5"></i>
                                                         </a>
                                                       </li>
                                                     }
                                                     else
                                                     {
-                                                      <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project.">
+                                                      <li class="file-item" data-filename="@act_.ProjectFiles" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project.">
                                                         <a class="" aria-disabled="true" disabled>
-                                                            <i class="bi bi-paperclip fs-5"></i>
+                                                            <i class="bi fs-5"></i>
                                                         </a>
                                                       </li>
                                                     }
 
 
                                                   </ul>
+
+                                                      <script>
+
+                                                        (function () {
+                                                          const map = {
+                                                            image: [".jpg",".jpeg",".png",".gif",".bmp",".tiff",".webp"],
+                                                            word: [".doc",".docx"],
+                                                            pdf: [".pdf"],
+                                                            excel: [".xls",".xlsx",".csv"],
+                                                            ppt: [".ppt",".pptx"],
+                                                            zip: [".zip",".rar",".7z"],
+                                                            text: [".txt",".md"],
+                                                            play: [".mp4",".mov",".avi",".mkv"],
+                                                            music: [".mp3",".wav",".flac"]
+                                                          };
+
+                                                          const getIcon = (ext) => {
+                                                            ext = (ext || "").toLowerCase();
+                                                            if (map.image.includes(ext)) return "bi-file-earmark-image";
+                                                            if (map.word.includes(ext)) return "bi-file-earmark-word";
+                                                            if (map.pdf.includes(ext)) return "bi-file-earmark-pdf";
+                                                            if (map.excel.includes(ext)) return "bi-file-earmark-excel";
+                                                            if (map.ppt.includes(ext)) return "bi-file-earmark-ppt";
+                                                            if (map.zip.includes(ext)) return "bi-file-earmark-zip";
+                                                            if (map.text.includes(ext)) return "bi-file-earmark-text";
+                                                            if (map.play.includes(ext)) return "bi-file-earmark-play";
+                                                            if (map.music.includes(ext)) return "bi-file-earmark-music";
+                                                            return "bi-file-earmark";
+                                                          };
+
+                                                          document.querySelectorAll(".file-item").forEach(li => {
+                                                            const filename = li.getAttribute("data-filename") || "";
+                                                            const ext = filename.substring(filename.lastIndexOf("."));
+                                                            const i = li.querySelector("i.bi");
+                                                            i.classList.add(getIcon(ext));
+                                                          });
+                                                        })();
+
+                                                    </script>
 
                                                 </td>
 
@@ -3439,6 +3566,12 @@
             {               
               @* User Mini-Dashboard Main *@
               <div id="main" class="main" style="margin-top:0 !important;margin-bottom:-20px !important">
+
+                @{
+                    //var year = DateTime.UtcNow.Year;            
+                    //var startOfYearUtc = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    //ar startOfNextYearUtc = startOfYearUtc.AddYears(1);
+                }
 
                 @* Filters *@
                 <div class="d-flex flex-row justify-content-center mt-1">
@@ -3510,7 +3643,7 @@
                                 else
                                 if(statusId != 0)
                                 {
-                                  url = Url.Action("Index", new { Status = statusId, ProjectType = p_type.Id, });                                    
+                                  url = Url.Action("Index", new { Status = statusId, ProjectType = p_type.Id, StartDate = ViewBag.startOfYearUtc, EndDate = ViewBag.startOfNextYearUtc });                                    
                                   @: <option value="@url" @selected >@p_type.TypeName  </option>
                                   
                                 }
@@ -3580,12 +3713,12 @@
                                 else
                                 if(ProjectTypeFilter != 0)
                                 {
-                                  url = Url.Action("Index", new {ProjectType = ProjectTypeFilter, Status = status.Id});
+                                  url = Url.Action("Index", new {ProjectType = ProjectTypeFilter, Status = status.Id, StartDate = ViewBag.startOfYearUtc, EndDate = ViewBag.startOfNextYearUtc});
                                   @: <option value="@url" @selected_ > @status.StatusName</option>  
                                 }
                                 else
                                 {
-                                  url = Url.Action("Index", new { Status = status.Id });
+                                  url = Url.Action("Index", new { Status = status.Id, StartDate = ViewBag.startOfYearUtc, EndDate = ViewBag.startOfNextYearUtc });
                                   @: <option value="@url" @selected_ > @status.StatusName</option>
                                 }
                                     
@@ -3626,6 +3759,8 @@
                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#00D100"><path d="M7 3V6H3V8H7V11H9V3H7ZM11 8H21V6H11V8ZM17 13V16H21V18H17V21H15V13H17ZM13 18H3V16H13V18Z"></path></svg>
                                 </span>
                                 <span class="apply_filter">Filters Applied</span>
+                                
+                              
                               }
                               else
                               {
@@ -3678,19 +3813,20 @@
 
                           <form method="get" class="d-flex align-items-center ms-1 me-1 pe-1 ps-1">
 
-                              @if (StatusDate != null)
+                              @if (ViewBag.StartDate != null && ViewBag.EndDate != null)
                               {
                                   <input type="hidden" name="Status" class="form-control" value="@Context.Request.Query["Status"]" />
 
-                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                                  <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
 
-                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                                  <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
                               }
                               else
-                              {
-                                  <input type="date" id="start_date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                              {                                 
 
-                                  <input type="date" id="end_date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
+                                  <input type="date" id="start_date" name="StartDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
+
+                                  <input type="date" id="end_date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
                               }
 
                               <button type="submit" class="btn btn-outline-secondary">
@@ -3705,13 +3841,13 @@
 
                 </div>  
                 
-         
+                @* DASHBOARD *@
                 <section class="dashboard mt-4" style="margin-bottom:0 !important;">
                   
                   <div class="row">
 
                     @*Mini User Dashboard *@
-                    <div class="col-lg-10 mx-auto d-flex flex-row flex-wrap justify-content-center gap-2" style="margin-bottom:0 !important;padding-bottom:0 !important;">
+                    <div class="col-lg-12 col-xxl-10 mx-auto d-flex flex-row flex-wrap justify-content-center gap-2" style="margin-bottom:0 !important;padding-bottom:0 !important;">
                
 
                         @*Project Card *@
@@ -3737,46 +3873,109 @@
                             <div class="card-body">
                               <h5 class="card-title">Projects <span>| All</span></h5>
 
+                              @* ALl Projects *@
                               <div class="d-flex align-items-center">
+
+                                @* Totals *@
                                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                   <i class="bi bi-folder2"></i>
                                 </div>
+                                <span class="d-inline-flex align-items-center pe-2 me-2 border-end">
+                                      @{
+                                        var p = from p_ in projects_data
+                                              select new {
+                                                p_.Id
+                                              };
+                                      }    
+                                         
+                                      <div class="flex-column">
+
+                                          <h6 class="px-2"> @p.Count()</h6>
+                                          <span class="text-primary small pt-1 fw-bold px-2">
+                                          
+                                            @{
+                                              var completed_proj = projects_data.Where(p => p.ProjectStatusID == 4).ToList();
+                                              double getPerc_proj = 0;
+                                              if(p.Count() > 0)
+                                              {
+                                                getPerc_proj = ((double)completed_proj.Count / p.Count()) *100;
+                                              }
+                                            }
+                                            @getPerc_proj.ToString("F2")%
+                                          </span>
+                                          <span class="text-muted small pt-2 ps-1">
+                                              <i class="bi bi-check-circle-fill text-success"></i>
+                                          </span>
+
+                                      </div>
+
+                                </span>
+
                                 <div class="ps-3">
-                                   @{
-                                      var p = from p_ in projects_data
-                                            select new {
-                                              p_.Id
-                                            };
-                                    }
-                         
+                                               
 
                                   <div class="mb-0">
-                                      <span class="d-inline-flex align-items-center pe-3 me-3 border-end">
-                                         <small class="text-secondary me-1">Total:</small><h6 class="fs-5"> @p.Count()</h6>
+                                      
+                                      @* Long‑term: *@
+                                      <span class="d-inline-flex align-items-center pe-2 me-2 border-end">
+                                        <small class="text-secondary me-1">Long‑term:</small> <h6 class="">@projects_data.Count(x => x.ProjectTypeID == 1)</h6>
                                       </span>
 
-                                      <span class="d-inline-flex align-items-center pe-3 me-3 border-end">
-                                        <small class="text-secondary me-1">Long‑term:</small> <h6 class="fs-5">@projects_data.Count(x => x.ProjectTypeID == 1)</h6>
+                                      @* Ad hoc: *@
+                                      <span class="d-inline-flex align-items-center pe-2 me-2">
+                                        <small class="text-secondary me-1">Ad hoc:</small> <h6 class="">@projects_data.Count(x => x.ProjectTypeID == 2)</h6>
                                       </span>
 
-                                      <span class="d-inline-flex align-items-center">
-                                        <small class="text-secondary me-1">Ad hoc:</small> <h6 class="fs-5">@projects_data.Count(x => x.ProjectTypeID == 2)</h6>
-                                      </span>
+                                      @* KPI Related *@
+                                      <span class="d-inline-flex align-items-center px-2 mx-2 border-start" title="KPI Related Projects" data-bs-toggle="tooltip" data-bs-placement="top" >                                          
+                                          
+                                          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center" style="background-color: rgba(255, 193, 7, 0.1);" >
+                                            <i class="bi bi-stars" style="color: #FFD700;"></i>
+                                          </div>
+                                          <div class="ps-3">
+                                            <h6>
+        
+                                              @{
+                                                var kpi_related = from proj in Model.Projects
+                                                        join kpi in Model.KPIs
+                                                        on proj.ProjectKPI equals kpi.Id
+                                                        where proj.AccountID == currentUser.AccountID
+                                                        && kpi.Id != 26
+                                                        select new {
+                                                          kpi.Id,
+                                                          kpi.KPIName,
+                                                          ProjectID = proj.Id,
+                                                          ProjectStatusID = proj.ProjectStatusID
+                                                        };
+
+                                              }                                   
+                                              @kpi_related.Count()
+                                            </h6>
+                                            <span class="text-success small pt-1 fw-bold">
+                                              @{
+                                                var completed_kpi_proj = kpi_related.Where(p => p.ProjectStatusID == 4).ToList();
+                                                double getPerc_ = 0;
+                                              
+                                                if(kpi_related.Count() > 0)
+                                                {
+                                                  getPerc_ = ((double)completed_kpi_proj.Count / kpi_related.Count()) * 100;
+                                                }
+                                              }
+                                              @getPerc_.ToString("F2")%
+                                              
+                                            </span>
+                                            <span class="text-muted small pt-2 ps-1">
+                                              <i class="bi bi-check-circle-fill text-success"></i>
+                                            </span>
+                                          </div>
+
+                                      </span>                                  
+
                                   </div>
 
-                                  <span class="text-primary small pt-1 fw-bold">
-                                    @{
-                                      var completed_proj = projects_data.Where(p => p.ProjectStatusID == 4).ToList();
-                                      double getPerc_proj = 0;
-                                      if(p.Count() > 0)
-                                      {
-                                        getPerc_proj = ((double)completed_proj.Count / p.Count()) *100;
-                                      }
-                                    }
-                                    @getPerc_proj.ToString("F2")%
-                                  </span>
-                                  <span class="text-muted small pt-2 ps-1">Completed</span>
+                                  
                                 </div>
+
                               </div>
                             </div>
                           </div>
@@ -3841,7 +4040,9 @@
                                     @getPerc.ToString("F2")%
                                     
                                   </span>
-                                  <span class="text-muted small pt-2 ps-1">Completed</span>
+                                  <span class="text-muted small pt-2 ps-1">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -3870,7 +4071,7 @@
 
                             <div class="card-body">
                               <h5 class="card-title">
-                                Collaborative Projects <span>| All</span>
+                                Collaborative <span>| All</span>
                               </h5>
 
                               <div class="d-flex align-items-center">
@@ -3904,7 +4105,9 @@
                                     @getPerc_partner_proj.ToString("F2")%
 
                                   </span>
-                                  <span class="text-muted small pt-2 ps-1">Completed</span>
+                                  <span class="text-muted small pt-2 ps-1">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -4151,7 +4354,21 @@
                                                           @* Project Name *@
                                                           <div class="col-sm-6" >
                                                               <span class="accordion-button collapsed fw-semibold" data-bs-toggle="collapse" data-bs-target="#flush-collapse_@proj.Id" aria-expanded="false" aria-controls="flush-collapse_@proj.Id">
-                                                                <span class="fw-bold">@countProject. &nbsp;</span>@proj.ProjectName @getProjectOwner
+                                                                <span class="fw-bold">@countProject. &nbsp;</span>
+                                                                   
+                                                                   <span class="d-inline-flex align-items-center" style="gap:.375rem;">
+                                                                  
+                                                                    @if(proj?.ProjectKPI != null && proj.ProjectKPI != 26)
+                                                                    {
+                                                                      var kpi = Model.KPIs.FirstOrDefault(x => x.Id == proj.ProjectKPI);
+                                                                      <i class="bi bi-stars fs-5" style="color: #FFD700;" data-bs-toggle="tooltip" data-bs-placement="top" title="@kpi.KPIName" aria-label="KPI-linked project"></i>
+                                                                    }
+                                                                                                                                  
+                                                                    @proj.ProjectName @getProjectOwner
+
+                                                                  </span>
+                                                                 
+                                                                
                                                                 @* <span class="">
                                                                   @if(proj.ProjectTypeID == 1)
                                                                   {
@@ -4162,6 +4379,7 @@
                                                                     <i class="bi bi-layers fs-5 text-primary"></i>
                                                                   }
                                                                 </span> *@
+
                                                               </span>
                                                           </div>
 
@@ -4294,10 +4512,11 @@
                                                           <div class="col-auto d-none d-lg-block" style="vertical-align:middle;float:right;">
 
                                                             <ul class="list-unstyled d-flex" style="margin:0;padding:0;border:1px solid grey;border-radius:4px;">
-                                                                @* Add Project *@
+                                                                
+                                                                @* Add Activity *@
                                                                 <li class="align-middle ps-4 pe-4" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="modal" data-bs-target="#modalActivity_@proj.Id">
                                                                     <span class="clip" style="color: blue;">
-                                                                      <i class="bi bi-plus-circle"></i>
+                                                                      <i class="bi bi-plus-circle fs-6"></i>
                                                                     </span>
                                                                 </li>
 
@@ -4309,7 +4528,7 @@
                                                                       @* Edit Project *@
                                                                       <li class="align-middle ps-4 pe-4" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="modal" data-bs-target="#modalProjectEdit_@proj.Id">
                                                                         <span class="safe" style="color: green;">
-                                                                            <i class="bi bi-pencil-square" ></i>
+                                                                            <i class="bi bi-pencil-square fs-6" ></i>
                                                                         </span>
                                                                       </li>
 
@@ -4318,7 +4537,7 @@
                                                                       { 
                                                                         <li class="align-middle ps-4 pe-4 pt-1" style="margin:0;padding:0;display: inline-flex; align-items: center;" id="btnDeleteProject_@proj.Id">
                                                                           <span class="danger"style="color: red;" >
-                                                                              <i class="bi bi-trash3"></i>
+                                                                              <i class="bi bi-trash3 fs-6"></i>
                                                                           </span>
                                                                         </li>
                                                                       }
@@ -4326,7 +4545,7 @@
                                                                       {
                                                                         <li class="align-middle ps-4 pe-4 pt-1" style="margin:0;padding:0;display: inline-flex; align-items: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Cannot delete. This project has related activities.">
                                                                           <span class="">
-                                                                              <i class="bi bi-trash3"></i>
+                                                                              <i class="bi bi-trash3 fs-6"></i>
                                                                           </span>
                                                                         </li>
                                                                       }
@@ -4337,14 +4556,14 @@
                                                                         @* Edit Project *@
                                                                         <li class="align-middle ps-4 pe-4" style="margin:0;padding:0;display: inline-flex; align-items: center;" disabled>
                                                                           <span class="" style="color: grey !important;" >
-                                                                              <i class="bi bi-pencil-square" ></i>
+                                                                              <i class="bi bi-pencil-square fs-6" ></i>
                                                                           </span>
                                                                         </li>
 
                                                                         @* Delete Project *@
                                                                         <li class="align-middle ps-4 pe-4 pt-1" style="margin:0;padding:0;display: inline-flex; align-items: center;" disabled>
                                                                           <span class="" style="color: grey !important;" >
-                                                                              <i class="bi bi-trash3"></i>
+                                                                              <i class="bi bi-trash3 fs-6"></i>
                                                                           </span>
                                                                         </li>
                                                                     }
@@ -4387,14 +4606,17 @@
                                                                     <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Members</h6>
                                                                     <p class="fw-light">@getProjectMembers.Substring(1)</p>
                                                                   </div>
+
+                                                                  @* Attachments *@
                                                                   <div class="col-sm-2 ps-3 pe-3">
                                                                     <h6 class="fw-semibold mb-1" style="color:#a71930;">Project Attachments</h6>
                                                                     @if(proj.ProjectFiles.Length > 2)
                                                                     {
-                                                                      <p class="fw-light">
-                                                                        <a href="~/Attachments/Projects/@proj.ProjectFiles" class="clip" download>
+                                                                      <p class="fw-light file-item">
+                                                                        <a href="~/Attachments/Projects/@proj.ProjectFiles" class="clip"
+                                                                          data-filename="@proj.ProjectFiles" download>
                                                                           <span>
-                                                                            <i class="bi bi-paperclip fs-5"></i>
+                                                                            <i class="bi bi-paperclip fs-6"></i>
                                                                           </span>
                                                                           @proj.ProjectFiles.Substring(4)
                                                                         </a>
@@ -4630,23 +4852,64 @@
                                                       @if(!String.IsNullOrEmpty(act.ProjectFiles) && act.ProjectFiles.Contains('.'))
                                                       {
                                                         string fileName = act.ProjectFiles.Length >= 3 ? act.ProjectFiles.Substring(4) : act.ProjectFiles;
-                                                        <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName">
+                                                        <li class="file-item" data-filename="@act.ProjectFiles" data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName">
                                                           <a href="~/Attachments/Activity/@act.ProjectFiles" class="clip" download>
-                                                              <i class="bi bi-paperclip fs-5"></i>
+                                                              <i class="bi fs-6"></i>
                                                           </a>
                                                         </li>
                                                       }
                                                       else
                                                       {
-                                                        <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project.">
+                                                        <li class="file-item" data-filename="@act.ProjectFiles" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this Activity.">
                                                           <a class="" aria-disabled="true" disabled>
-                                                              <i class="bi bi-paperclip fs-5"></i>
+                                                              <i class="bi fs-6" style="color:lightgray;"></i>
                                                           </a>
                                                         </li>
                                                       }
 
 
                                                     </ul>
+
+                                                    
+                                                    <script>
+
+                                                        (function () {
+                                                          const map = {
+                                                            image: [".jpg",".jpeg",".png",".gif",".bmp",".tiff",".webp"],
+                                                            word: [".doc",".docx"],
+                                                            pdf: [".pdf"],
+                                                            excel: [".xls",".xlsx",".csv"],
+                                                            ppt: [".ppt",".pptx"],
+                                                            zip: [".zip",".rar",".7z"],
+                                                            text: [".txt",".md"],
+                                                            play: [".mp4",".mov",".avi",".mkv"],
+                                                            music: [".mp3",".wav",".flac"]
+                                                          };
+
+                                                          const getIcon = (ext) => {
+                                                            ext = (ext || "").toLowerCase();
+                                                            if (map.image.includes(ext)) return "bi-file-earmark-image";
+                                                            if (map.word.includes(ext)) return "bi-file-earmark-word";
+                                                            if (map.pdf.includes(ext)) return "bi-file-earmark-pdf";
+                                                            if (map.excel.includes(ext)) return "bi-file-earmark-excel";
+                                                            if (map.ppt.includes(ext)) return "bi-file-earmark-ppt";
+                                                            if (map.zip.includes(ext)) return "bi-file-earmark-zip";
+                                                            if (map.text.includes(ext)) return "bi-file-earmark-text";
+                                                            if (map.play.includes(ext)) return "bi-file-earmark-play";
+                                                            if (map.music.includes(ext)) return "bi-file-earmark-music";
+                                                            return "bi-file-earmark";
+                                                          };
+
+                                                          document.querySelectorAll(".file-item").forEach(li => {
+                                                            const filename = li.getAttribute("data-filename") || "";
+                                                            const ext = filename.substring(filename.lastIndexOf("."));
+                                                            const i = li.querySelector("i.bi");
+                                                            i.classList.add(getIcon(ext));
+                                                          });
+                                                        })();
+
+                                                    </script>
+
 
                                                   </td>
 
@@ -4664,35 +4927,35 @@
                                                               @* EDIT *@
                                                               <li class="align-middle" data-bs-toggle="modal" data-bs-target="#btnEditActivity_@act.Id" >
                                                                 <span class="safe">
-                                                                    <i class="bi bi-pencil-square"></i>
+                                                                    <i class="bi bi-pencil-square fs-6"></i>
                                                                 </span>
                                                               </li>
 
                                                               @* DELETE *@
                                                               <li id="btnDeleteActivity_@act.Id">
                                                                 <span class="danger">
-                                                                    <i class="bi bi-trash3"></i>
+                                                                    <i class="bi bi-trash3 fs-6"></i>
                                                                 </span>
                                                               </li>
 
                                                             </ul>
                                                         }
                                                         else
-                                                        if(proj.AccountID != currentUser.AccountID && proj.Id == act.MemberProject) //Member Actions
+                                                        if(proj.AccountID != currentUser.AccountID && proj.Id == act.MemberProject) //Project Member Actions
                                                         {
                                                           <ul class="list-unstyled d-flex" style="margin: 0 !important; padding: 0 !important;">
 
                                                             @* EDIT *@
                                                             <li class="align-middle" data-bs-toggle="modal" data-bs-target="#btnEditActivity_@act.Id" >
                                                               <span class="safe">
-                                                                  <i class="bi bi-pencil-square"></i>
+                                                                  <i class="bi bi-pencil-square fs-6"></i>
                                                               </span>
                                                             </li>
 
                                                             @* DELETE *@
                                                             <li id="btnDeleteActivity_@act.Id">
                                                               <span class="danger">
-                                                                  <i class="bi bi-trash3"></i>
+                                                                  <i class="bi bi-trash3 fs-6"></i>
                                                               </span>
                                                             </li>
 
@@ -4853,7 +5116,7 @@
 
                                             }
 
-                                            // Modal Activity
+                                            // Modal ADD-Activity
                                             <div class="modal modal-md fade" id="modalActivity_@proj.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                               <div class="modal-dialog modal-xl">
                                                   <form enctype="multipart/form-data" class="frm_Activity" id="frm_Activity_@proj.Id" >
@@ -4877,6 +5140,7 @@
 
                                                           <div class="row">
 
+                                                              @* LEFT Column *@
                                                               <div class="col-md-6">
 
                                                                 <input type="hidden" asp-for="@Model.ActivityModel.ProjectID" value="@proj.Id" class="form-control" />
@@ -4912,6 +5176,7 @@
                                                                   <input type="range" min="0" max="100" asp-for="@Model.ActivityModel.ActivityProgress" class="form-range"  />
                                                               </div> *@
 
+                                                              @* RIGHT Column *@
                                                               <div class="col-md-6">
 
                                                                   @* Status *@
@@ -4927,12 +5192,12 @@
                                                                   <div class="col-sm-12 mb-1 d-flex justify-content-center">
                                                                     <div class="flex-grow-1">
                                                                         <label class="col-form-label fw-bold">Start Date: <span class="text-danger">*</span></label>
-                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityStartDate" class="form-control"  />
+                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityStartDate" value="@proj.ProjectStartDate.ToString("yyyy-MM-dd")" class="form-control"  />
                                                                     </div>
 
                                                                     <div class="flex-grow-1">
                                                                         <label class="col-form-label fw-bold align-right">End Date: <span class="text-danger">*</span></label>
-                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityEndDate" class="form-control"  />
+                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityEndDate" value="@proj.ProjectEndDate.ToString("yyyy-MM-dd")" class="form-control"  />
                                                                     </div>
                                                                   </div>
 
@@ -4959,8 +5224,7 @@
 
                                                                       <input type="file" class="form-control mt-2 d-none"
                                                                             asp-for="@Model.ProjectFiles" required />
-                                                                  </div>
-                                                                  
+                                                                  </div>                                                                  
 
                                                                   @* ActivityModel_MemberProject *@
                                                                   @if(proj.AccountID != currentUser.AccountID)
@@ -5038,14 +5302,15 @@
                                                                                   asp-items="Model.ProjectTypeList"
                                                                                   required>
 
-                                                                            @if(proj.ProjectTypeID != null)
+                                                                            @* @if(proj.ProjectTypeID != null)
                                                                             {
                                                                               <option value="" selected>@proj.TypeName</option>
                                                                             }
                                                                             else
                                                                             {
                                                                                <option value="" selected>Select Project Type</option>
-                                                                            }
+                                                                            } *@
+                                                                            <option value="" selected>Select Project Type</option>  
                                                                           </select>
 
                                                                         </div>
@@ -5371,6 +5636,57 @@
 
                       @* <!-- 2-COLUMN RESPONSIVE LAYOUT --> *@
                       <div class="row g-4">
+
+                          @* KPI-ADD *@
+                          <div class="col-sm-12">
+                                                                                                                                      
+                              @* Project Type (with left accent bar) *@
+                              <div class="d-flex align-items-stretch shadow-sm rounded-3">
+
+                                @* <!-- Left accent bar --> *@
+                                <div class="bg-success rounded-start" style="width: 6px;"></div>
+
+                                @* <!-- Content pane --> *@
+                                <div class="border border-1 border-success-subtle rounded-end ps-4 pe-4 w-100">
+
+                                  <div class="form-group">
+
+
+                                    <div class="form-check pt-1">
+                                      <input class="form-check-input align-content-center" type="checkbox" value="" id="flexCheckKPI">
+                                      <label class="form-check-label" for="flexCheckIndeterminate">
+                                          <span>This Project is KPI Related
+                                          <i class="bi bi-check2-circle text-success"></i></span>
+                                      </label>
+                                    </div>                                                 
+        
+                                    <select class="form-select mb-2 d-none" id="ProjectModel_ProjectKPI"
+                                            asp-for="@Model.ProjectModel.ProjectKPI"
+                                            asp-items="Model.KPIsList"
+                                            required>                                   
+                                      <option value="" selected>Select Related KPI</option>  
+                                    </select> 
+                                    
+                                    <script>
+                                        const checkbox = document.getElementById('flexCheckKPI');
+                                        const select = document.getElementById('ProjectModel_ProjectKPI');
+
+                                        checkbox.addEventListener('change', function () {
+                                            if (this.checked) {
+                                                select.classList.remove('d-none');
+                                            } else {
+                                                select.classList.add('d-none');
+                                            }
+                                        });
+                                    </script>
+
+
+                                  </div>
+                                </div>
+
+                              </div>
+
+                          </div>
 
                           @* <!-- LEFT COLUMN --> *@
                           <div class="col-md-6">

@@ -33,6 +33,8 @@ namespace ProjectManagement.Models
         
         public int? ProjectTypeID { get; set; }
 
+        public int? ProjectKPI { get; set; }
+
         /* Ref Nav Properties */
         [ForeignKey("ProjectStatusID")]
         public virtual Status Status { get; set; }

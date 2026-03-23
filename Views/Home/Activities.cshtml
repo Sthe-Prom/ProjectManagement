@@ -1228,6 +1228,9 @@
                       on proj.ProjectStatusID equals stat.Id
                       join p_type in Model.ProjectTypes 
                       on proj.ProjectTypeID equals p_type.Id
+                       join kpi in Model.KPIs
+                      on proj.ProjectKPI equals kpi.Id into gj
+                      from kpi in gj.DefaultIfEmpty()
                       //where acc.Id == userId ||
                                         //acc.AccountID == proj.SelectedAssignedUserIds[0]
                       //where project_lists.Contains(proj.Id)
@@ -1249,7 +1252,9 @@
                       CalculatedDisplayStatusId = proj.CalculatedDisplayStatusId,
                       FirstName = acc.FirstName,
                       ProjectTypeID = p_type.Id,
-                      TypeName = p_type.TypeName
+                      TypeName = p_type.TypeName,
+                      ProjectKPI = proj.ProjectKPI,
+                      KPIName = kpi.KPIName
 
                     };         
 
@@ -1367,7 +1372,7 @@
                                                   url = Url.Action( "Activities", 
                                                           new {Staff = account.AccountID, Project = projectId.ProjectID, StartDate = StartDateStaff, EndDateStaff = EndDateStaff })   ;  
                                                   
-                                                  @:  <option value="@url" @selected>@account.FirstName @projectId.ProjectID  </option>                                  
+                                                  @:  <option value="@url" @selected>@account.FirstName </option>                                  
                                               
                                               }
                                               else
@@ -1376,7 +1381,7 @@
                                                   url = Url.Action( "Activities", 
                                                         new { Staff = account.AccountID, Project = projectId.ProjectID })   ;  
                                                 
-                                                  @:  <option value="@url" @selected>@account.FirstName @projectId.ProjectID   </option>  
+                                                  @:  <option value="@url" @selected>@account.FirstName </option>  
                                               }
                                               else
                                               {
@@ -1449,18 +1454,18 @@
                                             var selected_ = project.ProjectID == (ViewBag.Project) ? "selected" : ""; 
                                             var url = "";    
 
-                                            if(StaffFilter != null)
-                                            {
-                                                url = Url.Action("Activities", new {Staff = StaffFilter, Project = project.ProjectID });
+                                            //if(StaffFilter != null)
+                                            //{
+                                                url = Url.Action("Activities", new {Staff = StaffFilter, Project = project.ProjectID, StartDate = StartDateStatus, EndDate = EndDateStatus });
                                                 @: <option value="@url" @selected_ > @project.ProjectName</option>            
-                                            }
-                                            else
+                                            //}
+                                            @* else
                                             if(StartDateStatus != null && EndDateStatus != null) 
                                             {                                                                             
                                                 url = Url.Action("Activities", new { Project = project.ProjectID, StartDate = StartDateStatus, EndDate = EndDateStatus });
                                                 @: <option value="@url" @selected_ > @project.ProjectName</option>                  
 
-                                            }                                            
+                                            }                                             *@
                                                 
                                         }
 
@@ -1518,20 +1523,20 @@
 
                                     <form method="get" class="d-flex align-items-center">
 
-                                        @if (ProjectDate != null)
-                                        {
+                                        @* @if (ViewBag.Project != null)
+                                        { *@
                                             <input type="hidden" name="Project" class="form-control" value="@Context.Request.Query["Project"]" />
 
-                                            <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                                            <input type="date" id="start_date" placeholder="Start Date" name="StartDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
 
-                                            <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
-                                        }
-                                        else
+                                            <input type="date" id="end_date" placeholder="End Date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
+                                        @* } *@
+                                        @* else
                                         {
-                                            <input type="date" id="start_date" name="StartDate" class="form-control" value="@Context.Request.Query["StartDate"]" />
+                                            <input type="date" id="start_date" name="StartDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
 
-                                            <input type="date" id="end_date" name="EndDate" class="form-control" value="@Context.Request.Query["EndDate"]" />
-                                        }
+                                            <input type="date" id="end_date" name="EndDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
+                                        } *@
 
                                         <button type="submit" class="btn btn-outline-secondary">
                                             <i class="bi bi-funnel-fill"></i>
@@ -1946,7 +1951,14 @@
                                                         @* Project Name *@
                                                         <div class="col-sm-6" >                                                      
                                                             <span class="accordion-button collapsed fw-semibold" data-bs-toggle="collapse" data-bs-target="#flush-collapse_@proj.ProjectID" aria-expanded="true" aria-controls="project-flush-collapse">
-                                                              <span class="fw-bold">@proj.ProjectName @getProjectOwner</span>
+                                                              <span class="fw-bold">
+                                                                    @if(proj?.ProjectKPI != null && proj.ProjectKPI != 26)
+                                                                    {
+                                                                      var kpi = Model.KPIs.FirstOrDefault(x => x.Id == proj.ProjectKPI);
+                                                                      <i class="bi bi-stars fs-5" style="color: #FFD700;" data-bs-toggle="tooltip" data-bs-placement="top" title="@kpi.KPIName" aria-label="KPI-linked project"></i>
+                                                                    }
+                                                                  @proj.ProjectName @getProjectOwner
+                                                                </span>
                                                             </span>
                                                         </div>
 
@@ -2240,6 +2252,7 @@
                                                                           @* <!-- Content pane --> *@
                                                                           <div class="border border-1 border-success-subtle rounded-end ps-4 pe-4 w-100">
                                                                             <div class="form-group">
+
                                                                               <label asp-for="@Model.ProjectType.Id" class="col-form-label fw-bold d-flex align-items-center gap-2">
                                                                                 <i class="bi bi-check2-circle text-success"></i>
                                                                                 Ad hoc / Long-term Project 
@@ -2249,15 +2262,12 @@
                                                                                       asp-for="@proj.ProjectTypeID"
                                                                                       asp-items="Model.ProjectTypeList"
                                                                                       required>
-
-                                                                                @if(proj.ProjectTypeID != null)
-                                                                                {
-                                                                                  <option value="" selected>@proj.TypeName</option>
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                  <option value="" selected>Select Project Type</option>
-                                                                                }
+                                                                                                                                                                
+                                                                                      @* @if(proj.ProjectTypeID != null)
+                                                                                      {
+                                                                                        <option value="" selected></option>
+                                                                                      }                 *@                
+                                                                                     <option value="" selected>Select Project Type</option>                                                
 
                                                                               </select>
 
@@ -2604,26 +2614,67 @@
                                                         @* Attachments *@
                                                         @if(!String.IsNullOrEmpty(act.ProjectFiles) && act.ProjectFiles.Contains('.'))
                                                         {
-                                                        <li class="">
-                                                            @{
-                                                                string fileName = act.ProjectFiles.Length >= 3 ? act.ProjectFiles.Substring(4) : act.ProjectFiles;
-                                                             }
-                                                            <a href="~/Attachments/Activity/@act.ProjectFiles" data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName" class="clip" download>
-                                                                <i class="bi bi-paperclip fs-5"></i>
-                                                            </a>
-                                                        </li>
+                                                          string fileName = act.ProjectFiles.Length >= 3 ? act.ProjectFiles.Substring(4) : act.ProjectFiles;
+
+                                                          <li class="file-item" data-filename="@act.ProjectFiles"  data-bs-toggle="tooltip" data-bs-placement="top" title="@fileName" >
+                                                            
+                                                              <a href="~/Attachments/Activity/@act.ProjectFiles" class="clip" download>
+                                                                  <i class="bi fs-6"></i>
+                                                              </a>
+                                                              
+                                                          </li>
                                                         }
                                                         else
                                                         {
-                                                        <li class="" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this project.">
+                                                        <li class="file-item" data-filename="@act.ProjectFiles" data-bs-toggle="tooltip" data-bs-placement="top" title="No attachments for this Activity.">
                                                             <a class="" aria-disabled="true" disabled>
-                                                                <i class="bi bi-paperclip fs-5"></i>
+                                                                <i class="bi fs-6" style="color:lightgray"></i>
                                                             </a>
                                                         </li>
                                                         }
 
 
                                                     </ul>
+
+                                                    <script>
+
+                                                        (function () {
+                                                          const map = {
+                                                            image: [".jpg",".jpeg",".png",".gif",".bmp",".tiff",".webp"],
+                                                            word: [".doc",".docx"],
+                                                            pdf: [".pdf"],
+                                                            excel: [".xls",".xlsx",".csv"],
+                                                            ppt: [".ppt",".pptx"],
+                                                            zip: [".zip",".rar",".7z"],
+                                                            text: [".txt",".md"],
+                                                            play: [".mp4",".mov",".avi",".mkv"],
+                                                            music: [".mp3",".wav",".flac"]
+                                                          };
+
+                                                          const getIcon = (ext) => {
+                                                            ext = (ext || "").toLowerCase();
+                                                            if (map.image.includes(ext)) return "bi-file-earmark-image";
+                                                            if (map.word.includes(ext)) return "bi-file-earmark-word";
+                                                            if (map.pdf.includes(ext)) return "bi-file-earmark-pdf";
+                                                            if (map.excel.includes(ext)) return "bi-file-earmark-excel";
+                                                            if (map.ppt.includes(ext)) return "bi-file-earmark-ppt";
+                                                            if (map.zip.includes(ext)) return "bi-file-earmark-zip";
+                                                            if (map.text.includes(ext)) return "bi-file-earmark-text";
+                                                            if (map.play.includes(ext)) return "bi-file-earmark-play";
+                                                            if (map.music.includes(ext)) return "bi-file-earmark-music";
+                                                            return "bi-file-earmark";
+                                                          };
+
+                                                          document.querySelectorAll(".file-item").forEach(li => {
+                                                            const filename = li.getAttribute("data-filename") || "";
+                                                            const ext = filename.substring(filename.lastIndexOf("."));
+                                                            const i = li.querySelector("i.bi");
+                                                            i.classList.add(getIcon(ext));
+                                                          });
+                                                        })();
+
+                                                    </script>
+
                                                 </td>
 
                                                 @* Actions *@
@@ -2640,15 +2691,15 @@
                                                             @* EDIT *@
                                                             <li class="align-middle" data-bs-toggle="modal" data-bs-target="#btnEditActivity_@act.Id" >
                                                             <span class="safe">
-                                                                <i class="bi bi-pencil-square"></i>
+                                                                <i class="bi bi-pencil-square fs-6"></i>
                                                             </span>
                                                             </li>
 
                                                             @* DELETE *@
                                                             <li id="btnDeleteActivity_@act.Id">
-                                                            <span class="danger">
-                                                                <i class="bi bi-trash3"></i>
-                                                            </span>
+                                                              <span class="danger">
+                                                                  <i class="bi bi-trash3 fs-6"></i>
+                                                              </span>
                                                             </li>
 
                                                         </ul>
@@ -2661,14 +2712,14 @@
                                                         @* EDIT *@
                                                         <li class="align-middle" data-bs-toggle="modal" data-bs-target="#btnEditActivity_@act.Id" >
                                                             <span class="safe">
-                                                                <i class="bi bi-pencil-square"></i>
+                                                                <i class="bi bi-pencil-square fs-6"></i>
                                                             </span>
                                                         </li>
 
                                                         @* DELETE *@
                                                         <li id="btnDeleteActivity_@act.Id">
                                                             <span class="danger">
-                                                                <i class="bi bi-trash3"></i>
+                                                                <i class="bi bi-trash3 fs-6"></i>
                                                             </span>
                                                         </li>
 
@@ -2880,15 +2931,22 @@
 
                                                               @* Dates *@
                                                               <div class="col-sm-12 mb-1 d-flex justify-content-center">
-                                                                <div class="flex-grow-1">
-                                                                    <label class="col-form-label fw-bold">Start Date: <span class="text-danger">*</span></label>
-                                                                    <input type="date" asp-for="@Model.ActivityModel.ActivityStartDate" class="form-control"  />
-                                                                </div>
 
-                                                                <div class="flex-grow-1">
-                                                                    <label class="col-form-label fw-bold align-right">End Date: <span class="text-danger">*</span></label>
-                                                                    <input type="date" asp-for="@Model.ActivityModel.ActivityEndDate" class="form-control"  />
-                                                                </div>
+                                                                  @if(@ViewBag.Project != null)
+                                                                  {
+                                                                    var current_project = Model.Projects.FirstOrDefault(x => x.Id == @ViewBag.Project);
+                                                                    <div class="flex-grow-1">
+                                                                        <label class="col-form-label fw-bold">Start Date: <span class="text-danger">*</span></label>
+                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityStartDate" value="@current_project.ProjectStartDate.ToString("yyyy-MM-dd")" class="form-control"  />
+                                                                    </div>
+
+                                                                    <div class="flex-grow-1">
+                                                                        <label class="col-form-label fw-bold align-right">End Date: <span class="text-danger">*</span></label>
+                                                                        <input type="date" asp-for="@Model.ActivityModel.ActivityEndDate" value="@current_project.ProjectEndDate.ToString("yyyy-MM-dd")" class="form-control"  />
+                                                                    </div>
+
+                                                                  }
+
                                                               </div>
 
                                                         
