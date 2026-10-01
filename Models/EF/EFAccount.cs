@@ -62,10 +62,10 @@ namespace ProjectManagement.Models
 
         }
 
-        public Account DeleteAccount(int AccountID)
+        public Account DeleteAccount(string AccountID)
         {
             Account dbEntry = context.Account
-                .FirstOrDefault(c => c.AccountID == AccountID);
+                .FirstOrDefault(c => c.Id == AccountID);
 
             if (dbEntry != null)
             {

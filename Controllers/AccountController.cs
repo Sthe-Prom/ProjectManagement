@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using ProjectManagement.Models;
 using ProjectManagement.Interfaces;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace ProjectManagement.Controllers;
 
@@ -76,6 +77,21 @@ public class AccountController : Controller
 
     [HttpGet]
     public IActionResult Profile()
+    {
+        ProfileViewModel vm = new ProfileViewModel()
+        {
+            Users = getUsers(),
+            Subdepts = getSubdepts(),
+            Designation = getDesignation(),
+            Accounts = context.Accounts,
+            Account = new Account()
+        };
+
+        return View(vm);
+    }
+
+    [HttpGet]
+    public IActionResult Accounts()
     {
         ProfileViewModel vm = new ProfileViewModel()
         {
@@ -243,6 +259,38 @@ public class AccountController : Controller
     // {       
     //     return await Designation.ToList();
     // }
+
+    [HttpPost]
+    public ActionResult DeleteAccount(string Id)
+    {        
+        //Prepare Json Response
+        JsonViewModel model = new JsonViewModel();
+       
+        if (Id.Length > 0)
+        {            
+            var Account = context.Accounts.Where(c => c.Id == Id).FirstOrDefault();
+
+            model.ResponseCode = 0;
+           // model.ResponseMessage = "Project Deleted successfully";
+            string name = Account.FirstName + " "+ Account.LastName;
+            if(name.Length >= 20)
+            {
+                model.ResponseMessage = JsonConvert.SerializeObject("Account "+ name.Substring(0, 15) + " was Deleted successfully.");
+            }else{
+                model.ResponseMessage = JsonConvert.SerializeObject("Account "+ name + " was Deleted successfully.");
+            }
+
+            Account = context.DeleteAccount(Id);
+           
+        }
+        else
+        {
+            model.ResponseCode = 1;
+            model.ResponseMessage = "Error deleting Account. No Id Found.";
+        }
+
+        return Json(model);
+    }
   
 }
 

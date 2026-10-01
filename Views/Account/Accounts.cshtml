@@ -1,10 +1,13 @@
-@model UserAdminViewModel
+@model ProfileViewModel
 @inject SignInManager<User> signInManager;
 @inject UserManager<User> userManager;
 
 @{
-    ViewData["Title"] = "Manage Users";
+    ViewData["Title"] = "Manage Accounts";
     Layout = "_Layout";
+
+     var userId = userManager.GetUserId(User);
+    User user = await userManager.FindByIdAsync(userId);
 }
 
 
@@ -17,7 +20,7 @@
                     <div class="d-flex flex-row justify-content-between">  
                         
                             <div class="col-auto">
-                                <h5 class="card-title mb-0">Managing Users</h5>
+                                <h5 class="card-title mb-0">Managing Accounts</h5>
                             </div>
                             <div class="col-auto">
                                 <a href="~/RoleAdmin/Index" class="text-right btn btn-outline-info">Manage Roles</a>                         
@@ -44,9 +47,9 @@
                                         <th class="text-danger text-center">Action</th>
                                     </tr>
 
-                                    @foreach (User user in Model.Users)
+                                    @foreach (var acc in Model.Accounts)
                                     {
-                                        if((Model.Users.Count() == 0) && (signInManager.IsSignedIn(User)))
+                                        if(Model.Accounts.Count() == 0)
                                         {
                                             <tr><td colspan="3" class="text-center">No User Accounts</td></tr>
                                         }
@@ -56,11 +59,11 @@
                                             {
                                                 <tr>
                                                 @* <td>@user.Id</td> *@
-                                                <td>@user.UserName</td>
-                                                <td>@user.Email</td>
+                                                <td>@acc.FirstName @acc.LastName</td>
+                                                <td>@acc.Email</td>
                                                 @*<td>@User.Identity.Name</td>*@
                                                 <td class="align-middle text-center">
-                                                    <form asp-action="Delete" asp-route-id="@user.Id" method="post" id="@user.Id">
+                                                    <form asp-action="DeleteAccount" asp-route-id="@acc.Id" method="post" id="@acc.Id">
                                                         <a asp-action="Edit" asp-route-Id="@user.Id">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
@@ -93,5 +96,35 @@
     </div>
 
 </div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body text-white" id="toast-body">
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function showToast(message, success = true) {
+        let toastEl = document.getElementById("liveToast");
+        let body = document.getElementById("toast-body");
+        let title = document.getElementById("toast-title");
+
+        title.innerText = success ? "Success" : "Error";
+        body.innerText = message;
+
+        toastEl.classList.remove("bg-danger", "bg-success");
+        toastEl.classList.add(success ? "bg-success" : "bg-danger");
+
+        let toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+
+</script>
 
                     

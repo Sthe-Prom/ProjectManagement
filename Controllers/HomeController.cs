@@ -923,6 +923,7 @@ public class HomeController : Controller
             Project.ProjectStatusID = Convert.ToInt32(formCollection["proj_ProjectStatusID"]);
             Project.ProjectTypeID = Convert.ToInt32(formCollection["proj_ProjectTypeID"]);
             Project.AccountID = Convert.ToInt32(formCollection["proj_AccountID"]);
+            Project.ProjectKPI = Convert.ToInt32(formCollection["proj_ProjectKPI"]);
             Project.SelectedAssignedUserIds = updatedUserIds;
         
             try

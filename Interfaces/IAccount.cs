@@ -12,6 +12,6 @@ namespace ProjectManagement.Interfaces
 
         Task SaveAccount(Account Account);
 
-        Account DeleteAccount(int AccountID);
+        Account DeleteAccount(string AccountID);
     }
 }

@@ -96,7 +96,8 @@ function ActivityUpdate(tit,msg) {
     });   
 }
 
-function delUser(){
+
+function delUser(btn) {
     swal({
         title: "Are you sure?",
         text: "Are you sure you want to delete this user?",
@@ -104,20 +105,56 @@ function delUser(){
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "Yes, delete user!",
-        cancelButtonText: "No, cancel!",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    },
-        function (isConfirm) {
-            if (isConfirm) {
-                document.getElementById('frm1').submit();
-                swal("Deleted!", "Selected user deleted.", "success");
-            } else {
-                swal("Cancelled", "user not deleted:)", "error");
-            }
-        });    
-     
+        cancelButtonText: "No, cancel!"
+    }, function (isConfirm) {
+
+        if (!isConfirm) return;
+
+        let form = btn.closest("form");
+        let url = form.action;
+
+        let formData = new FormData(form);
+
+        fetch(url, {
+            method: "POST",
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            showToast(data.responseMessage, data.responseCode === 0);
+        })
+        .catch(err => {
+            showToast("An error occurred.", false);
+        });
+    });
 }
+
+// function delUser(btn){
+//     swal({
+//         title: "Are you sure?",
+//         text: "Are you sure you want to delete this user?",
+//         type: "warning",
+//         showCancelButton: true,
+//         confirmButtonColor: "#DD6B55",
+//         confirmButtonText: "Yes, delete user!",
+//         cancelButtonText: "No, cancel!",
+//         closeOnConfirm: false,
+//         closeOnCancel: false
+//     },
+//         function (isConfirm) {
+//             if (isConfirm) {
+//                 btn.closest('form').submit();
+//                 swal("Deleted!", "Selected user deleted.", "success");
+//             } else {
+//                 swal("Cancelled", "user not deleted:)", "error");
+//             }
+//         });    
+     
+// }
+
+
+
+
 
  //Filter()
         const tableSort = (tableId) => {

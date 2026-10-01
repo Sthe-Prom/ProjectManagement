@@ -485,4 +485,14 @@ $RECYCLE.BIN/
 
 *.json
 *.db
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Local configuration containing secrets
+appsettings.json
+appsettings.Development.json
 wwwroot/Attachments
