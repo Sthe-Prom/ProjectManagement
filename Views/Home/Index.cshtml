@@ -6,8 +6,13 @@
 @{
     ViewData["Title"] = "Projects";
 
+    User? user = null;
+
     var userId = userManager.GetUserId(User);
-    User user = await userManager.FindByIdAsync(userId);
+    if(!string.IsNullOrEmpty(userId))
+    {
+        user = await userManager.FindByIdAsync(userId);
+    }
 }
 
 <style>
@@ -1314,7 +1319,7 @@
       @* <h5 class="text-center" style="color: #0F204B;">​<strong style="position: relative;">Process workflow</strong></h5> *@
       @*<ul id="itgyf" class="list list-unstyled list-inline-item align-items-center text-center" style="align-content: center;"> *@
       <div class="flex-grow-1 ">
-        @if(await userManager.IsInRoleAsync(user,"Admin"))
+        @if(user != null && await userManager.IsInRoleAsync(user,"Admin"))
         {
           <span>          
              <div class="dropdown align-middle">   
