@@ -32,7 +32,7 @@ app.UseCors("AllowSpecificOrigin");
 
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors 'self' https://mir-projects.powerappsportals.com/");
+    context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors 'self' https://mir-projects2.powerappsportals.com/");
     await next();
 });
 

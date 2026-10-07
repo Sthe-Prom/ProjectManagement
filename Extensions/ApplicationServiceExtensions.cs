@@ -20,7 +20,7 @@ namespace ProjectManagement.Extensions
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("https://mir-projects.powerappsportals.com/")
+                    builder => builder.WithOrigins("https://mir-projects2.powerappsportals.com/")
                                     .AllowAnyHeader()
                                     .AllowAnyMethod()
                                     .AllowCredentials());
@@ -66,11 +66,15 @@ namespace ProjectManagement.Extensions
 
             services.ConfigureApplicationCookie(options =>
             {
-                //options.Cookie.SameSite = SameSiteMode.None;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.Cookie.SameSite = SameSiteMode.None;
+                //options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                //options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
+
+            services.Configure<SmtpEmailOptions>(config.GetSection("Smtp"));
+            services.Configure<PasswordResetOptions>(config.GetSection("PasswordReset"));
+            services.AddTransient<IEmailSender, SmtpEmailSender>();
 
             //Application Service Registration
             services.AddTransient<IProject, EFProject>();
